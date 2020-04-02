@@ -73,7 +73,8 @@ with open(FILE_NAME, 'r') as read_obj:
     if(str(csv_list[0][3]) == 'moa'):
         csv_list.pop(0) #Remove header
 
-    train_rows, validation_rows, test_rows = get_randomized_sets(csv_list)
+    classes_to_include = [] #Empty for all classes included
+    train_rows, validation_rows, test_rows = get_randomized_sets(csv_list, classes_to_include=classes_to_include )
     
     for row in train_rows:
         sort_into_class_folders(row, "Train")
