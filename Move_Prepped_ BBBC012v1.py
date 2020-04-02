@@ -14,9 +14,11 @@ IMAGE_NAME ='/bbbc021v1_%s.png' #Where %s is the image number
 def sort_into_class_folders(row):
     if(str(row[3]) == 'moa') :     #Ignore header
         return
+    #Fetch path information
     current_path = IMAGE_DIR + IMAGE_NAME  % str(row[0])
     target_path = DIR + str(row[3])+"/" +str(row[0]) + ".png"
     dir_path = DIR + str(row[3])
+    # make sure the folder exists
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
         print(str(row))
