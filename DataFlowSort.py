@@ -67,9 +67,9 @@ with open(FILE_NAME, 'r') as read_obj:
     for row in csv_reader:
         if(csv_reader.line_num in train_row_numbers):
             sort_into_class_folders(row, "Train")
-        else if(csv_reader.line_num in validation_row_numbers):
+        elif(csv_reader.line_num in validation_row_numbers):
              sort_into_class_folders(row, "Validation")
-        else if(csv_reader.line_num in test_row_numbers):
+        elif(csv_reader.line_num in test_row_numbers):
             sort_into_test_folder(row, "Test")
         else:
             excluded_row_count +=1
