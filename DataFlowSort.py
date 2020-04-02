@@ -6,9 +6,9 @@ import os
 import shutil
 import numpy as np
 
-DIR = '/home/jovyan/TestData'
+DIR = '/home/jovyan/TestData/'
 LABELS_PATH = '/home/jovyan/kensert_CNN/bbbc021_labels.csv'
-IMAGE_DIR= '/home/jovyan/kensert_CNN/kensert_CNN/images_bbbc021'
+IMAGE_DIR= '/home/jovyan/kensert_CNN/images_bbbc021'
 IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
 VALIDATION_SET_SIZE = 0.15 #Percentage written as decimal
 
