@@ -52,25 +52,26 @@ def get_randomized_set_rows(read_obj):
     np.random.shuffle(indices)
     print("Random number at positoin 5: " + str(indices[5]))
 
-    train_rows= indices[:training_set_size]
+    train_row_numbers = indices[:training_set_size]
     validation_rows=indices[training_set_size:training_set_size + validation_set_size]
     test_rows = indices[training_set_size + validation_set_size:]
-    return train_rows, validation_rows,test_rows
+    return train_row_numbers, validation_rows,test_rows
 
 with open(FILE_NAME, 'r') as read_obj:
     # pass the file object to reader() to get the reader object
     csv_reader = csv.reader(read_obj, delimiter=";")
     train_row_numbers, validation_row_numbers,test_row_numbers = get_randomized_set_rows(read_obj)
     
-    train_rows=[row for idx, row in enumerate(csv_reader) if idx in train_row_numbers]
-    validation_rows=[row for idx, row in enumerate(csv_reader) if idx in validation_row_numbers]
-    test_rows=[row for idx, row in enumerate(csv_reader) if idx in test_row_numbers]
+    excluded_row_count = 0
 
-    for row in train_rows:
-        sort_into_class_folders(row, "Train")
-    for row in validation_rows:
-        sort_into_class_folders(row, "Validation")
-    for row in test_rows:
-        sort_into_test_folder(row, "Test")
-
-
+    for row in csv_reader:
+        if(csv_reader.line_num in train_row_numbers):
+            sort_into_class_folders(row, "Train")
+        else if(csv_reader.line_num in validation_row_numbers):
+             sort_into_class_folders(row, "Validation")
+        else if(csv_reader.line_num in test_row_numbers):
+            sort_into_test_folder(row, "Test")
+        else:
+            excluded_row_count +=1
+    
+    print("Number of rows that were excluded: " + str(excluded_row_count))
