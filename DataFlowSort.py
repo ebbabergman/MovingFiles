@@ -6,10 +6,10 @@ import os
 import shutil
 import numpy as np
 
-DIR = '/Users/ebbbe288/Documents/TestData/'
-FILE_NAME = '/Users/ebbbe288/Documents/TestData_bbc021v/bbbc021v1_labels.csv'
-IMAGE_DIR= '/Users/ebbbe288/Documents/TestData_bbc021v/images_bbbc021'
-IMAGE_NAME ='/bbbc021v1_%s.png' #Where %s is the image number
+DIR = '/home/jovyan/TestData'
+LABELS_PATH = '/home/jovyan/kensert_CNN/bbbc021_labels.csv'
+IMAGE_DIR= '/home/jovyan/kensert_CNN/kensert_CNN/images_bbbc021'
+IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
 VALIDATION_SET_SIZE = 0.15 #Percentage written as decimal
 
 ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
@@ -66,7 +66,7 @@ def get_randomized_sets(csv_list, classes_to_include):
 
 print("Starting program")
 
-with open(FILE_NAME, 'r') as read_obj:
+with open(LABELS_PATH, 'r') as read_obj:
     # pass the file object to reader() to get the reader object
     csv_reader = csv.reader(read_obj, delimiter=";")
     csv_list = list(csv_reader)
