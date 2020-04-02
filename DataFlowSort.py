@@ -19,7 +19,7 @@ def sort_into_class_folders(row, category): #Where category is train, validation
         return
     current_path = IMAGE_DIR + IMAGE_NAME  % str(row[0])
    
-    dir_path = DIR + category + str(row[3]) 
+    dir_path = DIR + category +"/" + str(row[3]) 
     target_path = dir_path +"/" +str(row[0]) + ".png"
 
     if not os.path.exists(dir_path):
@@ -72,23 +72,21 @@ def get_randomized_sets(csv_list):
     test_rows = np.array(csv_list) [indices[training_set_size + validation_set_size:]]
     return train_row_numbers, validation_rows,test_rows
 
+print("Starting program")
+
 with open(FILE_NAME, 'r') as read_obj:
     # pass the file object to reader() to get the reader object
     csv_reader = csv.reader(read_obj, delimiter=";")
     csv_list = list(csv_reader)
-    train_row_numbers, validation_row_numbers,test_row_numbers = get_randomized_sets(csv_list)
+    if(str(csv_list[0][3]) == 'moa'):
+        csv_list.pop(0) #Remove header
+    train_rows, validation_rows, test_rows = get_randomized_sets(csv_list)
     
-    excluded_row_count = 0
-    read_obj.seek(0)
-
-    for row in csv_reader:
-        if(csv_reader.line_num in train_row_numbers):
-            sort_into_class_folders(row, "Train")
-        elif(csv_reader.line_num in validation_row_numbers):
-             sort_into_class_folders(row, "Validation")
-        elif(csv_reader.line_num in test_row_numbers):
-            sort_into_test_folder(row, "Test")
-        else:
-            excluded_row_count +=1
+    for row in train_rows:
+        sort_into_class_folders(row, "Train")
+    for row in validation_rows:
+        sort_into_class_folders(row, "Validation")
+    for row in test_rows:
+        sort_into_test_folder(row, "Test")
     
-    print("Number of rows that were excluded: " + str(excluded_row_count))
+print("Finished program")
