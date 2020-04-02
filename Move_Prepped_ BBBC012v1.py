@@ -4,7 +4,7 @@
 import csv
 import os
 
-
+DIR = '/Users/ebbbe288/Documents/TestData/'
 FILE_NAME = '/Users/ebbbe288/Documents/TestData_bbc021v/bbbc021v1_labels.csv'
 # with open(FILE_NAME, newline='') as csvfile:
 #     data = list(csv.reader(csvfile))
@@ -12,7 +12,12 @@ FILE_NAME = '/Users/ebbbe288/Documents/TestData_bbc021v/bbbc021v1_labels.csv'
 
 ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
 def sort_into_class_folders(row):
-     print(str(row))
+    if(str(row[3]) == 'moa') :     #Ignore header
+        return
+    dir_path = DIR + str(row[3])
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+        print(str(row))
 
 
 with open(FILE_NAME, 'r') as read_obj:
