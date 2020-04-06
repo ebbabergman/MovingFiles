@@ -11,6 +11,7 @@ LABELS_PATH = '/home/jovyan/kensert_CNN/bbbc021_labels.csv'
 IMAGE_DIR= '/home/jovyan/kensert_CNN/images_bbbc021'
 IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
 VALIDATION_SET_SIZE = 0.15 #Percentage written as decimal
+INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors' , 'DNA replication'] #Empty for all classes included
 
 ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
 def sort_into_class_folders(row, category): #Where category is train, validation or test
@@ -73,7 +74,7 @@ with open(LABELS_PATH, 'r') as read_obj:
     if(str(csv_list[0][3]) == 'moa'):
         csv_list.pop(0) #Remove header
 
-    classes_to_include = ['Aurora kinase inhibitors', 'Eg5 inhibitors' ] #Empty for all classes included
+    classes_to_include = INCLUDED_CLASSES
     train_rows, validation_rows, test_rows = get_randomized_sets(csv_list, classes_to_include=classes_to_include )
     
     for row in train_rows:
