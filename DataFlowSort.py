@@ -6,12 +6,13 @@ import os
 import shutil
 import numpy as np
 
-DIR = '/home/jovyan/TestData/'
+DIR = '/home/jovyan/TestData_Binary/'
 LABELS_PATH = '/home/jovyan/kensert_CNN/bbbc021_labels.csv'
 IMAGE_DIR= '/home/jovyan/kensert_CNN/images_bbbc021'
 IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
-VALIDATION_SET_SIZE = 0.15 #Percentage written as decimal
-INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors' , 'DNA replication'] #Empty for all classes included
+VALIDATION_SET_SIZE = 0.20 #Percentage written as decimal
+TEST_SET_SIZE = 0.15
+INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors'] #Empty for all classes included
 
 ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
 def sort_into_class_folders(row, category): #Where category is train, validation or test
@@ -55,7 +56,8 @@ def get_randomized_sets(csv_list, classes_to_include):
 
     data_size = len(included_rows )
     validation_set_size = int(data_size * VALIDATION_SET_SIZE + 1)
-    training_set_size = int(data_size - 2* validation_set_size)
+    test_set_size = int(data_size * TEST_SET_SIZE + 1)
+    training_set_size = int(data_size -validation_set_size - test_set_size)
 
     indices = np.arange(data_size)
     np.random.shuffle(indices)
