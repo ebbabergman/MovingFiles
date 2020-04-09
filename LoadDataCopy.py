@@ -20,7 +20,7 @@ def copy_image(row): #Where category is train, validation or test
         return
     current_path = IMAGE_DIR + IMAGE_NAME  % str(row[0])
    
-    dir_path = DIR + category +"/" + str(row[3]) 
+    dir_path = OUTPUT_DIR + "/Images"
     target_path = dir_path +"/" +str(row[0]) + ".png"
 
     if not os.path.exists(dir_path):
@@ -57,9 +57,15 @@ with open(LABELS_PATH, 'r') as read_obj:
     if(str(csv_list[0][3]) == 'moa'):
         csv_list.pop(0) #Remove header
     
-    rows = get_randomized_set(csv_ist)
+    rows = get_randomized_set(csv_list)
+
+    with open(OUTPUT_DIR + "/Labels.csv", 'w', newline = '') as new_labels_file:
+     wr = csv.writer(new_labels_file, quoting=csv.QUOTE_ALL)
+     wr.writerow(rows)
 
     for row in rows:
        copy_image(row)
+
+
     
 print("Finished program")
