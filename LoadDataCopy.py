@@ -63,13 +63,12 @@ with open(LABELS_PATH, 'r') as read_obj:
         os.makedirs(OUTPUT_DIR)
         print("Made the output dir")
 
-    #np.savetxt(OUTPUT_DIR + "/Labels.csv",rows, delimiter=";")
     with open(OUTPUT_DIR + "/Labels.csv", 'w', newline = '') as new_labels_file:
-        wr = csv.writer(new_labels_file, delimiter=";")
-        wr.writerow(rows)
+        wr = csv.writer(new_labels_file, delimiter=",")
+        wr.writerows(rows)
 
-    # for row in rows:
-    #     copy_image(row)
+    for row in rows:
+        copy_image(row)
 
 
     
