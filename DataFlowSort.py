@@ -36,6 +36,7 @@ def sort_into_test_folder(row, category): #Where category is train, validation o
     current_path = IMAGE_DIR + IMAGE_NAME  % str(row[0])
    
     dir_path = DIR + category 
+    dir_path = DIR + category + "/" +category #dataflow needs a subfolder, but test subfolder should not be class
     target_path = dir_path +"/" +str(row[0]) + ".png"
 
     if not os.path.exists(dir_path):
