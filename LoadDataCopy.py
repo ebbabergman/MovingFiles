@@ -54,6 +54,7 @@ with open(LABELS_PATH, 'r') as read_obj:
     # pass the file object to reader() to get the reader object
     csv_reader = csv.reader(read_obj, delimiter=";")
     csv_list = list(csv_reader)
+    header = ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
     if(str(csv_list[0][3]) == 'moa'):
         csv_list.pop(0) #Remove header
     
@@ -65,6 +66,7 @@ with open(LABELS_PATH, 'r') as read_obj:
 
     with open(OUTPUT_DIR + "/Labels.csv", 'w', newline = '') as new_labels_file:
         wr = csv.writer(new_labels_file, delimiter=",")
+        wr.writerow(header)
         wr.writerows(rows)
 
     for row in rows:
