@@ -10,7 +10,7 @@ OUTPUT_DIR = '/home/jovyan/scratch-shared/Ebba/Small_bbbc021'
 LABELS_PATH = '/home/jovyan/kensert_CNN/bbbc021_labels.csv'
 IMAGE_DIR= '/home/jovyan/kensert_CNN/images_bbbc021'
 IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
-OUTPUT_SIZE = 0.5 # Percentage of original total size that should be used
+OUTPUT_SIZE = 0.1 # Percentage of original total size that should be used
 INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors'] #Empty for all classes included, not recommended, this file only copies in that case
 
 ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
