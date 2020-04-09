@@ -59,12 +59,17 @@ with open(LABELS_PATH, 'r') as read_obj:
     
     rows = get_randomized_set(csv_list)
 
-    with open(OUTPUT_DIR + "/Labels.csv", 'w', newline = '') as new_labels_file:
-     wr = csv.writer(new_labels_file, quoting=csv.QUOTE_ALL)
-     wr.writerow(rows)
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+        print("Made the output dir")
 
-    for row in rows:
-       copy_image(row)
+    np.savetxt((OUTPUT_DIR + "/Labels.csv",rows, delimiter=",")
+    # with open(OUTPUT_DIR + "/Labels.csv", 'w', newline = '') as new_labels_file:
+    #     wr = csv.writer(new_labels_file, quoting=csv.QUOTE_ALL)
+    #     wr.writerow(rows)
+
+    # for row in rows:
+    #     copy_image(row)
 
 
     
