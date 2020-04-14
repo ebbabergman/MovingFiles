@@ -57,7 +57,7 @@ def get_randomized_sets(csv_list, classes_to_include):
             if(entry[3] in classes_to_include):
                 included_rows.append(entry)
 
-    data_size = len(included_rows ) * OUTPUT_SIZE
+    data_size = int(len(included_rows ) * OUTPUT_SIZE)
     validation_set_size = int(data_size * VALIDATION_SET_SIZE + 1)
     test_set_size = int(data_size * TEST_SET_SIZE + 1)
     training_set_size = int(data_size -validation_set_size - test_set_size)
