@@ -13,6 +13,8 @@ IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
 VALIDATION_SET_SIZE = 0.20 #Percentage written as decimal
 TEST_SET_SIZE = 0.15
 INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors'] #Empty for all classes included
+OUTPUT_SIZE = 0.1 # Percentage of original total size that should be used
+
 
 ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
 def sort_into_class_folders(row, category): #Where category is train, validation or test
@@ -55,7 +57,7 @@ def get_randomized_sets(csv_list, classes_to_include):
             if(entry[3] in classes_to_include):
                 included_rows.append(entry)
 
-    data_size = len(included_rows )
+    data_size = len(included_rows ) * OUTPUT_SIZE
     validation_set_size = int(data_size * VALIDATION_SET_SIZE + 1)
     test_set_size = int(data_size * TEST_SET_SIZE + 1)
     training_set_size = int(data_size -validation_set_size - test_set_size)
@@ -65,7 +67,7 @@ def get_randomized_sets(csv_list, classes_to_include):
 
     train_row_numbers =np.array(included_rows) [indices[:training_set_size]]
     validation_rows=np.array(included_rows) [indices[training_set_size:training_set_size + validation_set_size]]
-    test_rows = np.array(included_rows) [indices[training_set_size + validation_set_size:]]
+    test_rows = np.array(included_rows) [indices[training_set_size + validation_set_size:training_set_size + validation_set_size + test_set_size]]
     return train_row_numbers, validation_rows,test_rows
 
 print("Starting program")
