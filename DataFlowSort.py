@@ -6,7 +6,7 @@ import os
 import shutil
 import numpy as np
 
-OUTPUT_DIR = '/home/jovyan/TestData_Binary/'
+OUTPUT_DIR = '/home/jovyan/scratch-shared/Ebba/Combined'
 LABELS_PATH = '/home/jovyan/kensert_CNN/bbbc021_labels.csv'
 IMAGE_DIR= '/home/jovyan/kensert_CNN/images_bbbc021'
 IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
@@ -23,7 +23,7 @@ def sort_into_class_folders(row, category): #Where category is train, validation
         return
     current_path = IMAGE_DIR + IMAGE_NAME  % str(row[0])
    
-    dir_path = OUTPUT_DIR + category +"/" + str(row[3]) 
+    dir_path = OUTPUT_DIR+"/"  + category +"/" + str(row[3]) 
     target_path = dir_path +"/" +str(row[0]) + ".png"
 
     if not os.path.exists(dir_path):
@@ -37,8 +37,7 @@ def sort_into_test_folder(row, category): #Where category is train, validation o
         return
     current_path = IMAGE_DIR + IMAGE_NAME  % str(row[0])
    
-    dir_path = OUTPUT_DIR + category 
-    dir_path = OUTPUT_DIR + category + "/" +category #dataflow needs a subfolder, but test subfolder should not be class
+    dir_path = OUTPUT_DIR+"/"  + category + "/" +category #dataflow needs a subfolder, but test subfolder should not be class
     target_path = dir_path +"/" +str(row[0]) + ".png"
 
     if not os.path.exists(dir_path):
