@@ -14,7 +14,7 @@ OUTPUT_SIZE = 0.1 # Percentage of original total size that should be used
 INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors'] #Empty for all classes included, not recommended, this file only copies in that case
 
 ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
-def copy_image(row): #Where category is train, validation or test
+def copy_image(row): 
     if(str(row[3]) == 'moa') :     #Ignore header
         print("reached header!!!!")
         return
