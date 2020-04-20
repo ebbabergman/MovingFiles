@@ -14,13 +14,14 @@ import csv
 import os
 import shutil
 import numpy as np
+import random
 
 LABELS_PATH = '/home/jovyan/kensert_CNN/bbbc021_labels.csv'
-OUTPUT_DIR = '/home/jovyan/scratch-shared/Ebba/Combined'
+OUTPUT_DIR = '/home/jovyan/scratch-shared/Ebba/Leave_One_Out'
 IMAGE_DIR= '/home/jovyan/kensert_CNN/images_bbbc021'
 IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
 VALIDATION_SET_SIZE = 0.20 #Percentage written as decimal
-TEST_SET_SIZE = 0.15
+#TEST_SET_SIZE = 0.15
 INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors'] #Empty for all classes included
 OUTPUT_SIZE = 0.1 # Percentage of original total size that should be used
 
@@ -69,27 +70,39 @@ def sort_into_one_folder(row):
     shutil.copyfile(current_path, target_path)
 
 def get_randomized_sets_leave_one_out(csv_list, classes_to_include):
-    # Choose 3 random sets for training, validation and test
+
+    nested_dict = {}
+    test_rows = []
     included_rows = []
 
-    if(len(classes_to_include)==0):
-        included_rows = csv_list 
-    else:
-        for entry in csv_list:
-            if(entry[3] in classes_to_include):
+
+    for entry in csv_list:
+        moa = entry[3] 
+        compound = entry[1]
+        if(len(classes_to_include)==0 or moa in classes_to_include ):
+            if moa not in nested_dict:
+                nested_dict[moa] = {}
+            nested_dict[moa][compound] = entry 
+
+    for compound_dict in nested_dict.values():
+        leave_out = random.choice(list(compound_dict.keys()))
+        for compound in compound_dict:
+            if (compound[1] == leave_out):
+                test_rows.append(entry)
+            else:
                 included_rows.append(entry)
 
     data_size = int(len(included_rows ) * OUTPUT_SIZE)
     validation_set_size = int(data_size * VALIDATION_SET_SIZE + 1)
-    test_set_size = int(data_size * TEST_SET_SIZE + 1)
-    training_set_size = int(data_size -validation_set_size - test_set_size)
+    #test_set_size = int(data_size * TEST_SET_SIZE + 1)
+    training_set_size = int(data_size -validation_set_size)
 
     indices = np.arange(data_size)
     np.random.shuffle(indices)
 
     train_row_numbers =np.array(included_rows) [indices[:training_set_size]]
     validation_rows=np.array(included_rows) [indices[training_set_size:training_set_size + validation_set_size]]
-    test_rows = np.array(included_rows) [indices[training_set_size + validation_set_size:training_set_size + validation_set_size + test_set_size]]
+    test_rows = np.array(test_rows)
     return train_row_numbers, validation_rows,test_rows
 
 print("Starting program")
