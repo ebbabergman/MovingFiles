@@ -79,19 +79,22 @@ def get_randomized_sets_leave_one_out(csv_list, classes_to_include):
     for entry in csv_list:
         moa = entry[3] 
         compound = entry[1]
-        if(len(classes_to_include)==0 or moa in classes_to_include ):
+        if len(classes_to_include)==0 or moa in classes_to_include :
             if moa not in nested_dict:
                 nested_dict[moa] = {}
-            nested_dict[moa][compound] = entry 
+            if compound not in nested_dict[moa]:
+                nested_dict[moa][compound] = []
+            nested_dict[moa][compound].append(entry)
 
     for compound_dict in nested_dict.values():
         leave_out = random.choice(list(compound_dict.keys()))
         for compound in compound_dict:
-            if (compound[1] == leave_out):
-                test_rows.append(entry)
+            if (compound == leave_out):
+                test_rows = test_rows + compound_dict[compound]
             else:
-                included_rows.append(entry)
+                included_rows = included_rows + compound_dict[compound]
 
+## Tar vi alltid första och inte random? Kolla efter pausen
     data_size = int(len(included_rows ) * OUTPUT_SIZE)
     validation_set_size = int(data_size * VALIDATION_SET_SIZE + 1)
     #test_set_size = int(data_size * TEST_SET_SIZE + 1)
