@@ -23,7 +23,7 @@ IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
 VALIDATION_SET_SIZE = 0.20 #Percentage written as decimal
 #TEST_SET_SIZE = 0.15
 INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors'] #Empty for all classes included
-OUTPUT_SIZE = 0.1 # Percentage of original total size that should be used
+OUTPUT_SIZE = 1 # Percentage of original total size that should be used
 
 
 ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
@@ -94,7 +94,6 @@ def get_randomized_sets_leave_one_out(csv_list, classes_to_include):
             else:
                 included_rows = included_rows + compound_dict[compound]
 
-## Tar vi alltid första och inte random? Kolla efter pausen
     data_size = int(len(included_rows ) * OUTPUT_SIZE)
     validation_set_size = int(data_size * VALIDATION_SET_SIZE + 1)
     #test_set_size = int(data_size * TEST_SET_SIZE + 1)
@@ -121,6 +120,9 @@ with open(LABELS_PATH, 'r') as read_obj:
     classes_to_include = INCLUDED_CLASSES
     train_rows, validation_rows, test_rows = get_randomized_sets_leave_one_out(csv_list, classes_to_include=classes_to_include )
     
+    if os.path.exists(OUTPUT_DIR) and os.path.isdir(OUTPUT_DIR):
+        shutil.rmtree(OUTPUT_DIR)
+
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
         print("Made the output dir")
