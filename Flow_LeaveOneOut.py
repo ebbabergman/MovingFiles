@@ -22,8 +22,9 @@ IMAGE_DIR= '/home/jovyan/kensert_CNN/images_bbbc021'
 IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
 VALIDATION_SET_SIZE = 0.20 #Percentage written as decimal
 #TEST_SET_SIZE = 0.15
-INCLUDED_CLASSES = [] #Empty for all classes included
-#INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included
+#INCLUDED_CLASSES = [] #Empty for all classes included
+INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included
+MOA_TO_LEAVE_OUT = 'Aurora kinase inhibitors'
 OUTPUT_SIZE = 1 # Percentage of original total size that should be used
 
 
@@ -76,6 +77,7 @@ def get_randomized_sets_leave_one_out(csv_list, classes_to_include):
     test_rows = []
     validation_rows = []
     train_rows = []
+    included_rows = []
 
 
     for entry in csv_list:
@@ -88,17 +90,28 @@ def get_randomized_sets_leave_one_out(csv_list, classes_to_include):
                 nested_dict[moa][compound] = []
             nested_dict[moa][compound].append(entry)
 
-    for compound_dict in nested_dict.values():
-        leave_out = random.choice(list(compound_dict.keys()))
+    for moa in nested_dict:
+        compound_dict = nested_dict[moa]
+        if moa == MOA_TO_LEAVE_OUT:
+            leave_out = random.choice(list(compound_dict.keys()))
         for compound in compound_dict:
-            if (compound == leave_out):
+            if (moa == MOA_TO_LEAVE_OUT and compound == leave_out):
                 if True:
                 # if random.random() < 0.5 :
                     test_rows = test_rows + compound_dict[compound]
                 # else: 
-                    validation_rows = validation_rows + compound_dict[compound]
+                    #validation_rows = validation_rows + compound_dict[compound]
             else:
-                train_rows =train_rows + compound_dict[compound]
+                included_rows =included_rows + compound_dict[compound]
+
+    data_size =len(included_rows)
+    validation_set_size = int(data_size * VALIDATION_SET_SIZE + 1)
+    training_set_size = int(data_size -validation_set_size)
+    indices = np.arange(data_size)
+    np.random.shuffle(indices)
+
+    train_rows =np.array(included_rows) [indices[:training_set_size]]
+    validation_rows=np.array(included_rows) [indices[training_set_size:training_set_size + validation_set_size]]
 
     return train_rows, validation_rows,test_rows
 
