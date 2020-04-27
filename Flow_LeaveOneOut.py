@@ -22,9 +22,9 @@ IMAGE_DIR= '/home/jovyan/kensert_CNN/images_bbbc021'
 IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
 VALIDATION_SET_SIZE = 0.20 #Percentage written as decimal
 #TEST_SET_SIZE = 0.15
-#INCLUDED_CLASSES = [] #Empty for all classes included
-INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included
-MOA_TO_LEAVE_OUT = 'Aurora kinase inhibitors'
+INCLUDED_CLASSES = [] #Empty for all classes included
+#INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included
+MOA_TO_LEAVE_OUT = "Actin disruptors"
 OUTPUT_SIZE = 1 # Percentage of original total size that should be used
 
 
@@ -95,7 +95,7 @@ def get_randomized_sets_leave_one_out(csv_list, classes_to_include):
         if moa == MOA_TO_LEAVE_OUT:
             leave_out = random.choice(list(compound_dict.keys()))
         for compound in compound_dict:
-            if (moa == MOA_TO_LEAVE_OUT and compound == leave_out):
+            if moa == MOA_TO_LEAVE_OUT  and compound == leave_out:
                 if True:
                 # if random.random() < 0.5 :
                     test_rows = test_rows + compound_dict[compound]
