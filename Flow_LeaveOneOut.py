@@ -22,9 +22,9 @@ IMAGE_DIR= '/home/jovyan/kensert_CNN/images_bbbc021'
 IMAGE_NAME ='/bbbc021_%s.png' #Where %s is the image number
 VALIDATION_SET_SIZE = 0.20 #Percentage written as decimal
 #TEST_SET_SIZE = 0.15
-#INCLUDED_CLASSES = [] #Empty for all classes included
-INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included
-MOA_TO_LEAVE_OUT = "Eg5 inhibitors"
+INCLUDED_CLASSES = [] #Empty for all classes included
+#INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included
+MOA_TO_LEAVE_OUT = "DNA damage"
 OUTPUT_SIZE = 1 # Percentage of original total size that should be used
 
 
