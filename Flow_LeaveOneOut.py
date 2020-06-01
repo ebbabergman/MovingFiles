@@ -115,7 +115,7 @@ def get_randomized_sets_leave_one_out(csv_list, classes_to_include):
 
     return train_rows, validation_rows,test_rows
 
-print("Starting program")
+print("Starting levave on out")
 
 with open(LABELS_PATH, 'r') as read_obj:
     # pass the file object to reader() to get the reader object
@@ -149,4 +149,4 @@ with open(LABELS_PATH, 'r') as read_obj:
     for row in test_rows:
         sort_into_test_folder(row, "Test")
     
-print("Finished program")
+print("Finished leave one out")

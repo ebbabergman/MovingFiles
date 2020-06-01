@@ -14,7 +14,7 @@ VALIDATION_SET_SIZE = 0.20 #Percentage written as decimal
 TEST_SET_SIZE = 0.15
 #INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors'] #Empty for all classes included
 INCLUDED_CLASSES = [] #Empty for all classes included
-OUTPUT_SIZE = 1 # Percentage of original total size that should be used
+OUTPUT_SIZE = 1 # Percentage of original total size that should be used, written as a decimal 0-1.
 
 
 ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
@@ -84,7 +84,7 @@ def get_randomized_sets(csv_list, classes_to_include):
     test_rows = np.array(included_rows) [indices[training_set_size + validation_set_size:training_set_size + validation_set_size + test_set_size]]
     return train_row_numbers, validation_rows,test_rows
 
-print("Starting program")
+print("Starting moving files program")
 
 with open(LABELS_PATH, 'r') as read_obj:
     # pass the file object to reader() to get the reader object
@@ -115,4 +115,4 @@ with open(LABELS_PATH, 'r') as read_obj:
     for row in test_rows:
         sort_into_test_folder(row, "Test")
     
-print("Finished program")
+print("Finished moving files program")
