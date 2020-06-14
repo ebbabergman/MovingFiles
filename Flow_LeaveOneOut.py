@@ -26,7 +26,7 @@ VALIDATION_SET_SIZE = 0.20 #Percentage written as decimal
 #MOA_TO_LEAVE_OUT = "DNA damage"
 INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included
 MOA_TO_LEAVE_OUT = "DNA replication"
-COMPOUND_TO_LEAVE_OUT = "AZ-A"
+COMPOUND_TO_LEAVE_OUT = "AZ138"
 LEAVE_OUT_MOA = False
 OUTPUT_SIZE = 1 # Percentage of original total size that should be used
 
