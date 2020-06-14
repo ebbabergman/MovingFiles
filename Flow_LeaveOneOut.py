@@ -26,6 +26,8 @@ VALIDATION_SET_SIZE = 0.20 #Percentage written as decimal
 #MOA_TO_LEAVE_OUT = "DNA damage"
 INCLUDED_CLASSES = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included
 MOA_TO_LEAVE_OUT = "DNA replication"
+COMPOUND_TO_LEAVE_OUT = "AZ-A"
+LEAVE_OUT_MOA = False
 OUTPUT_SIZE = 1 # Percentage of original total size that should be used
 
 
@@ -80,7 +82,6 @@ def get_randomized_sets_leave_one_out(csv_list, classes_to_include):
     train_rows = []
     included_rows = []
 
-
     for entry in csv_list:
         moa = entry[3] 
         compound = entry[1]
@@ -91,12 +92,13 @@ def get_randomized_sets_leave_one_out(csv_list, classes_to_include):
                 nested_dict[moa][compound] = []
             nested_dict[moa][compound].append(entry)
 
+    leave_out = COMPOUND_TO_LEAVE_OUT
     for moa in nested_dict:
         compound_dict = nested_dict[moa]
-        if moa == MOA_TO_LEAVE_OUT:
+        if LEAVE_OUT_MOA and moa == MOA_TO_LEAVE_OUT:
             leave_out = random.choice(list(compound_dict.keys()))
         for compound in compound_dict:
-            if moa == MOA_TO_LEAVE_OUT  and compound == leave_out:
+            if compound == leave_out:
                 if True:
                 # if random.random() < 0.5 :
                     test_rows = test_rows + compound_dict[compound]
@@ -115,6 +117,7 @@ def get_randomized_sets_leave_one_out(csv_list, classes_to_include):
     validation_rows=np.array(included_rows) [indices[training_set_size:training_set_size + validation_set_size]]
 
     return train_rows, validation_rows,test_rows
+
 
 print("Starting levave on out")
 
