@@ -184,10 +184,10 @@ class LeaveOneOut:
                 wr.writerows(test_rows)
 
             for row in train_rows:
-                self.sort_into_class_folders(row, "train")
+                self.sort_into_class_folders(row, "Train")
             for row in validation_rows:
-                self.sort_into_class_folders(row, "validation")
+                self.sort_into_class_folders(row, "Validation")
             for row in test_rows:
-                self.sort_into_test_folder(row, "test")
+                self.sort_into_test_folder(row, "Test")
             
-        print("finished leave one out")
+        print("Finished leave one out")
