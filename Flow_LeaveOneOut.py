@@ -176,7 +176,7 @@ class LeaveOneOut:
                 os.makedirs(self.output_dir)
                 print("made the output dir")
 
-            with open(self.output_dir + "/labels.csv", 'w', newline = '') as new_labels_file:
+            with open(self.output_dir + "/Labels.csv", 'w', newline = '') as new_labels_file:
                 wr = csv.writer(new_labels_file, delimiter=",")
                 wr.writerow(header)
                 wr.writerows(train_rows)
