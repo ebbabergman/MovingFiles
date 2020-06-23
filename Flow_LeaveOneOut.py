@@ -61,7 +61,8 @@ class LeaveOneOut:
             self.output_dir = output_dir
             self.image_dir = image_dir
             self.image_name  = image_name
-            self.validation_set_size = included_classes
+            self.validation_set_size = validation_set_size
+            self.included_classes = included_classes
             self.moa_to_leave_out = moa_to_leave_out
             self.compound_to_leave_out = compound_to_leave_out
             self.leave_out_moa = leave_out_moa,
