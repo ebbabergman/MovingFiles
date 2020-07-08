@@ -28,7 +28,7 @@ class LeaveOneOut:
     #moa_to_leave_out = "DNA damage",
     #included_classes = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included,
     moa_to_leave_out = "DNA replication",
-    compound_to_leave_out = "AZ-U",
+    compound_to_leave_out = "cytochalasin B",
     leave_out_moa = False,
     output_size = 1 # Percentage of original total size that should be used,
     ):
@@ -40,8 +40,47 @@ class LeaveOneOut:
         self.included_classes = included_classes
         self.moa_to_leave_out = moa_to_leave_out
         self.compound_to_leave_out = compound_to_leave_out
-        self.leave_out_moa = leave_out_moa,
+        self.leave_out_moa = leave_out_moa
         self.output_size = output_size
+
+    def main(self):
+        print("starting levave on out")
+
+        with open(self.labels_path, 'r') as read_obj:
+            csv_reader = csv.reader(read_obj, delimiter=";")
+            csv_list = list(csv_reader)
+            header = ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
+            if(str(csv_list[0][3]) == 'moa'):
+                csv_list.pop(0) #remove header
+
+            classes_to_include = self.included_classes
+            train_rows, validation_rows, test_rows = self.get_randomized_sets_leave_one_out(csv_list, classes_to_include=classes_to_include )
+            
+            if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
+                shutil.rmtree(self.output_dir)
+
+            if not os.path.exists(self.output_dir):
+                os.makedirs(self.output_dir)
+                print("made the output dir")
+
+            with open(self.output_dir + "/Labels.csv", 'w', newline = '') as new_labels_file:
+                wr = csv.writer(new_labels_file, delimiter=",")
+                wr.writerow(header)
+                wr.writerows(train_rows)
+                wr.writerows(validation_rows)
+                wr.writerows(test_rows)
+
+            for row in train_rows:
+                self.sort_into_class_folders(row, "Train")
+            for row in validation_rows:
+                self.sort_into_class_folders(row, "Validation")
+            for row in test_rows:
+                self.sort_into_test_folder(row, "Test")
+            
+        print("Finished leave one out")
+    
+    def run(self):
+        self.main()
 
     def update_settings(self,
         labels_path = '/home/jovyan/kensert_CNN/bbbc021_labels.csv',
@@ -53,7 +92,7 @@ class LeaveOneOut:
         #moa_to_leave_out = "DNA damage",
         #included_classes = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included,
         moa_to_leave_out = "DNA replication",
-        compound_to_leave_out = "AZ-U",
+        compound_to_leave_out = "cytochalasin B",
         leave_out_moa = False,
         output_size = 1 # Percentage of original total size that should be used,
         ):
@@ -65,7 +104,7 @@ class LeaveOneOut:
             self.included_classes = included_classes
             self.moa_to_leave_out = moa_to_leave_out
             self.compound_to_leave_out = compound_to_leave_out
-            self.leave_out_moa = leave_out_moa,
+            self.leave_out_moa = leave_out_moa
             self.output_size = output_size
 
     ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
@@ -155,39 +194,6 @@ class LeaveOneOut:
 
         return train_rows, validation_rows,test_rows
 
-    def run(self):
-        print("starting levave on out")
-
-        with open(self.labels_path, 'r') as read_obj:
-            # pass the file object to reader() to get the reader object
-            csv_reader = csv.reader(read_obj, delimiter=";")
-            csv_list = list(csv_reader)
-            header = ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
-            if(str(csv_list[0][3]) == 'moa'):
-                csv_list.pop(0) #remove header
-
-            classes_to_include = self.included_classes
-            train_rows, validation_rows, test_rows = self.get_randomized_sets_leave_one_out(csv_list, classes_to_include=classes_to_include )
-            
-            if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
-                shutil.rmtree(self.output_dir)
-
-            if not os.path.exists(self.output_dir):
-                os.makedirs(self.output_dir)
-                print("made the output dir")
-
-            with open(self.output_dir + "/Labels.csv", 'w', newline = '') as new_labels_file:
-                wr = csv.writer(new_labels_file, delimiter=",")
-                wr.writerow(header)
-                wr.writerows(train_rows)
-                wr.writerows(validation_rows)
-                wr.writerows(test_rows)
-
-            for row in train_rows:
-                self.sort_into_class_folders(row, "Train")
-            for row in validation_rows:
-                self.sort_into_class_folders(row, "Validation")
-            for row in test_rows:
-                self.sort_into_test_folder(row, "Test")
-            
-        print("Finished leave one out")
+    
+if __name__ == "__main__":
+    LeaveOneOut().main()
