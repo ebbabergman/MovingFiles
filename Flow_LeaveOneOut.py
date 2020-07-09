@@ -19,19 +19,19 @@ import random
 class LeaveOneOut:
     
     def __init__(self,
-    labels_path = '/home/jovyan/kensert_CNN/bbbc021_labels.csv',
-    output_dir = '/home/jovyan/scratch-shared/Ebba/Leave_One_Out',
-    image_dir= '/home/jovyan/kensert_CNN/images_bbbc021',
-    image_name ='/bbbc021_%s.png', #Where %s is the image number,
-    validation_set_size = 0.20, #Percentage written as decimal,
-    included_classes = [], #Empty for all classes included,
-    #moa_to_leave_out = "DNA damage",
-    #included_classes = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included,
-    moa_to_leave_out = "DNA replication",
-    compound_to_leave_out = "cytochalasin B",
-    leave_out_moa = False,
-    output_size = 1 # Percentage of original total size that should be used,
-    ):
+                labels_path = '/home/jovyan/kensert_CNN/bbbc021_labels.csv',
+                output_dir = '/home/jovyan/scratch-shared/Ebba/Leave_One_Out',
+                image_dir= '/home/jovyan/kensert_CNN/images_bbbc021',
+                image_name ='/bbbc021_%s.png', #Where %s is the image number,
+                validation_set_size = 0.20, #Percentage written as decimal,
+                included_classes = [], #Empty for all classes included,
+                #moa_to_leave_out = "DNA damage",
+                #included_classes = ['Aurora kinase inhibitors', 'Eg5 inhibitors','DNA replication'] #Empty for all classes included,
+                moa_to_leave_out = "",
+                compound_to_leave_out = "cytochalasin B",
+                leave_out_moa = False,
+                output_size = 1 # Percentage of original total size that should be used,
+                ):
         self.labels_path = labels_path
         self.output_dir = output_dir
         self.image_dir = image_dir
