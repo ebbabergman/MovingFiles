@@ -108,7 +108,7 @@ class LeaveOneOut:
             self.output_size = output_size
 
     ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
-    def sort_into_class_folders(self,row, category): #where category is train, validation or test
+    def sort_into_class_folders(self, row, category): #where category is train, validation or test
         if(str(row[3]) == 'moa') :     #ignore header
             print("reached header!!!!")
             return
@@ -122,7 +122,7 @@ class LeaveOneOut:
             print(str(row))
         shutil.copyfile(current_path, target_path)
 
-    def sort_into_test_folder(self,row, category): #where category is train, validation or test
+    def sort_into_test_folder(self, row, category): #where category is train, validation or test
         if(str(row[3]) == 'moa') :     #ignore header
             print("reached header!!!!")
             return
@@ -136,7 +136,7 @@ class LeaveOneOut:
             print(str(row))
         shutil.copyfile(current_path, target_path)
 
-    def sort_into_one_folder(self,row):
+    def sort_into_one_folder(self, row):
         if(str(row[3]) == 'moa') :     #ignore header
             print("reached header!!!!")
             return
@@ -150,7 +150,34 @@ class LeaveOneOut:
             print(str(row))
         shutil.copyfile(current_path, target_path)
 
-    def get_randomized_sets_leave_one_out(self,csv_list, classes_to_include):
+
+    def get_training_validation_rows(self,well_dictionary):
+        well_training_rows = []
+        well_validation_rows = []
+
+        well_keys = np.array(list(well_dictionary.keys()))
+        data_size =len(well_keys)
+
+        validation_set_size = int(data_size * self.validation_set_size)
+        if validation_set_size <= 0 :
+            validation_set_size = 1
+
+        training_set_size = int(data_size -validation_set_size)
+        indices = np.arange(data_size)
+        np.random.shuffle(indices)
+        well_training_keys = well_keys[indices[:training_set_size]]
+        well_validation_keys = well_keys[indices[training_set_size:training_set_size + validation_set_size]]
+
+        for key in well_training_keys:
+            well_training_rows.append(well_dictionary[key])
+        for key in well_validation_keys:
+            well_validation_rows.append(well_dictionary[key])
+        
+        well_training_rows = [item for sublist in well_training_rows for item in sublist]
+        well_validation_rows = [item for sublist in well_validation_rows for item in sublist]
+        return well_training_rows, well_validation_rows
+
+    def get_randomized_sets_leave_one_out(self, csv_list, classes_to_include):
 
         nested_dict = {}
         test_rows = []
@@ -158,7 +185,6 @@ class LeaveOneOut:
         train_rows = []
         included_rows = []
 
-## Well
         for entry in csv_list:
             moa = entry[3] 
             compound = entry[1]
@@ -181,25 +207,15 @@ class LeaveOneOut:
                 if compound == leave_out:
                     test_rows = test_rows +list(compound_dict[compound].values())
                 else:
-                    included_rows =included_rows + list(compound_dict[compound].values())
-
-        
-        data_size =len(included_rows)
-        validation_set_size = int(data_size * self.validation_set_size + 1)
-        training_set_size = int(data_size -validation_set_size)
-        indices = np.arange(data_size)
-        np.random.shuffle(indices)
-
-        train_rows =np.array(included_rows) [indices[:training_set_size]]
-        validation_rows=np.array(included_rows) [indices[training_set_size:training_set_size + validation_set_size]]
+                    new_training_rows, new_validation_rows = self.get_training_validation_rows(compound_dict[compound])
+                    train_rows.append(new_training_rows) 
+                    validation_rows.append(new_validation_rows)
 
         train_rows = [item for sublist in train_rows for item in sublist]
         validation_rows = [item for sublist in validation_rows for item in sublist]
         test_rows = [item for sublist in test_rows for item in sublist]
 
-
         return train_rows, validation_rows,test_rows
 
-    
 if __name__ == "__main__":
     LeaveOneOut().main()
