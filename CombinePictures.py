@@ -9,7 +9,29 @@ PATH_WITH_FILES = "/home/jovyan/Outputs/Old/SmallerBatches"
 image_extensions = ("*CalibrationCurve.png", "*CalibrationCurve.jpg", "*CalibrationCurve.gif")
 output_file = "CalibrationCurves.pdf"
 
+COMPOUNDS_CLASS_DICTIONARY = {
+            "PP-2": "Epithelial",           "AZ-J": "Epithelial",                 "AZ-U": "Epithelial",                                     # Epithelial
+            "colchicine" :  'Microtubule destabilizers',     "vincristine":  'Microtubule destabilizers',          "demecolcine":  'Microtubule destabilizers',   "nocodazole":  'Microtubule destabilizers',              # Microtubule destabilizers
+            "docetaxel":'Microtubule stabilizers',      "taxol":'Microtubule stabilizers',                "epothilone B":'Microtubule stabilizers',                             # Microtubule stabilizers
+            "ALLN":'Protein degradation',           "lactacystin":'Protein degradation',          "MG-132":'Protein degradation',        "proteasome inhibitor I":'Protein degradation',  # Protein degradation
+            "anisomycin":'Protein synthesis',     "emetine":'Protein synthesis',              "cyclohexamide":'Protein synthesis',                            # Protein synthesis
+            "alsterpaullone":'Kinase inhibitors', "bryostatin":'Kinase inhibitors',           "PD-169316":'Kinase inhibitors',                                # Kinase inhibitors
+            "AZ138":'Eg5 inhibitors',          "AZ-C":'Eg5 inhibitors',                                                             # Eg-5 inhibitors
+            "floxuridine":'DNA replication',    "mitoxantrone":'DNA replication',         "methotrexate":'DNA replication',  "camptothecin":'DNA replication',            # DNA-replication
+            "etoposide":'DNA damage',      "chlorambucil":'DNA damage',         "cisplatin":'DNA damage',     "mitomycin C":'DNA damage',             # DNA-damage
+            "simvastatin":'Cholesterol-lowering',    "mevinolin/lovastatin":'Cholesterol-lowering',                                             # Cholesterol-lowering
+            "AZ841":'Aurora kinase inhibitors',          "AZ-A":'Aurora kinase inhibitors',                 "AZ258":'Aurora kinase inhibitors',                                    # Aurora kinase inhibitors
+            "cytochalasin B":'Actin disruptors', "latrunculin B":'Actin disruptors',        "cytochalasin D":'Actin disruptors'                           # Actin disruptor
+
+    
+}
+
+
+
 print("Starting print pictures to pdf program")
+
+
+
 
 # This list will hold the images file names
 images = []
@@ -46,9 +68,10 @@ for image in images:
     
     # Image caption
     start = PATH_WITH_FILES + "/"
-    end = '_'
+    end = '_Conformal'
     compound =  image[image.find(start)+len(start):image.rfind(end)]
-    caption = "Figure " + i + ":  Compound: " +compound+" Moa: " 
+    moa = COMPOUNDS_CLASS_DICTIONARY[compound]
+    caption = "Figure " + str(i) + ":  Compound: " +compound+" Moa: "  + moa
     pdf.cell(3.0, 0.0, image)
     pdf.ln(0.25)
     i+=1
