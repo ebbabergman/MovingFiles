@@ -58,7 +58,6 @@ for image in images:
        
     if i == 1:
         cover = Image.open(image)
-        w,h = cover.size
         # Create instance of FPDF class
         pdf=FPDF('P','in','letter')
         # Add new page. Without this you cannot create the document.
@@ -74,11 +73,7 @@ for image in images:
         pdf.set_font('Arial','',10.0)
  
     pdf.add_page()
-    pdf.image(image,0,0,w,h)
-
-    # # Setting image width to half the page and
-    # # height to 1/4th of the page
-    # pdf.image(image,0,0, w=pdf.w/2.0, h=pdf.h/2.0)
+    pdf.image(image,0,0,  w=pdf.w/1, h=pdf.h/1)
     pdf.ln(0.15)
 
 # Image caption
@@ -87,7 +82,7 @@ for image in images:
     compound =  image[image.find(start)+len(start):image.rfind(end)]
     moa = COMPOUNDS_CLASS_DICTIONARY[compound]
     caption = "Figure " + str(i) + ":  Compound: " +compound+" Moa: "  + moa
-    pdf.cell(3.0, 0.0, image)
+    pdf.cell(3.0, 0.0, caption)
     pdf.ln(0.25)
 
     print("processed %d" % i)
