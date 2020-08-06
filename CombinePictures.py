@@ -8,6 +8,7 @@ import glob
 PATH_WITH_FILES = "/home/jovyan/Outputs/Old/SmallerBatches"
 image_extensions = ("*CalibrationCurve.png", "*CalibrationCurve.jpg", "*CalibrationCurve.gif")
 output_file = "CalibrationCurves.pdf"
+w,h = 0,0
 
 COMPOUNDS_CLASS_DICTIONARY = {
             "PP-2": "Epithelial",           "AZ-J": "Epithelial",                 "AZ-U": "Epithelial",                                     # Epithelial
@@ -26,12 +27,7 @@ COMPOUNDS_CLASS_DICTIONARY = {
     
 }
 
-
-
 print("Starting print pictures to pdf program")
-
-
-
 
 # This list will hold the images file names
 images = []
@@ -41,7 +37,6 @@ images = []
 for extension in image_extensions:
     images.extend(glob.glob(PATH_WITH_FILES + "/" +  extension))
  
-
 # Create instance of FPDF class
 pdf=FPDF('P','in','letter')
 # Add new page. Without this you cannot create the document.
@@ -60,13 +55,33 @@ pdf.set_font('Arial','',10.0)
 # them with their caption one below the other
 i = 1
 for image in images:
+       
+    if i == 1:
+        cover = Image.open(image)
+        w,h = cover.size
+        # Create instance of FPDF class
+        pdf=FPDF('P','in','letter')
+        # Add new page. Without this you cannot create the document.
+        pdf.add_page()
+        # Set font to Arial, 'B'old, 16 pts
+        pdf.set_font('Arial','B',16.0)
+        
+        # Page header
+        pdf.cell(4.0,1.0,'Images in this folder')
+        pdf.ln(0.25)
+        
+        # Smaller font for image captions
+        pdf.set_font('Arial','',10.0)
  
-    # Setting image width to half the page and
-    # height to 1/4th of the page
-    pdf.image(image,0,0, w=pdf.w/2.0, h=pdf.h/2.0)
+    pdf.add_page()
+    pdf.image(image,0,0,w,h)
+
+    # # Setting image width to half the page and
+    # # height to 1/4th of the page
+    # pdf.image(image,0,0, w=pdf.w/2.0, h=pdf.h/2.0)
     pdf.ln(0.15)
-    
-    # Image caption
+
+# Image caption
     start = PATH_WITH_FILES + "/"
     end = '_Conformal'
     compound =  image[image.find(start)+len(start):image.rfind(end)]
@@ -74,7 +89,12 @@ for image in images:
     caption = "Figure " + str(i) + ":  Compound: " +compound+" Moa: "  + moa
     pdf.cell(3.0, 0.0, image)
     pdf.ln(0.25)
+
+    print("processed %d" % i)
     i+=1
+
+    
+    
  
 # output content into a file ('F')
 pdf.output(output_file,'F')
