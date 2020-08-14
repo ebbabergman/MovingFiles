@@ -112,7 +112,6 @@ class LeaveOneOut:
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
 
-    ##Assumes row structure is ['image_number', 'compound', 'concentration', 'moa', 'plate', 'well', 'replicate']
     def sort_into_class_folders(self, row, category): #where category is train, validation or test
         current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
     
