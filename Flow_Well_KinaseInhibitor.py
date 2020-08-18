@@ -26,8 +26,8 @@ class LeaveOneOut:
                 validation_set_size  = 0.20, #Percentage written as decimal,
                 included_classes = [], #Empty for all classes included,
                 class_index = 11,
-                well_index = 2,
-                index_to_leave_out = 5,
+                well_index = 3,
+                index_to_leave_out = 6,
                 image_number_index = 1,
                 name_to_leave_out = "" ,
                 output_size = 1 # Percentage of original total size that should be used,
@@ -149,12 +149,15 @@ class LeaveOneOut:
         shutil.copyfile(current_path, target_path)
 
 
-    def get_training_validation_rows(self,well_dictionary):
+    def get_training_validation_rows(self,compound_dictionary):
         well_training_rows = []
         well_validation_rows = []
 
-        well_keys = np.array(list(well_dictionary.keys()))
+        well_keys = np.array(list(compound_dictionary.keys()))
         data_size =len(well_keys)
+        if(data_size == 1):
+            raise Exception("Note enough data to have both a validation and a training entry. Key: " + str(well_keys))
+
 
         validation_set_size = int(data_size * self.validation_set_size)
         if validation_set_size <= 0 :
@@ -167,9 +170,9 @@ class LeaveOneOut:
         well_validation_keys = well_keys[indices[training_set_size:training_set_size + validation_set_size]]
 
         for key in well_training_keys:
-            well_training_rows.append(well_dictionary[key])
+            well_training_rows.append(compound_dictionary[key])
         for key in well_validation_keys:
-            well_validation_rows.append(well_dictionary[key])
+            well_validation_rows.append(compound_dictionary[key])
         
         well_training_rows = [item for sublist in well_training_rows for item in sublist]
         well_validation_rows = [item for sublist in well_validation_rows for item in sublist]
