@@ -187,21 +187,19 @@ class LeaveOneOut:
             divide_by = entry[self.divide_by_index]
             well = entry[self.well_index]
             if leave_out_entry == leave_out:
-                test_rows.append(entry)
+                test_rows.append([entry])
                 continue
             if len(classes_to_include)==0 or class_for_row in classes_to_include :
-                if class_for_row not in val_train_dict:
-                    val_train_dict[class_for_row] = {}
-                if divide_by not in val_train_dict[class_for_row]:
-                    val_train_dict[class_for_row][divide_by] = {}
-                if well not in val_train_dict[class_for_row][divide_by]:
-                    val_train_dict[class_for_row][divide_by][well] = []
-                val_train_dict[class_for_row][divide_by][well].append(entry)
+                if divide_by not in val_train_dict:
+                    val_train_dict[divide_by] = {}
+                if well not in val_train_dict[divide_by]:
+                    val_train_dict[divide_by][well] = []
+                val_train_dict[divide_by][well].append(entry)
 
-       
-        new_training_rows, new_validation_rows = self.get_training_validation_rows(val_train_dict)
-        train_rows.append(new_training_rows) 
-        validation_rows.append(new_validation_rows)
+        for key in val_train_dict.keys():
+            new_training_rows, new_validation_rows = self.get_training_validation_rows(val_train_dict[key])
+            train_rows.append(new_training_rows) 
+            validation_rows.append(new_validation_rows)
 
         train_rows = [item for sublist in train_rows for item in sublist]
         validation_rows = [item for sublist in validation_rows for item in sublist]
