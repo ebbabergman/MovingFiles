@@ -64,10 +64,9 @@ class GetInfo:
                     used_wells[divide_by] = {}
                 if class_for_row not in division_dict[divide_by]:
                     division_dict[divide_by][class_for_row] = {}
-                    used_wells[divide_by][class_for_row] = {}
+                    used_wells[divide_by][class_for_row] = []
                 if well not in division_dict[divide_by][class_for_row]:
                     division_dict[divide_by][class_for_row][well] = []
-                    used_wells[divide_by][class_for_row][well] = []
                 division_dict[divide_by][class_for_row][well].append(entry)
 
         longest_class = 0
