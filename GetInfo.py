@@ -42,22 +42,7 @@ class GetInfo:
                 os.makedirs(self.output_dir)
                 print("made the output dir")
 
-            with open(self.output_dir + "/Labels.csv", 'w', newline = '') as new_labels_file:
-                wr = csv.writer(new_labels_file, delimiter=",")
-                wr.writerow(header)
-                wr.writerows(train_rows)
-                wr.writerows(validation_rows)
-                wr.writerows(test_rows)
-
-            for row in train_rows:
-                if row != header:
-                    self.sort_into_class_folders(row, "Train")
-            for row in validation_rows:
-                if row != header:
-                    self.sort_into_class_folders(row, "Validation")
-            for row in test_rows:
-                if row != header:
-                    self.sort_into_test_folder(row, "Test")
+        ## Write output 
 
         print("Finished. Find output in: " + self.output_dir)
 
