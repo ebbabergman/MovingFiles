@@ -39,7 +39,7 @@ class LeaveOneOut:
         self.validation_set_size = validation_set_size
         self.included_classes = included_classes
         self.class_index =  class_index 
-        self. well_index =  well_index
+        self.well_index =  well_index
         self.index_to_leave_out =  index_to_leave_out
         self.image_number_index = image_number_index
         self.name_to_leave_out =      name_to_leave_out
