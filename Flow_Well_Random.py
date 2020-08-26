@@ -17,12 +17,12 @@ class LeaveOneOut:
                 image_name ='/%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
                 included_classes = [], #Empty for all classes included,
-                class_index = 11,
+                class_index = 10,
                 well_index = 3,
                 index_to_leave_out = 6,
                 divide_by_index = 5,
                 image_number_index = 1,
-                name_to_leave_out = "" ,
+                name_to_leave_out = ["CBK013405", "CBK288297"] ,
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
@@ -36,7 +36,7 @@ class LeaveOneOut:
         self.index_to_leave_out = index_to_leave_out
         self.divide_by_index =  divide_by_index
         self.image_number_index = image_number_index
-        self.name_to_leave_out =      name_to_leave_out
+        self.name_to_leave_out = name_to_leave_out
         self.output_size = output_size
 
     def main(self):
@@ -105,7 +105,7 @@ class LeaveOneOut:
         self.index_to_leave_out = index_to_leave_out
         self.divide_by_index =  divide_by_index
         self.image_number_index = image_number_index
-        self.name_to_leave_out =      name_to_leave_out
+        self.name_to_leave_out = name_to_leave_out
         self.output_size = output_size
 
     def sort_into_class_folders(self, row, category): #where category is train, validation or test
@@ -186,8 +186,10 @@ class LeaveOneOut:
             leave_out_entry = entry[self.index_to_leave_out]
             divide_by = entry[self.divide_by_index]
             well = entry[self.well_index]
-            if leave_out_entry == leave_out:
+            if leave_out_entry in leave_out:
                 test_rows.append([entry])
+                continue
+            if class_for_row == '':
                 continue
             if len(classes_to_include)==0 or class_for_row in classes_to_include :
                 if divide_by not in val_train_dict:
