@@ -27,13 +27,14 @@ class GetInfo:
 
     def main(self):
         print("start get info")
+        entries_list = []
 
         with open(self.labels_path, 'r') as read_obj:
             csv_reader = csv.reader(read_obj, delimiter=";")
             csv_list = list(csv_reader)
             header = csv_list.pop(0) #remove header
 
-            divisions_dict = self.get_divisions(csv_list)
+            entries_list = self.get_divisions(csv_list)
             
             if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
                 shutil.rmtree(self.output_dir)
@@ -43,7 +44,10 @@ class GetInfo:
                 print("made the output dir")
 
         ## Write output 
-
+        file_object = open(self.output_dir + "/classes.txt", "w+")
+        for entry in entries_list:
+            file_object.writelines(entry) 
+            
         print("Finished. Find output in: " + self.output_dir)
 
     def get_divisions(self, csv_list):
@@ -82,11 +86,11 @@ class GetInfo:
                 for class_key in division_dict[division].keys():
                     wells_for_class = division_dict[division][class_key]
                     used_wells_for_class = used_wells[division][class_key]
-                    if wells_for_class.size() == used_wells_for_class.size():
+                    if len(wells_for_class) == len(used_wells_for_class):
                         used_wells_for_class = []
-                    available_wells = wells_for_class - used_wells_for_class
+                    available_wells = [w for w in division_dict[division][class_key].keys() if w not in used_wells_for_class] 
                     well = random.choice(available_wells)
-                    wells_to_run[iteration].append(well)
+                    wells_to_run[iteration].append(str(well))
                     used_wells_for_class.append(well)
                     used_wells[division][class_key] = used_wells_for_class
             iteration += 1
