@@ -217,17 +217,16 @@ class LeaveOneOut:
         validation_rows = []
         train_rows = []
         included_rows = []
-        leave_out = self.name_to_leave_out
 
-        for divide_by_key in self.division_dict.keys():
-            for class_key in self.division_dict[divide_by_key].keys():
-                wells_for_class = self.division_dict[divide_by_key][class_key]
-                used_wells_for_class = self.used_wells[divide_by_key][class_key]
+        for divide_by_key in self.divisions_dict.keys():
+            for class_key in self.divisions_dict[divide_by_key].keys():
+                wells_for_class = self.divisions_dict[divide_by_key][class_key]
+                used_wells_for_class = self.used_wells_dict[divide_by_key][class_key]
                 if len(wells_for_class) == len(used_wells_for_class):
                     used_wells_for_class = []
-                available_wells = [w for w in self.division_dict[divide_by_key][class_key].keys() if w not in used_wells_for_class] 
+                available_wells = [w for w in self.divisions_dict[divide_by_key][class_key].keys() if w not in used_wells_for_class] 
                 chosen_well = random.choice(available_wells)
-                test_rows.append([self.division_dict[divide_by_key][class_key][chosen_well]])
+                test_rows.append([self.divisions_dict[divide_by_key][class_key][chosen_well]])
                 used_wells_for_class.append(chosen_well)
                 used_wells[divide_by_key][class_key] = used_wells_for_class
 
