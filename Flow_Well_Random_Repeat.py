@@ -108,7 +108,7 @@ class LeaveOneOut:
             if row != self.header:
                 self.sort_into_class_folders(row, "Validation")
         for row in test_rows:
-            if row != header:
+            if row != self.header:
                 self.sort_into_test_folder(row, "Test")
         self.runs += 1
         print("Finished leave one out")
@@ -226,7 +226,7 @@ class LeaveOneOut:
                     used_wells_for_class = []
                 available_wells = [w for w in self.divisions_dict[divide_by_key][class_key].keys() if w not in used_wells_for_class] 
                 chosen_well = random.choice(available_wells)
-                test_rows.append([self.divisions_dict[divide_by_key][class_key][chosen_well]])
+                test_rows.append(self.divisions_dict[divide_by_key][class_key][chosen_well])
                 used_wells_for_class.append(chosen_well)
                 self.used_wells_dict[divide_by_key][class_key] = used_wells_for_class
 
