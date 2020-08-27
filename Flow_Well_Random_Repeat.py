@@ -71,6 +71,9 @@ class LeaveOneOut:
         self.output_size = output_size
         self.runs = runs
     
+    def main(self):
+        self.run()
+
     def run(self):
         print("starting levave on out")
 
@@ -239,5 +242,5 @@ class LeaveOneOut:
 
         return train_rows, validation_rows,test_rows
 
-if __name__ == "__run__":
-    LeaveOneOut().run()
+if __name__ == "__main__":
+    LeaveOneOut().main()
