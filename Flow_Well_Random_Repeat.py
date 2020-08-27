@@ -107,7 +107,7 @@ class LeaveOneOut:
         for row in validation_rows:
             if row != self.header:
                 self.sort_into_class_folders(row, "Validation")
-        for row in self.test_rows:
+        for row in test_rows:
             if row != header:
                 self.sort_into_test_folder(row, "Test")
         self.runs += 1
@@ -228,9 +228,9 @@ class LeaveOneOut:
                 chosen_well = random.choice(available_wells)
                 test_rows.append([self.divisions_dict[divide_by_key][class_key][chosen_well]])
                 used_wells_for_class.append(chosen_well)
-                used_wells[divide_by_key][class_key] = used_wells_for_class
+                self.used_wells_dict[divide_by_key][class_key] = used_wells_for_class
 
-                new_training_rows, new_validation_rows = self.get_training_validation_rows(val_train_dict[divide_by_key][class_key], chosen_well)
+                new_training_rows, new_validation_rows = self.get_training_validation_rows(self.divisions_dict[divide_by_key][class_key], chosen_well)
                 train_rows.append(new_training_rows) 
                 validation_rows.append(new_validation_rows)
                 
