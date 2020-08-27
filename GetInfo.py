@@ -46,8 +46,8 @@ class GetInfo:
         ## Write output 
         file_object = open(self.output_dir + "/classes.txt", "w+")
         for entry in entries_list:
-            file_object.writelines(entry) 
-            
+            file_object.write("\"" + str(entry)+ "\"" +"\n") 
+
         print("Finished. Find output in: " + self.output_dir)
 
     def get_divisions(self, csv_list):
