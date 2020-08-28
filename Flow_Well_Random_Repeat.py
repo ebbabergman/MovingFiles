@@ -192,7 +192,7 @@ class LeaveOneOut:
         well_validation_rows = []
 
         well_keys = np.array(list(compound_dictionary.keys()))
-        available_wells = [w for w in well_keys if w not in ignore_well] 
+        well_keys = [w for w in well_keys if w not in ignore_well] 
         data_size =len(well_keys)
         if(data_size == 1):
             raise Exception("Note enough data to have both a validation and a training entry. Key: " + str(well_keys))
