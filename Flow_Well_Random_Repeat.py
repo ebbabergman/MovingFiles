@@ -41,6 +41,8 @@ class LeaveOneOut:
         self.runs = 0
         self.header = ""
         self.longest_class = 0
+        self.get_labels_info()
+
 
     def update_settings(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
@@ -70,21 +72,22 @@ class LeaveOneOut:
         self.image_number_index = image_number_index
         self.output_size = output_size
         self.runs = runs
+        self.get_labels_info()
     
     def main(self):
         self.run()
 
+    def get_labels_info(self):
+         with open(self.labels_path, 'r') as read_obj:
+            csv_reader = csv.reader(read_obj, delimiter=";")
+            csv_list = list(csv_reader)
+            self.header = csv_list.pop(0) #remove header
+
+            self.set_divisions(csv_list)
+
     def run(self):
         print("starting levave on out")
 
-        if self.runs == 0:
-            with open(self.labels_path, 'r') as read_obj:
-                csv_reader = csv.reader(read_obj, delimiter=";")
-                csv_list = list(csv_reader)
-                self.header = csv_list.pop(0) #remove header
-
-                self.set_divisions(csv_list)
-               
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
 
@@ -145,6 +148,9 @@ class LeaveOneOut:
                     longest_class = len(division_dict[key][class_key])
         self.longest_class = longest_class
 
+    def get_longest_class(self):
+        return self.longest_class
+        
     def sort_into_class_folders(self, row, category): #where category is train, validation or test
         current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
     
