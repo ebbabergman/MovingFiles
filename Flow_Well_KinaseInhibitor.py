@@ -114,7 +114,7 @@ class LeaveOneOut:
         self.image_number_index = image_number_index
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
-        
+
     def sort_into_class_folders(self, row, category): #where category is train, validation or test
         current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
     
@@ -206,6 +206,10 @@ class LeaveOneOut:
         leave_out = self.name_to_leave_out
         for class_for_row in nested_dict:
             compound_dict = nested_dict[class_for_row]
+            if class_for_row == 'control':
+                new_training_rows, new_validation_rows = self.get_training_validation_rows(compound_dict)
+                train_rows.append(new_training_rows) 
+                validation_rows.append(new_validation_rows)
             for leave_out_entry in compound_dict:
                 if leave_out_entry == leave_out:
                     test_rows = test_rows +list(compound_dict[leave_out_entry].values())
