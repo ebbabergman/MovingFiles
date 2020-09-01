@@ -5,12 +5,14 @@ import numpy as np
 import random
 
 class GetInfo:
+    ## TODO get 3 biggest classes
+    ## print information
 
     def __init__(self,
                     labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                     output_dir = '/home/jovyan/scratch-shared/Ebba/Kinase_Leave_One_Out',
-                    classes_to_include = [],
-                    class_index = 11,
+                    index_to_include = [],
+                    class_index = 5,
                     well_index = 3,
                     index_to_leave_out = 6,
                     divide_by_index = 5,
@@ -34,7 +36,7 @@ class GetInfo:
             csv_list = list(csv_reader)
             header = csv_list.pop(0) #remove header
 
-            entries_list = self.get_divisions(csv_list)
+            entries_list = self.get_number(csv_list)
             
             if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
                 shutil.rmtree(self.output_dir)
@@ -49,6 +51,37 @@ class GetInfo:
             file_object.write("\"" + str(entry)+ "\"" +"\n") 
 
         print("Finished. Find output in: " + self.output_dir)
+
+
+    def get_number(self, csv_list):
+
+        division_dict = {}
+        for entry in csv_list:
+            class_for_row = entry[self.class_index] 
+            leave_out_entry = entry[self.index_to_leave_out]
+            divide_by = entry[self.divide_by_index]
+            well = entry[self.well_index]
+            if class_for_row == '':
+                continue
+            if len(self.classes_to_include)==0 or class_for_row in self.classes_to_include :
+                if divide_by not in division_dict:
+                    division_dict[divide_by] = {}
+                if class_for_row not in division_dict[divide_by]:
+                    division_dict[divide_by][class_for_row] = {}
+                if well not in division_dict[divide_by][class_for_row]:
+                    division_dict[divide_by][class_for_row][well] = []
+                division_dict[divide_by][class_for_row][well].append(entry)
+
+        longest_class = 0
+        length_of_classes = {}
+        for key in division_dict.keys():
+            for class_key in division_dict[key]:
+                length_of_classes[class_key] = len(division_dict[key][class_key]
+                if longest_class < len(division_dict[key][class_key]):
+                    longest_class = len(division_dict[key][class_key])        
+
+        return length_of_classes
+
 
     def get_divisions(self, csv_list):
 
