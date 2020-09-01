@@ -178,8 +178,8 @@ class LeaveOneOut:
             well_validation_rows.append(compound_dictionary[key])
         
         if(control):
-            well_training_rows = [ well_training_rows for item in sublist ]
-            well_validation_rows = [ well_validation_rows for item in sublist]
+            well_training_rows = [item for dictionary in well_training_rows for sublist in dictionary.values() for item in sublist]
+            well_validation_rows = [item for dictionary in well_validation_rows for sublist in dictionary.values() for item in sublist]
         else:
             well_training_rows = [item for sublist in well_training_rows for item in sublist]
             well_validation_rows = [item for sublist in well_validation_rows for item in sublist]
