@@ -76,10 +76,10 @@ class GetInfo:
         length_of_classes = {}
         for key in division_dict.keys():
             for class_key in division_dict[key]:
-                length_of_classes[class_key] = len(division_dict[key][class_key]
+                length_of_classes[class_key] = len(division_dict[key][class_key])
                 if longest_class < len(division_dict[key][class_key]):
-                    longest_class = len(division_dict[key][class_key])        
-
+                    longest_class = len(division_dict[key][class_key])    
+    
         return length_of_classes
 
 
