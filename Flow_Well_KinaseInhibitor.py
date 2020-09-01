@@ -152,7 +152,7 @@ class LeaveOneOut:
         shutil.copyfile(current_path, target_path)
 
 
-    def get_training_validation_rows(self,compound_dictionary):
+    def get_training_validation_rows(self,compound_dictionary, control = False):
         well_training_rows = []
         well_validation_rows = []
 
@@ -177,8 +177,12 @@ class LeaveOneOut:
         for key in well_validation_keys:
             well_validation_rows.append(compound_dictionary[key])
         
-        well_training_rows = [item for sublist in well_training_rows for item in sublist]
-        well_validation_rows = [item for sublist in well_validation_rows for item in sublist]
+        if(control):
+            well_training_rows = [item for sublist in well_training_rows ]
+            well_validation_rows = [item for sublist in well_validation_rows]
+        else:
+            well_training_rows = [item for sublist in well_training_rows for item in sublist]
+            well_validation_rows = [item for sublist in well_validation_rows for item in sublist]
         return well_training_rows, well_validation_rows
 
     def get_randomized_sets_leave_one_out(self, csv_list, included_groups):
@@ -207,16 +211,17 @@ class LeaveOneOut:
         for class_for_row in nested_dict:
             compound_dict = nested_dict[class_for_row]
             if class_for_row == 'control':
-                new_training_rows, new_validation_rows = self.get_training_validation_rows(compound_dict)
+                new_training_rows, new_validation_rows = self.get_training_validation_rows(compound_dict, control= True)
                 train_rows.append(new_training_rows) 
                 validation_rows.append(new_validation_rows)
-            for leave_out_entry in compound_dict:
-                if leave_out_entry == leave_out:
-                    test_rows = test_rows +list(compound_dict[leave_out_entry].values())
-                else:
-                    new_training_rows, new_validation_rows = self.get_training_validation_rows(compound_dict[leave_out_entry])
-                    train_rows.append(new_training_rows) 
-                    validation_rows.append(new_validation_rows)
+            else:
+                for leave_out_entry in compound_dict:
+                    if leave_out_entry == leave_out:
+                        test_rows = test_rows +list(compound_dict[leave_out_entry].values())
+                    else:
+                        new_training_rows, new_validation_rows = self.get_training_validation_rows(compound_dict[leave_out_entry])
+                        train_rows.append(new_training_rows) 
+                        validation_rows.append(new_validation_rows)
 
         train_rows = [item for sublist in train_rows for item in sublist]
         validation_rows = [item for sublist in validation_rows for item in sublist]
