@@ -12,7 +12,7 @@ class GetInfo:
                     labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                     output_dir = '/home/jovyan/scratch-shared/Ebba/Kinase_Leave_One_Out',
                     index_to_include = [],
-                    class_index = 5,
+                    class_index = 10,
                     well_index = 3,
                     index_to_leave_out = 6,
                     divide_by_index = 5,
@@ -20,7 +20,7 @@ class GetInfo:
                     ):
         self.labels_path = labels_path
         self.output_dir = output_dir
-        self.classes_to_include = classes_to_include
+        self.classes_to_include = index_to_include
         self.class_index =  class_index 
         self.well_index =  well_index
         self.index_to_leave_out = index_to_leave_out
@@ -80,7 +80,7 @@ class GetInfo:
                 if longest_class < len(division_dict[key][class_key]):
                     longest_class = len(division_dict[key][class_key])    
     
-        return length_of_classes
+        return  sorted(length_of_classes.items(), key=lambda x: x[1], reverse=True)
 
 
     def get_divisions(self, csv_list):
