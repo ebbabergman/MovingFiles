@@ -14,7 +14,7 @@ class GetInfo:
                     include_groups = ['TK','CMGC','AGC'], #Empty for everything included,
                     include_index = 10, 
                     compound_index = 4,
-                    class_index = 10,
+                    class_index = 6,
                     well_index = 3,
                     index_to_leave_out = 6,
                     divide_by_index = 5,
@@ -113,7 +113,7 @@ class GetInfo:
                 if longest_class < len(division_dict[key][class_key]):
                     longest_class = len(division_dict[key][class_key])    
     
-        return  sorted(length_of_classes.items(), key=lambda x: x[1], reverse=True)
+        return length_of_classes.keys()
 
     def get_divisions(self, csv_list):
 
