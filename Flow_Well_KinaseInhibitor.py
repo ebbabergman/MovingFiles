@@ -24,10 +24,11 @@ class LeaveOneOut:
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299',
                 image_name ='/%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
-                included_classes = [], #Empty for all classes included,
+                include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
+                include_index = 11,
                 class_index = 11,
                 well_index = 3,
-                index_to_leave_out = 6,
+                leave_out_index = 6,
                 image_number_index = 1,
                 name_to_leave_out = "" ,
                 output_size = 1 # Percentage of original total size that should be used,
@@ -37,10 +38,11 @@ class LeaveOneOut:
         self.image_dir = image_dir
         self.image_name  = image_name
         self.validation_set_size = validation_set_size
-        self.included_classes = included_classes
+        self.included_groups = include_groups
+        self.include_index = include_index
         self.class_index =  class_index 
         self.well_index =  well_index
-        self.index_to_leave_out =  index_to_leave_out
+        self.leave_out_index =  leave_out_index
         self.image_number_index = image_number_index
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
@@ -53,7 +55,7 @@ class LeaveOneOut:
             csv_list = list(csv_reader)
             header = csv_list.pop(0) #remove header
 
-            classes_to_include = self.included_classes
+            classes_to_include = self.included_groups
             train_rows, validation_rows, test_rows = self.get_randomized_sets_leave_one_out(csv_list, classes_to_include=classes_to_include )
             
             if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
@@ -104,10 +106,10 @@ class LeaveOneOut:
         self.image_dir = image_dir
         self.image_name  = image_name
         self.validation_set_size = validation_set_size
-        self.included_classes = included_classes
+        self.included_groups = included_classes
         self.class_index =  class_index 
         self. well_index =  well_index
-        self.index_to_leave_out =  index_to_leave_out
+        self.leave_out_index =  index_to_leave_out
         self.image_number_index = image_number_index
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
@@ -178,7 +180,7 @@ class LeaveOneOut:
         well_validation_rows = [item for sublist in well_validation_rows for item in sublist]
         return well_training_rows, well_validation_rows
 
-    def get_randomized_sets_leave_one_out(self, csv_list, classes_to_include):
+    def get_randomized_sets_leave_one_out(self, csv_list, included_groups):
 
         nested_dict = {}
         test_rows = []
@@ -188,9 +190,10 @@ class LeaveOneOut:
 
         for entry in csv_list:
             class_for_row = entry[self.class_index] 
-            leave_out_entry = entry[self.index_to_leave_out]
+            leave_out_entry = entry[self.leave_out_index]
+            include_entry = entry[self.include_index]
             well = entry[self.well_index]
-            if len(classes_to_include)==0 or class_for_row in classes_to_include :
+            if len(included_groups)==0 or include_entry in included_groups :
                 if class_for_row not in nested_dict:
                     nested_dict[class_for_row] = {}
                 if leave_out_entry not in nested_dict[class_for_row]:
