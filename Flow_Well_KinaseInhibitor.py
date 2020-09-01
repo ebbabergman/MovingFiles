@@ -28,9 +28,9 @@ class LeaveOneOut:
                 include_index = 10,
                 class_index = 5,
                 well_index = 3,
-                leave_out_index = 10,
+                leave_out_index = 6,
                 image_number_index = 1,
-                name_to_leave_out = "TK" ,
+                name_to_leave_out = "CBK013405" ,
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
@@ -87,7 +87,7 @@ class LeaveOneOut:
         self.main()
 
     def update_settings(self,
-               labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
+                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/scratch-shared/Ebba/Kinase_Leave_One_Out',
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299',
                 image_name ='/%s.png', #Where %s is the image number,
@@ -96,9 +96,9 @@ class LeaveOneOut:
                 include_index = 10,
                 class_index = 5,
                 well_index = 3,
-                leave_out_index = 10,
+                leave_out_index = 6,
                 image_number_index = 1,
-                name_to_leave_out = "TK" ,
+                name_to_leave_out = "CBK013405" ,
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
@@ -114,7 +114,7 @@ class LeaveOneOut:
         self.image_number_index = image_number_index
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
-
+        
     def sort_into_class_folders(self, row, category): #where category is train, validation or test
         current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
     
