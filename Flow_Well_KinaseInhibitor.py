@@ -55,8 +55,7 @@ class LeaveOneOut:
             csv_list = list(csv_reader)
             header = csv_list.pop(0) #remove header
 
-            classes_to_include = self.included_groups
-            train_rows, validation_rows, test_rows = self.get_randomized_sets_leave_one_out(csv_list, classes_to_include=classes_to_include )
+            train_rows, validation_rows, test_rows = self.get_randomized_sets_leave_one_out(csv_list, included_groups=self.included_groups )
             
             if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
                 shutil.rmtree(self.output_dir)
