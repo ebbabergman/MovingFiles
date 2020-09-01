@@ -25,12 +25,12 @@ class LeaveOneOut:
                 image_name ='/%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
-                include_index = 11,
-                class_index = 11,
+                include_index = 10,
+                class_index = 5,
                 well_index = 3,
-                leave_out_index = 6,
+                leave_out_index = 10,
                 image_number_index = 1,
-                name_to_leave_out = "" ,
+                name_to_leave_out = "TK" ,
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
@@ -88,17 +88,18 @@ class LeaveOneOut:
         self.main()
 
     def update_settings(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
+               labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/scratch-shared/Ebba/Kinase_Leave_One_Out',
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299',
                 image_name ='/%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
-                included_classes = [], #Empty for all classes included,
-                class_index = 11,
-                well_index = 2,
-                index_to_leave_out = 5,
+                include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
+                include_index = 10,
+                class_index = 5,
+                well_index = 3,
+                leave_out_index = 10,
                 image_number_index = 1,
-                name_to_leave_out = "" ,
+                name_to_leave_out = "TK" ,
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
@@ -106,10 +107,11 @@ class LeaveOneOut:
         self.image_dir = image_dir
         self.image_name  = image_name
         self.validation_set_size = validation_set_size
-        self.included_groups = included_classes
+        self.included_groups = include_groups
+        self.include_index = include_index
         self.class_index =  class_index 
-        self. well_index =  well_index
-        self.leave_out_index =  index_to_leave_out
+        self.well_index =  well_index
+        self.leave_out_index =  leave_out_index
         self.image_number_index = image_number_index
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
