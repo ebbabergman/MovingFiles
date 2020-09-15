@@ -5,12 +5,11 @@ import numpy as np
 import random
 
 class GetInfo:
-    ## TODO get 3 biggest classes
-    ## print information
-
+    ## TODO bryt ut funktioner
+   
     def __init__(self,
                     labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                    output_dir = '/home/jovyan/scratch-shared/Ebba/Kinase_Leave_One_Out',
+                    output_dir = '/home/jovyan/classes/',
                     include_groups = ['TK','CMGC','AGC'], #Empty for everything included,
                     include_index = 10, 
                     compound_index = 4,
@@ -18,7 +17,8 @@ class GetInfo:
                     well_index = 3,
                     index_to_leave_out = 6,
                     divide_by_index = 5,
-                    loop_wells = 2
+                    loop_wells = 2,
+                    k = 10
                     ):
         self.labels_path = labels_path
         self.output_dir = output_dir
@@ -29,6 +29,7 @@ class GetInfo:
         self.index_to_leave_out = index_to_leave_out
         self.divide_by_index =  divide_by_index
         self.loop_wells = loop_wells
+        self.k = k
 
     def main(self):
         print("start get info")
@@ -39,7 +40,8 @@ class GetInfo:
             csv_list = list(csv_reader)
             header = csv_list.pop(0) #remove header
 
-            entries_list = self.get_compound(csv_list)
+            # entries_list = self.get_compound(csv_list)
+            entries_list = self.get_k_folds(csv_list)
             
             if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
                 shutil.rmtree(self.output_dir)
@@ -160,6 +162,65 @@ class GetInfo:
                     used_wells[division][class_key] = used_wells_for_class
             iteration += 1
         return wells_to_run
+
+def get_k_folds(self, csv_list):
+
+        division_dict = {}
+        used_wells = {}
+
+        for entry in csv_list:
+            class_for_row = entry[self.class_index] 
+            leave_out_entry = entry[self.index_to_leave_out]
+            divide_by = entry[self.divide_by_index]
+            well = entry[self.well_index]
+            if class_for_row == '':
+                continue
+            if len(self.classes_to_include)==0 or class_for_row in self.classes_to_include :
+                if divide_by not in division_dict:
+                    division_dict[divide_by] = {}
+                    used_classes[divide_by] = {}
+                if class_for_row not in division_dict[divide_by]:
+                    division_dict[divide_by][class_for_row] = 0
+                division_dict[divide_by][class_for_row] += 1
+
+
+        longest_class = 0
+        length_of_classes = {}
+        for key in division_dict.keys():
+            for class_key in division_dict[key]:
+                length_of_classes[class_key] = len(division_dict[key][class_key])
+                if longest_class < len(division_dict[key][class_key]):
+                    longest_class = len(division_dict[key][class_key])    
+    
+        ## divide into k-folds
+        ## Randomly assign into k-folds, try to weight classes
+        k_folds = {}
+        number_of_classes = 3
+        ##calculate how many for each class in each fold
+
+        ## randomly assign )and add to k-folds
+        ## TODO
+        for fold in range(self.k):
+            for divide_by_key in self.divisions_dict.keys():
+                for class_key in self.divisions_dict[divide_by_key].keys():
+                    wells_for_class = self.divisions_dict[divide_by_key][class_key]
+                    used_wells_for_class = self.used_wells_dict[divide_by_key][class_key]
+                    if len(wells_for_class) == len(used_wells_for_class):
+                        used_wells_for_class = []
+                    available_wells = [w for w in self.divisions_dict[divide_by_key][class_key].keys() if w not in used_wells_for_class] 
+                    chosen_well = random.choice(available_wells)
+                    test_rows.append(self.divisions_dict[divide_by_key][class_key][chosen_well])
+                    used_wells_for_class.append(chosen_well)
+                    self.used_wells_dict[divide_by_key][class_key] = used_wells_for_class
+
+                    new_training_rows, new_validation_rows = self.get_training_validation_rows(self.divisions_dict[divide_by_key][class_key], chosen_well)
+                    train_rows.append(new_training_rows) 
+                    validation_rows.append(new_validation_rows)
+            k_folds[fold] = 
+        ## 
+
+
+        return k_folds()
 
 if __name__ == "__main__":
     GetInfo().main()
