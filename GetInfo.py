@@ -13,7 +13,7 @@ class GetInfo:
                     include_groups = ['TK','CMGC','AGC'], #Empty for everything included,
                     include_index = 10, 
                     compound_index = 4,
-                    class_index = 6,
+                    class_index = 10,
                     well_index = 6,
                     index_to_leave_out = 6,
                     divide_by_index = 5,
@@ -214,7 +214,7 @@ class GetInfo:
             k_folds[k_fold] = current_fold
             k_fold += 1
 
-        return k_folds
+        return k_folds.values()
 
 if __name__ == "__main__":
     GetInfo().main()
