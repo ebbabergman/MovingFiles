@@ -41,7 +41,7 @@ class GetInfo:
             header = csv_list.pop(0) #remove header
 
             # entries_list = self.get_compound(csv_list)
-            entries_list = self.    (csv_list)
+            entries_list = self.get_k_folds(csv_list)
             
             if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
                 shutil.rmtree(self.output_dir)
