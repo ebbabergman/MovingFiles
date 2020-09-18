@@ -14,7 +14,7 @@ class GetInfo:
                     include_index = 10, 
                     compound_index = 4,
                     class_index = 6,
-                    well_index = 3,
+                    well_index = 6,
                     index_to_leave_out = 6,
                     divide_by_index = 5,
                     loop_wells = 2,
@@ -41,7 +41,7 @@ class GetInfo:
             header = csv_list.pop(0) #remove header
 
             # entries_list = self.get_compound(csv_list)
-            entries_list = self.get_k_folds(csv_list)
+            entries_list = self.    (csv_list)
             
             if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
                 shutil.rmtree(self.output_dir)
@@ -163,26 +163,29 @@ class GetInfo:
             iteration += 1
         return wells_to_run
 
-def get_k_folds(self, csv_list):
-
+    def get_k_folds(self, csv_list):
+        ## possibly well should actually be compound for this script
         division_dict = {}
         used_wells = {}
+        k_folds = {}
 
         for entry in csv_list:
-            class_for_row = entry[self.class_index] 
+            level2 = entry[self.class_index] 
             leave_out_entry = entry[self.index_to_leave_out]
             divide_by = entry[self.divide_by_index]
-            well = entry[self.well_index]
-            if class_for_row == '':
+            level3 = entry[self.well_index]
+            if level2 == '':
                 continue
-            if len(self.classes_to_include)==0 or class_for_row in self.classes_to_include :
+            if len(self.classes_to_include)==0 or level2 in self.classes_to_include :
                 if divide_by not in division_dict:
                     division_dict[divide_by] = {}
-                    used_classes[divide_by] = {}
-                if class_for_row not in division_dict[divide_by]:
-                    division_dict[divide_by][class_for_row] = 0
-                division_dict[divide_by][class_for_row] += 1
-
+                    used_wells[divide_by] = {}
+                if level2 not in division_dict[divide_by]:
+                    division_dict[divide_by][level2] = {}
+                    used_wells[divide_by][level2] = []
+                if level3 not in division_dict[divide_by][level2]:
+                    division_dict[divide_by][level2][level3] = []
+                division_dict[divide_by][level2][level3].append(entry)
 
         longest_class = 0
         length_of_classes = {}
@@ -190,35 +193,26 @@ def get_k_folds(self, csv_list):
             for class_key in division_dict[key]:
                 length_of_classes[class_key] = len(division_dict[key][class_key])
                 if longest_class < len(division_dict[key][class_key]):
-                    longest_class = len(division_dict[key][class_key])    
-    
-        ## divide into k-folds
-        ## Randomly assign into k-folds, try to weight classes
-        k_folds = {}
-        number_of_classes = 3
-        ##calculate how many for each class in each fold
-
-        ## randomly assign )and add to k-folds
-        ## TODO
-        for fold in range(self.k):
-            for divide_by_key in self.divisions_dict.keys():
-                for class_key in self.divisions_dict[divide_by_key].keys():
-                    wells_for_class = self.divisions_dict[divide_by_key][class_key]
-                    used_wells_for_class = self.used_wells_dict[divide_by_key][class_key]
-                    if len(wells_for_class) == len(used_wells_for_class):
-                        used_wells_for_class = []
-                    available_wells = [w for w in self.divisions_dict[divide_by_key][class_key].keys() if w not in used_wells_for_class] 
-                    chosen_well = random.choice(available_wells)
-                    test_rows.append(self.divisions_dict[divide_by_key][class_key][chosen_well])
-                    used_wells_for_class.append(chosen_well)
-                    self.used_wells_dict[divide_by_key][class_key] = used_wells_for_class
-
-                    new_training_rows, new_validation_rows = self.get_training_validation_rows(self.divisions_dict[divide_by_key][class_key], chosen_well)
-                    train_rows.append(new_training_rows) 
-                    validation_rows.append(new_validation_rows)
-            k_folds[fold] = 
-        ## 
-
+                    longest_class = len(division_dict[key][class_key])
+        
+        k_fold = 0 
+        while k_fold < self.k:
+            current_fold = []
+            for division in division_dict.keys(): ## TODO change to only the division we want?
+                for class_key in division_dict[division].keys():
+                    length =  length_of_classes[class_key]
+                    for iteration  in range(1, max(1, int(length/self.k))):
+                        wells_for_class = division_dict[division][class_key]
+                        used_wells_for_class = used_wells[division][class_key]
+                        if len(wells_for_class) == len(used_wells_for_class):
+                            used_wells_for_class = []
+                        available_wells = [w for w in division_dict[division][class_key].keys() if w not in used_wells_for_class] 
+                        level3 = random.choice(available_wells)
+                        current_fold.append(str(level3))
+                        used_wells_for_class.append(level3)
+                        used_wells[division][class_key] = used_wells_for_class
+            k_folds[k_fold] = current_fold
+            k_fold += 1
 
         return k_folds()
 
