@@ -176,7 +176,7 @@ class GetInfo:
             level3 = entry[self.well_index]
             if level2 == '':
                 continue
-            if len(self.classes_to_include)==0 or level2 in self.classes_to_include :
+            if len(self.included_groups)==0 or level2 in self.included_groups :
                 if divide_by not in division_dict:
                     division_dict[divide_by] = {}
                     used_wells[divide_by] = {}
@@ -214,7 +214,7 @@ class GetInfo:
             k_folds[k_fold] = current_fold
             k_fold += 1
 
-        return k_folds()
+        return k_folds
 
 if __name__ == "__main__":
     GetInfo().main()
