@@ -130,7 +130,7 @@ class LeaveOneOut:
         self.image_number_index = image_number_index
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
-        self.k_fold = k_fold
+        self.k_fold = int(k_fold)
         self.k_folds = k_folds
 
 
