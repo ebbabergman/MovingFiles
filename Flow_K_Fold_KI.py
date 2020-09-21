@@ -31,7 +31,7 @@ class LeaveOneOut:
                 leave_out_index = 6,
                 image_number_index = 1,
                 name_to_leave_out = "" ,
-                k_fold = 1,
+                k_fold = "4",
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
@@ -131,7 +131,18 @@ class LeaveOneOut:
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
         self.k_fold = int(k_fold)
-        self.k_folds = k_folds
+        self.k_folds = {1:['CBK293871', 'CBK289742', 'CBK293861', 'CBK288271', 'CBK278067', 'CBK200518C', 'CBK293879', 'CBK288256', 'CBK288268', 'CBK290998', 'CBK293860G', 'CBK288311', 'CBK290756'],
+2:['CBK293884', 'CBK277983', 'CBK290822G', 'CBK293876', 'CBK277987', 'CBK290852', 'CBK200981', 'CBK290815', 'CBK290649', 'CBK288297', 'CBK288310', 'CBK293911', 'CBK290956'],
+3:['CBK277992', 'CBK290253', 'CBK278049G', 'CBK278131', 'CBK277927', 'CBK293904', 'CBK288292', 'CBK290830', 'CBK293875', 'CBK278001', 'CBK289902', 'CBK041209', 'CBK288314'],
+4:['CBK288316', 'CBK290917', 'CBK288321', 'CBK288351C', 'CBK288330G', 'CBK290480', 'CBK277980', 'CBK040864', 'CBK288328', 'CBK290797', 'CBK277959', 'CBK293858C', 'CBK278129'],
+5:['CBK288257', 'CBK293174', 'CBK277991', 'CBK290853', 'CBK040892', 'CBK288327', 'CBK290997C', 'CBK277977', 'CBK293908', 'CBK290859', 'CBK288279C', 'CBK277936', 'CBK290484'],
+6:['CBK290196C', 'CBK293887', 'CBK041242C', 'CBK293852', 'CBK278057', 'CBK288269', 'CBK278013', 'CBK288270', 'CBK290224', 'CBK288350', 'CBK293891', 'CBK293867', 'CBK290561'],
+7:['CBK290987', 'CBK288253C', 'CBK278119G', 'CBK013405', 'CBK290845', 'CBK293859', 'CBK278127', 'CBK277962', 'CBK040896', 'CBK278128G', 'CBK293881', 'CBK288278', 'CBK293865'],
+8:['CBK293863', 'CBK278063', 'CBK289985', 'CBK290589', 'CBK288254', 'CBK290836', 'CBK293163', 'CBK278084', 'CBK293898', 'CBK290823', 'CBK290752', 'CBK290269', 'CBK290585'],
+9:['CBK290869', 'CBK288326C', 'CBK290847', 'CBK278056', 'CBK290995', 'CBK290855', 'CBK288272', 'CBK288321G', 'CBK288323', 'CBK289904', 'CBK041168', 'CBK290022', 'CBK290454C'],
+10:['CBK277968', 'CBK290267', 'CBK278016', 'CBK290877', 'CBK290206', 'CBK290915', 'CBK041143', 'CBK288255', 'CBK289937', 'CBK277922C', 'CBK288335', 'CBK293864', 'CBK201383'],
+}
+
 
 
     def sort_into_class_folders(self, row, category): #where category is train, validation or test
@@ -174,6 +185,7 @@ class LeaveOneOut:
     def get_training_validation_rows(self,compound_dictionary, control = False):
         well_training_rows = []
         well_validation_rows = []
+        well_test_rows = []
 
         well_keys = np.array(list(compound_dictionary.keys()))
         data_size =len(well_keys)
@@ -188,21 +200,31 @@ class LeaveOneOut:
         training_set_size = int(data_size -validation_set_size)
         indices = np.arange(data_size)
         np.random.shuffle(indices)
-        well_training_keys = well_keys[indices[:training_set_size]]
-        well_validation_keys = well_keys[indices[training_set_size:training_set_size + validation_set_size]]
+        well_validation_keys = well_keys[indices[:validation_set_size]]
+        if control: 
+            well_test_keys = well_keys[indices[validation_set_size:2*validation_set_size]]
+            well_training_keys = well_keys[indices[2*validation_set_size:]]
+        else: 
+            well_training_keys = well_keys[indices[validation_set_size:]]
+            well_test_keys = []
 
         for key in well_training_keys:
             well_training_rows.append(compound_dictionary[key])
         for key in well_validation_keys:
             well_validation_rows.append(compound_dictionary[key])
-        
+        for key in well_test_keys:
+            well_test_rows.append(compound_dictionary[key])
+
         if(control):
             well_training_rows = [item for dictionary in well_training_rows for sublist in dictionary.values() for item in sublist]
             well_validation_rows = [item for dictionary in well_validation_rows for sublist in dictionary.values() for item in sublist]
+            well_test_rows = [item for dictionary in well_test_rows for sublist in dictionary.values() for item in sublist]
         else:
             well_training_rows = [item for sublist in well_training_rows for item in sublist]
             well_validation_rows = [item for sublist in well_validation_rows for item in sublist]
-        return well_training_rows, well_validation_rows
+            well_test_rows = [item for sublist in well_test_rows for item in sublist]
+        
+        return well_training_rows, well_validation_rows, well_test_rows
 
     def get_randomized_sets_leave_one_out(self, csv_list, included_groups):
 
@@ -226,19 +248,21 @@ class LeaveOneOut:
                     nested_dict[class_for_row][leave_out_entry][well] = []
                 nested_dict[class_for_row][leave_out_entry][well].append(entry)
 
+        print(self.k_folds.keys())
         leave_out = self.k_folds[self.k_fold]
         for class_for_row in nested_dict:
             compound_dict = nested_dict[class_for_row]
             if class_for_row == 'control':
-                new_training_rows, new_validation_rows = self.get_training_validation_rows(compound_dict, control= True)
+                new_training_rows, new_validation_rows, new_test_rows = self.get_training_validation_rows(compound_dict, control= True)
                 train_rows.append(new_training_rows) 
                 validation_rows.append(new_validation_rows)
+                test_rows.append(new_test_rows)
             else:
                 for leave_out_entry in compound_dict:
                     if leave_out_entry in leave_out:
                         test_rows = test_rows +list(compound_dict[leave_out_entry].values())
                     else:
-                        new_training_rows, new_validation_rows = self.get_training_validation_rows(compound_dict[leave_out_entry])
+                        new_training_rows, new_validation_rows, _ = self.get_training_validation_rows(compound_dict[leave_out_entry])
                         train_rows.append(new_training_rows) 
                         validation_rows.append(new_validation_rows)
 
