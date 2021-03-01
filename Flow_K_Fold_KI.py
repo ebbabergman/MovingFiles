@@ -143,45 +143,6 @@ class LeaveOneOut:
 10:['CBK277968', 'CBK290267', 'CBK278016', 'CBK290877', 'CBK290206', 'CBK290915', 'CBK041143', 'CBK288255', 'CBK289937', 'CBK277922C', 'CBK288335', 'CBK293864', 'CBK201383'],
 }
 
-
-
-    def sort_into_class_folders(self, row, category): #where category is train, validation or test
-        current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
-    
-        dir_path = self.output_dir+"/"  + category +"/" + str(row[self.class_index]) 
-        target_path = dir_path +"/" +str(row[self.image_number_index]) + ".png"
-
-        if(str(row[self.image_number_index]) == ''):
-            return
-
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-            print(str(row))
-        shutil.copyfile(current_path, target_path)
-
-    def sort_into_test_folder(self, row, category): #where category is train, validation or test
-        current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
-    
-        dir_path = self.output_dir+"/"  + category + "/" +category #dataflow needs a subfolder, but test subfolder should not be class
-        target_path = dir_path +"/" +str(row[self.image_number_index]) + ".png"
-
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-            print(str(row))
-        shutil.copyfile(current_path, target_path)
-
-    def sort_into_one_folder(self, row):
-        current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
-    
-        dir_path = self.output_dir + "/images"
-        target_path = dir_path +"/" +str(row[self.image_number_index]) + ".png"
-
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-            print(str(row))
-        shutil.copyfile(current_path, target_path)
-
-
     def get_training_validation_rows(self,compound_dictionary, control = False):
         well_training_rows = []
         well_validation_rows = []
@@ -227,7 +188,6 @@ class LeaveOneOut:
         return well_training_rows, well_validation_rows, well_test_rows
 
     def get_randomized_sets_leave_one_out(self, csv_list, included_groups):
-
         nested_dict = {}
         test_rows = []
         validation_rows = []
@@ -272,5 +232,40 @@ class LeaveOneOut:
 
         return train_rows, validation_rows,test_rows
 
+    def sort_into_class_folders(self, row, category): #where category is train, validation or test
+        current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
+    
+        dir_path = self.output_dir+"/"  + category +"/" + str(row[self.class_index]) 
+        target_path = dir_path +"/" +str(row[self.image_number_index]) + ".png"
+
+        if(str(row[self.image_number_index]) == ''):
+            return
+
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+            print(str(row))
+        shutil.copyfile(current_path, target_path)
+
+    def sort_into_test_folder(self, row, category): #where category is train, validation or test
+        current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
+    
+        dir_path = self.output_dir+"/"  + category + "/" +category #dataflow needs a subfolder, but test subfolder should not be class
+        target_path = dir_path +"/" +str(row[self.image_number_index]) + ".png"
+
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+            print(str(row))
+        shutil.copyfile(current_path, target_path)
+
+    def sort_into_one_folder(self, row):
+        current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
+    
+        dir_path = self.output_dir + "/images"
+        target_path = dir_path +"/" +str(row[self.image_number_index]) + ".png"
+
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+            print(str(row))
+        shutil.copyfile(current_path, target_path)
 if __name__ == "__main__":
     LeaveOneOut().main()
