@@ -34,7 +34,7 @@ class GetInfo:
         self.k = k
 
     def main(self):
-        print("start get info")
+        print("Started get info.")
         entries_list = []
 
         with open(self.labels_path, 'r') as read_obj:
