@@ -108,7 +108,7 @@ class LeaveOneOut:
                 validation_set_size  = 0.20, #Percentage written as decimal,
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_index = 10,
-                class_index = 5,
+                class_index = 10,
                 well_index = 3,
                 leave_out_index = 6,
                 image_number_index = 1,
