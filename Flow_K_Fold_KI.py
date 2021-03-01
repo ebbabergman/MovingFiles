@@ -143,50 +143,6 @@ class LeaveOneOut:
 10:['CBK277968', 'CBK290267', 'CBK278016', 'CBK290877', 'CBK290206', 'CBK290915', 'CBK041143', 'CBK288255', 'CBK289937', 'CBK277922C', 'CBK288335', 'CBK293864', 'CBK201383'],
 }
 
-    def get_training_validation_rows(self,compound_dictionary, control = False):
-        well_training_rows = []
-        well_validation_rows = []
-        well_test_rows = []
-
-        well_keys = np.array(list(compound_dictionary.keys()))
-        data_size =len(well_keys)
-        if(data_size == 1):
-            raise Exception("Note enough data to have both a validation and a training entry. Key: " + str(well_keys))
-
-
-        validation_set_size = int(data_size * self.validation_set_size)
-        if validation_set_size <= 0 :
-            validation_set_size = 1
-
-        training_set_size = int(data_size -validation_set_size)
-        indices = np.arange(data_size)
-        np.random.shuffle(indices)
-        well_validation_keys = well_keys[indices[:validation_set_size]]
-        if control: 
-            well_test_keys = well_keys[indices[validation_set_size:2*validation_set_size]]
-            well_training_keys = well_keys[indices[2*validation_set_size:]]
-        else: 
-            well_training_keys = well_keys[indices[validation_set_size:]]
-            well_test_keys = []
-
-        for key in well_training_keys:
-            well_training_rows.append(compound_dictionary[key])
-        for key in well_validation_keys:
-            well_validation_rows.append(compound_dictionary[key])
-        for key in well_test_keys:
-            well_test_rows.append(compound_dictionary[key])
-
-        if(control):
-            well_training_rows = [item for dictionary in well_training_rows for sublist in dictionary.values() for item in sublist]
-            well_validation_rows = [item for dictionary in well_validation_rows for sublist in dictionary.values() for item in sublist]
-            well_test_rows = [item for dictionary in well_test_rows for sublist in dictionary.values() for item in sublist]
-        else:
-            well_training_rows = [item for sublist in well_training_rows for item in sublist]
-            well_validation_rows = [item for sublist in well_validation_rows for item in sublist]
-            well_test_rows = [item for sublist in well_test_rows for item in sublist]
-        
-        return well_training_rows, well_validation_rows, well_test_rows
-
     def get_randomized_sets_leave_one_out(self, csv_list, included_groups):
         nested_dict = {}
         test_rows = []
@@ -231,6 +187,51 @@ class LeaveOneOut:
         test_rows = [item for sublist in test_rows for item in sublist]
 
         return train_rows, validation_rows,test_rows
+
+    def get_training_validation_rows(self,compound_dictionary, control = False):
+        well_training_rows = []
+        well_validation_rows = []
+        well_test_rows = []
+
+        well_keys = np.array(list(compound_dictionary.keys()))
+        data_size =len(well_keys)
+        if(data_size == 1):
+            raise Exception("Note enough data to have both a validation and a training entry. Key: " + str(well_keys))
+
+
+        validation_set_size = int(data_size * self.validation_set_size)
+        if validation_set_size <= 0 :
+            validation_set_size = 1
+
+        training_set_size = int(data_size -validation_set_size)
+        indices = np.arange(data_size)
+        np.random.shuffle(indices)
+        well_validation_keys = well_keys[indices[:validation_set_size]]
+        if control: 
+            well_test_keys = well_keys[indices[validation_set_size:2*validation_set_size]]
+            well_training_keys = well_keys[indices[2*validation_set_size:]]
+        else: 
+            well_training_keys = well_keys[indices[validation_set_size:]]
+            well_test_keys = []
+
+        for key in well_training_keys:
+            well_training_rows.append(compound_dictionary[key])
+        for key in well_validation_keys:
+            well_validation_rows.append(compound_dictionary[key])
+        for key in well_test_keys:
+            well_test_rows.append(compound_dictionary[key])
+
+        if(control):
+            well_training_rows = [item for dictionary in well_training_rows for sublist in dictionary.values() for item in sublist]
+            well_validation_rows = [item for dictionary in well_validation_rows for sublist in dictionary.values() for item in sublist]
+            well_test_rows = [item for dictionary in well_test_rows for sublist in dictionary.values() for item in sublist]
+        else:
+            well_training_rows = [item for sublist in well_training_rows for item in sublist]
+            well_validation_rows = [item for sublist in well_validation_rows for item in sublist]
+            well_test_rows = [item for sublist in well_test_rows for item in sublist]
+        
+        return well_training_rows, well_validation_rows, well_test_rows
+
 
     def sort_into_class_folders(self, row, category): #where category is train, validation or test
         current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
