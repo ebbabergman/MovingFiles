@@ -10,6 +10,7 @@ class GetInfo:
     def __init__(self,
                     labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                     output_dir = '/home/jovyan/classes/',
+                    output_file_name = "classes2",
                     include_groups = ['TK','CMGC','AGC'], #Empty for everything included,
                     include_index = 10, 
                     compound_index = 4,
@@ -22,6 +23,7 @@ class GetInfo:
                     ):
         self.labels_path = labels_path
         self.output_dir = output_dir
+        self.output_file_name = output_file_name
         self.included_groups = include_groups
         self.include_index = include_index
         self.class_index =  class_index 
@@ -51,7 +53,7 @@ class GetInfo:
                 print("made the output dir")
 
         ## Write output 
-        file_object = open(self.output_dir + "/classes.txt", "w+")
+        file_object = open(self.output_dir + self.output_file_name + ".txt", "w+")
         for entry in entries_list:
             file_object.write("\"" + str(entry)+ "\"" +"\n") 
 
