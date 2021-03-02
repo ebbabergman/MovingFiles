@@ -204,7 +204,7 @@ class LeaveOneOut:
         if not seperate_on_wells:
             for leave_out_entry in compound_dictionary:
                         if leave_out_entry in self.name_to_leave_out:
-                            test_rows = test_rows +list(compound_dictionary[leave_out_entry].values())
+                            well_test_rows = well_test_rows +list(compound_dictionary[leave_out_entry].values())
                             del compound_dictionary[leave_out_entry]
                         
         well_keys = np.array(list(compound_dictionary.keys()))
