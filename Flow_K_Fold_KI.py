@@ -143,7 +143,7 @@ class LeaveOneOut:
 10:['CBK277968', 'CBK290267', 'CBK278016', 'CBK290877', 'CBK290206', 'CBK290915', 'CBK041143', 'CBK288255', 'CBK289937', 'CBK277922C', 'CBK288335', 'CBK293864', 'CBK201383'],
 }
 
-    def get_randomized_sets_leave_one_out(self, csv_list, included_groups):
+    def get_randomized_sets_leave_one_out(self, csv_list, included_groups, seperate_on_wells = True):
         nested_dict = {}
         test_rows = []
         validation_rows = []
@@ -166,21 +166,28 @@ class LeaveOneOut:
 
         print(self.k_folds.keys())
         leave_out = self.k_folds[self.k_fold]
-        for class_for_row in nested_dict:
-            compound_dict = nested_dict[class_for_row]
-            if class_for_row == 'control':
-                new_training_rows, new_validation_rows, new_test_rows = self.get_training_validation_rows(compound_dict, control= True)
+        for class_key in nested_dict:
+            compound_dict = nested_dict[class_key]
+            if class_key == 'control':
+                new_training_rows, new_validation_rows, new_test_rows = self.get_training_validation_rows(compound_dict, seperate_on_wells = False)
                 train_rows.append(new_training_rows) 
                 validation_rows.append(new_validation_rows)
                 test_rows.append(new_test_rows)
             else:
-                for leave_out_entry in compound_dict:
-                    if leave_out_entry in leave_out:
-                        test_rows = test_rows +list(compound_dict[leave_out_entry].values())
-                    else:
-                        new_training_rows, new_validation_rows, _ = self.get_training_validation_rows(compound_dict[leave_out_entry])
-                        train_rows.append(new_training_rows) 
-                        validation_rows.append(new_validation_rows)
+                if(seperate_on_wells):
+                    for leave_out_entry in compound_dict:
+                        if leave_out_entry in leave_out:
+                            test_rows = test_rows +list(compound_dict[leave_out_entry].values())
+                        else:
+                            new_training_rows, new_validation_rows, _ = self.get_training_validation_rows(compound_dict[leave_out_entry],seperate_on_wells = seperate_on_wells)
+                            train_rows.append(new_training_rows) 
+                            validation_rows.append(new_validation_rows)
+                else:
+                    new_training_rows, new_validation_rows, new_test_rows = self.get_training_validation_rows(compound_dict,seperate_on_wells = seperate_on_wells)
+                    train_rows.append(new_training_rows) 
+                    validation_rows.append(new_validation_rows)
+                    test_rows.append(new_test_rows)
+
 
         train_rows = [item for sublist in train_rows for item in sublist]
         validation_rows = [item for sublist in validation_rows for item in sublist]
@@ -188,7 +195,8 @@ class LeaveOneOut:
 
         return train_rows, validation_rows,test_rows
 
-    def get_training_validation_rows(self,compound_dictionary, control = False):
+## TOdo change names from well compound etc.
+    def get_training_validation_rows(self,compound_dictionary, seperate_on_wells = True):
         well_training_rows = []
         well_validation_rows = []
         well_test_rows = []
@@ -198,7 +206,6 @@ class LeaveOneOut:
         if(data_size == 1):
             raise Exception("Note enough data to have both a validation and a training entry. Key: " + str(well_keys))
 
-
         validation_set_size = int(data_size * self.validation_set_size)
         if validation_set_size <= 0 :
             validation_set_size = 1
@@ -206,8 +213,9 @@ class LeaveOneOut:
         training_set_size = int(data_size -validation_set_size)
         indices = np.arange(data_size)
         np.random.shuffle(indices)
+
         well_validation_keys = well_keys[indices[:validation_set_size]]
-        if control: 
+        if not seperate_on_wells: 
             well_test_keys = well_keys[indices[validation_set_size:2*validation_set_size]]
             well_training_keys = well_keys[indices[2*validation_set_size:]]
         else: 
@@ -221,7 +229,7 @@ class LeaveOneOut:
         for key in well_test_keys:
             well_test_rows.append(compound_dictionary[key])
 
-        if(control):
+        if(not seperate_on_wells):
             well_training_rows = [item for dictionary in well_training_rows for sublist in dictionary.values() for item in sublist]
             well_validation_rows = [item for dictionary in well_validation_rows for sublist in dictionary.values() for item in sublist]
             well_test_rows = [item for dictionary in well_test_rows for sublist in dictionary.values() for item in sublist]
