@@ -31,7 +31,7 @@ class LeaveOneOut:
                 leave_out_index = 6,
                 image_number_index = 1,
                 name_to_leave_out = "" ,
-                k_fold = "4",
+                k_fold = "1",
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
@@ -196,17 +196,19 @@ class LeaveOneOut:
         return train_rows, validation_rows,test_rows
 
 ## TOdo change names from well compound etc.
-    def get_training_validation_rows(self,compound_dictionary, control = False, seperate_on_wells = True):
+    def get_training_validation_rows(self,compound_dictionary, control = False, seperate_on_wells = True, k_fold = True):
         well_training_rows = []
         well_validation_rows = []
         well_test_rows = []
 
+        new_compound_dictionary = compound_dictionary.copy()
         if not seperate_on_wells:
             for leave_out_entry in compound_dictionary:
-                        if leave_out_entry in self.name_to_leave_out:
+                        if (k_fold and leave_out_entry in self.k_folds[self.k_fold]) or (not k_fold and leave_out_entry in self.name_to_leave_out):
                             well_test_rows = well_test_rows +list(compound_dictionary[leave_out_entry].values())
-                            del compound_dictionary[leave_out_entry]
-                        
+                            del new_compound_dictionary[leave_out_entry]
+        
+        compound_dictionary = new_compound_dictionary
         well_keys = np.array(list(compound_dictionary.keys()))
         data_size =len(well_keys)
         if(data_size == 1):
