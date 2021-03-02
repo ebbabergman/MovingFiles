@@ -201,6 +201,12 @@ class LeaveOneOut:
         well_validation_rows = []
         well_test_rows = []
 
+        if not seperate_on_wells:
+            for leave_out_entry in compound_dictionary:
+                        if leave_out_entry in self.name_to_leave_out:
+                            test_rows = test_rows +list(compound_dictionary[leave_out_entry].values())
+                            del compound_dictionary[leave_out_entry]
+                        
         well_keys = np.array(list(compound_dictionary.keys()))
         data_size =len(well_keys)
         if(data_size == 1):
@@ -210,14 +216,13 @@ class LeaveOneOut:
         if validation_set_size <= 0 :
             validation_set_size = 1
 
-        training_set_size = int(data_size -validation_set_size)
         indices = np.arange(data_size)
         np.random.shuffle(indices)
 
         well_validation_keys = well_keys[indices[:validation_set_size]]
         if not seperate_on_wells: 
-            well_test_keys = well_keys[indices[validation_set_size:2*validation_set_size]]
-            well_training_keys = well_keys[indices[2*validation_set_size:]]
+            well_teswell_training_keyst_keys = well_keys[indices[validation_set_size:2*validation_set_size]]
+            well_test_keys = well_keys[indices[2*validation_set_size:]]
         else: 
             well_training_keys = well_keys[indices[validation_set_size:]]
             well_test_keys = []
