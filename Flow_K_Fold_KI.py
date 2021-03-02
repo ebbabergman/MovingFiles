@@ -221,7 +221,7 @@ class LeaveOneOut:
 
         well_validation_keys = well_keys[indices[:validation_set_size]]
         if not seperate_on_wells: 
-            well_teswell_training_keyst_keys = well_keys[indices[validation_set_size:2*validation_set_size]]
+            well_training_keys = well_keys[indices[validation_set_size:2*validation_set_size]]
             well_test_keys = well_keys[indices[2*validation_set_size:]]
         else: 
             well_training_keys = well_keys[indices[validation_set_size:]]
