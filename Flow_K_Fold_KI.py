@@ -164,7 +164,7 @@ class LeaveOneOut:
                     nested_dict[class_for_row][leave_out_entry][well] = []
                 nested_dict[class_for_row][leave_out_entry][well].append(entry)
 
-        print(self.k_folds.keys())
+        #print(self.k_folds.keys())
         leave_out = self.k_folds[self.k_fold]
         for class_key in nested_dict:
             compound_dict = nested_dict[class_key]
@@ -172,7 +172,7 @@ class LeaveOneOut:
                 new_training_rows, new_validation_rows, new_test_rows = self.get_training_validation_rows(compound_dict, control= True, seperate_on_wells = seperate_on_wells)
                 train_rows.append(new_training_rows) 
                 validation_rows.append(new_validation_rows)
-                test_rows.append(new_test_rows)
+                test_rows.append(new_test_rows) # check if done on well level
             else:
                 if(seperate_on_wells):
                     for leave_out_entry in compound_dict:
