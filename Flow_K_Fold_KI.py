@@ -169,7 +169,7 @@ class LeaveOneOut:
         for class_key in nested_dict:
             compound_dict = nested_dict[class_key]
             if class_key == 'control':
-                new_training_rows, new_validation_rows, new_test_rows = self.get_training_validation_rows(compound_dict, seperate_on_wells = False)
+                new_training_rows, new_validation_rows, new_test_rows = self.get_training_validation_rows(compound_dict, control= True, seperate_on_wells = seperate_on_wells)
                 train_rows.append(new_training_rows) 
                 validation_rows.append(new_validation_rows)
                 test_rows.append(new_test_rows)
@@ -196,7 +196,7 @@ class LeaveOneOut:
         return train_rows, validation_rows,test_rows
 
 ## TOdo change names from well compound etc.
-    def get_training_validation_rows(self,compound_dictionary, seperate_on_wells = True):
+    def get_training_validation_rows(self,compound_dictionary, control = False, seperate_on_wells = True):
         well_training_rows = []
         well_validation_rows = []
         well_test_rows = []
@@ -220,7 +220,7 @@ class LeaveOneOut:
         np.random.shuffle(indices)
 
         well_validation_keys = well_keys[indices[:validation_set_size]]
-        if not seperate_on_wells: 
+        if control: 
             well_training_keys = well_keys[indices[validation_set_size:2*validation_set_size]]
             well_test_keys = well_keys[indices[2*validation_set_size:]]
         else: 
@@ -234,7 +234,7 @@ class LeaveOneOut:
         for key in well_test_keys:
             well_test_rows.append(compound_dictionary[key])
 
-        if(not seperate_on_wells):
+        if(not seperate_on_wells) or control:
             well_training_rows = [item for dictionary in well_training_rows for sublist in dictionary.values() for item in sublist]
             well_validation_rows = [item for dictionary in well_validation_rows for sublist in dictionary.values() for item in sublist]
             well_test_rows = [item for dictionary in well_test_rows for sublist in dictionary.values() for item in sublist]
