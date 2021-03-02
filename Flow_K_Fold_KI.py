@@ -69,7 +69,7 @@ class LeaveOneOut:
             csv_list = list(csv_reader)
             header = csv_list.pop(0) #remove header
 
-            train_rows, validation_rows, test_rows = self.get_randomized_sets_leave_one_out(csv_list, included_groups=self.included_groups )
+            train_rows, validation_rows, test_rows = self.get_randomized_sets_leave_one_out(csv_list, included_groups=self.included_groups, seperate_on_wells= False )
             
             if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
                 shutil.rmtree(self.output_dir)
