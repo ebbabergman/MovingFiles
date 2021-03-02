@@ -200,16 +200,16 @@ class LeaveOneOut:
         well_training_rows = []
         well_validation_rows = []
         well_test_rows = []
+        well_test_keys = []
 
-        new_compound_dictionary = compound_dictionary.copy()
-        if not seperate_on_wells:
+        if not seperate_on_wells and not control:
             for leave_out_entry in compound_dictionary:
                         if (k_fold and leave_out_entry in self.k_folds[self.k_fold]) or (not k_fold and leave_out_entry in self.name_to_leave_out):
-                            well_test_rows = well_test_rows +list(compound_dictionary[leave_out_entry].values())
-                            del new_compound_dictionary[leave_out_entry]
+                            well_test_keys.append(leave_out_entry)
         
-        compound_dictionary = new_compound_dictionary
         well_keys = np.array(list(compound_dictionary.keys()))
+        well_keys = np.setdiff1d(well_keys, well_test_keys)
+
         data_size =len(well_keys)
         if(data_size == 1):
             raise Exception("Note enough data to have both a validation and a training entry. Key: " + str(well_keys))
@@ -227,7 +227,6 @@ class LeaveOneOut:
             well_test_keys = well_keys[indices[2*validation_set_size:]]
         else: 
             well_training_keys = well_keys[indices[validation_set_size:]]
-            well_test_keys = []
 
         for key in well_training_keys:
             well_training_rows.append(compound_dictionary[key])
