@@ -114,29 +114,34 @@ class LeaveOneOut:
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
         
-        #df_validation = df_used.group.sample(frac = self.validation_set_size)
-        df_validation = df_used.groupby(self.class_column_header).sample(frac=self.validation_set_size) 
-        
-        print(df.size)
-        print(df_used.size)
-        print(df_validation.size)
-        print ("Hello")
+        #df_validation = df_used.group.sample(frac = self.validation_set_size) ##TODO Both lines same results, why ?
+        df_validation = df_used.groupby(self.class_column_header).sample(frac=self.validation_set_size) ##TODO Both lines same results, why ?
+        df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
 
-        #     train_rows, validation_rows, test_rows = self.get_randomized_sets_leave_one_out(csv_list, included_groups=self.included_groups, seperate_on_wells= False )
-            
-        #     if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
-        #         shutil.rmtree(self.output_dir)
 
-        #     if not os.path.exists(self.output_dir):
-        #         os.makedirs(self.output_dir)
-        #         print("made the output dir")
 
-        #     with open(self.output_dir + "/Labels.csv", 'w', newline = '') as new_labels_file:
-        #         wr = csv.writer(new_labels_file, delimiter=",")
-        #         wr.writerow(header)
-        #         wr.writerows(train_rows)
-        #         wr.writerows(validation_rows)
-        #         wr.writerows(test_rows)
+        ## Make new csv files with rows marked for the different sets
+        #df[test] = ???
+        df["valid"] = df.index.isin(df_validation.index)
+        df["train"] = df.index.isin(df_train.index)
+
+        ## Get information of distribution between classes and groupings in the different set
+
+        ## Save information 
+        if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
+            shutil.rmtree(self.output_dir)
+
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+            print("made the output dir")
+
+        df.to_csv(self.output_dir + "/Labels.csv")
+        # with open(self.output_dir + "/Labels.csv", 'w', newline = '') as new_labels_file:
+        #     wr = csv.writer(new_labels_file, delimiter=",")
+        #     wr.writerow(header)
+        #     wr.writerows(train_rows)
+        #     wr.writerows(validation_rows)
+        #     wr.writerows(test_rows)
 
         #     for row in train_rows:
         #         if row != header:
