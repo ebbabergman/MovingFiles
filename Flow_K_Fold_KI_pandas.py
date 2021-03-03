@@ -23,9 +23,9 @@ class LeaveOneOut:
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
                 k_fold_dir = '/home/jovyan/Inputs/K_folds/',
-                k_fold_name = "k_fold_/%s.csv",#where /%s is the k_fold number
-                image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299',
-                image_name ='/%s.png', #Where %s is the image number,
+                k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
+                image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
+                image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
@@ -58,8 +58,8 @@ class LeaveOneOut:
     def update_settings(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/scratch-shared/Ebba/Kinase_Leave_One_Out',
-                image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299',
-                image_name ='/%s.png', #Where %s is the image number,
+                image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
+                image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_index = 10,
@@ -96,8 +96,8 @@ class LeaveOneOut:
         ## Todo, remove test, or mark test somehow in labels
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
-
-        df_test = pd.read_csv()
+        k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
+        df_test = pd.read_csv(k_fold_file)
 
        
         df_validation = df_used.groupby(self.class_column_header).sample(frac = self.validation_set_size)
