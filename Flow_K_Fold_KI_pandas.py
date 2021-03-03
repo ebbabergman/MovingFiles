@@ -26,7 +26,7 @@ class LeaveOneOut:
                 image_name ='/%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
-                include_index = 10,
+                include_header = 'group',
                 class_column_header = 'group',
                 well_index = 3,
                 leave_out_index = 6,
@@ -41,7 +41,7 @@ class LeaveOneOut:
         self.image_name  = image_name
         self.validation_set_size = validation_set_size
         self.included_groups = include_groups
-        self.include_index = include_index
+        self.include_header = include_header
         self.class_column_header =  class_column_header 
         self.well_index =  well_index
         self.leave_out_index =  leave_out_index
@@ -111,8 +111,8 @@ class LeaveOneOut:
 
         df = pd.read_csv(self.labels_path , delimiter= ";")
 
-        df_grouped = df.groupby(["type"])[self.class_column_header]
-
+       # df_grouped = df.groupby(["type"])[self.class_column_header]
+        df_grouped = df_grouped.apply(pd.DataFrame.loc,df_grouped[self.include_header].isin(self.included_groups)) # ADD not in test set later
         df_validation = df_grouped.apply(pd.DataFrame.sample, frac = self.validation_set_size).reset_index(drop=True) 
 
 
