@@ -22,6 +22,7 @@ class LeaveOneOut:
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
+                save_labels_dir = '/home/jovyan/scratch-shared/Ebba/GPU2/Ebba_DL/Outputs',
                 k_fold_dir = '/home/jovyan/Inputs/K_folds/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
@@ -53,6 +54,7 @@ class LeaveOneOut:
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
         self.k_fold = int(k_fold)
+        self.save_labels_dir = save_labels_dir
        
 
     def update_settings(self,
@@ -132,8 +134,10 @@ class LeaveOneOut:
             print("Made the output directory: " + self.output_dir)
 
         df.to_csv(self.output_dir + "/Labels.csv")
-
         df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"))
+
+        df.to_csv(self.save_labels_dir + "/Labels.csv")
+        df_statistics.to_csv((self.save_labels_dir + "/LabelStatistics.csv"))
 
         train_rows = df_train[[self.image_number_heading,self.class_column_header]].to_numpy()
         validation_rows = df_validation[[self.image_number_heading,self.class_column_header]].to_numpy()
