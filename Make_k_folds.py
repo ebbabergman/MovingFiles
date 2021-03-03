@@ -78,22 +78,21 @@ class MakeKFolds:
         number_of_folds = self.k_folds
         k_fold_frac = 1/number_of_folds
         k_folds = [None]*number_of_folds
-        group_n = [None]*number_of_folds
-# df_statistics_base[df_statistics_base["valid"]==1]
-        index = 0
+        group_n = {}
+
         for group in self.included_groups:
             test = df_used[df_used[self.include_header].isin([group])]
-            group_n[index] = int(test.count()[[self.other_header_with_numbers]]*k_fold_frac) 
-            index +=1
+            group_n[group] = int(test.count()[[self.other_header_with_numbers]]*k_fold_frac) 
 
-
-
-        
         for k_fold in range(0,number_of_folds-1):
-            
-                df_fold = df_used.groupby(self.class_column_header).sample(frac = k_fold_frac)
-                df_used = pd.concat([df_used, df_fold, df_fold]).drop_duplicates(keep=False)
-                k_folds[k_fold] = df_fold
+            df_fold= pd.DataFrame()
+            for group in self.included_groups:
+                df_group = df_used[df_used[self.include_header].isin([group])]
+                df_group = df_group.sample(n = group_n[group])
+                df_fold.append(df_group)
+                df_fold.append(pd.DataFrame(df_group))
+            df_used = pd.concat([df_used, df_fold, df_fold]).drop_duplicates(keep=False)
+            k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_used
 
         return k_folds
