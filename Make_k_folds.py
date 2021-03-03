@@ -18,6 +18,7 @@ class MakeKFolds:
                 class_column_header = 'group',
                 other_header_with_numbers = 'well',
                 k_folds = "10",
+                frac_of_controls_to_use = 0.20
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
@@ -28,6 +29,7 @@ class MakeKFolds:
         self.class_column_header =  class_column_header 
         self.other_header_with_numbers = other_header_with_numbers
         self.k_folds = int(k_folds)
+        self.frac_of_controls_to_use = frac_of_controls_to_use
 
     def main(self):
         print("Started get info.")
@@ -37,12 +39,13 @@ class MakeKFolds:
         df = pd.read_csv(self.labels_path , delimiter= ";")
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
+        df_control = df_used[df_used["type"] == "control"].sample(frac = 1-self.frac_of_controls_to_use)
+        df_used = pd.concat([df_used, df_control, df_control]).drop_duplicates(keep=False)
 
         k_folds = self.get_k_folds(df_used)
 
-        ## todo: handle controls s o that not all of them end up in test - percentage value at top? Filter away from used and then just go?
-            ##Make some statistics 
-        df_statistics_base = df[df[self.include_header].isin(groups)]
+        ##Make some statistics 
+        df_statistics_base = df_used
         df_statistics_base = df_statistics_base[[self.class_column_header, self.other_header_with_numbers]]
 
         df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[[self.other_header_with_numbers]].reset_index().values, columns=[self.class_column_header,self.other_header_with_numbers])
@@ -53,6 +56,7 @@ class MakeKFolds:
             df_fold = k_folds[k_fold] 
             df_statistics[str(k_fold)] = df_fold.groupby(self.class_column_header).count().reset_index()[[self.other_header_with_numbers]]
        
+        print(df_statistics)
         ##Write out data 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
