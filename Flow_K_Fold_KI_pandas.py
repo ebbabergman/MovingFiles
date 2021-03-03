@@ -113,15 +113,21 @@ class LeaveOneOut:
         ## Todo, remove test, or mark test somehow in labels
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
+       
+        df_validation2 = df_used.group.sample(frac = self.validation_set_size) ##TODO Both lines same results, why ?
+        df_validation = df_used.groupby(self.class_column_header).apply(lambda x: x.sample(frac=self.validation_set_size))
         
-        #df_validation = df_used.group.sample(frac = self.validation_set_size) ##TODO Both lines same results, why ?
-        df_validation = df_used.groupby(self.class_column_header).sample(frac=self.validation_set_size) ##TODO Both lines same results, why ?
+        
         df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
 
         #df[test] = ???
         df["valid"] = df.index.isin(df_validation.index)
         df["train"] = df.index.isin(df_train.index)
 
+        print(df_used.size)
+        print(df_train.size)
+        print(df_validation.size)
+        print(df_validation2.size)
         ## Get information of distribution between classes and groupings in the different set
         ## TODO
         ## Save information 
