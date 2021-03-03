@@ -53,6 +53,7 @@ class MakeKFolds:
                 k_folds[k_fold] = df_fold
             k_folds[number_of_folds-1] = df_used
 
+            ## todo: handle controls s o that not all of them end up in test - percentage value at top? Filter away from used and then just go?
              ##Make some statistics 
             df_statistics_base = df[df[self.include_header].isin(groups)]
             df_statistics_base = df_statistics_base[[self.class_column_header, self.other_header_with_numbers]]
