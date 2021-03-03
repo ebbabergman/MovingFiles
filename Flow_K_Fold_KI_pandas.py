@@ -93,12 +93,9 @@ class LeaveOneOut:
         print("Starting leave one out")
 
         df = pd.read_csv(self.labels_path , delimiter= ";")
-        ## Todo, remove test, or mark test somehow in labels
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
 
-        print("size:")
-        print(df_used.size)
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
         df_test =df_used[df_used[self.image_number_heading].isin(df_test[self.image_number_heading])] 
