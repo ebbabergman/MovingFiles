@@ -96,16 +96,18 @@ class LeaveOneOut:
         ## Todo, remove test, or mark test somehow in labels
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
+
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
 
+        df_used = pd.concat([df_used, df_test, df_test]).drop_duplicates(keep=False)
        
         df_validation = df_used.groupby(self.class_column_header).sample(frac = self.validation_set_size)
         df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
 
         df["valid"] = df.index.isin(df_validation.index)
         df["train"] = df.index.isin(df_train.index)
-        df["test"] = 0 
+        df["test"] = df.index.isin(df_test.index)
 
         ##Make some statistics 
         df_statistics_base = df[df[self.include_header].isin(groups)]
