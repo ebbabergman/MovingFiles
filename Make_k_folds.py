@@ -35,9 +35,7 @@ class MakeKFolds:
         df = pd.read_csv(self.labels_path , delimiter= ";")
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
-        df_control = df_used[df_used["type"] == "control"].sample(frac = 1-self.frac_of_controls_to_use)
-        df_used = pd.concat([df_used, df_control, df_control]).drop_duplicates(keep=False)
-
+       
         k_folds = self.get_k_folds(df_used)
 
         ##Make some statistics 
