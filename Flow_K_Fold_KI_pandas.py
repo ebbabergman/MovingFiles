@@ -118,15 +118,12 @@ class LeaveOneOut:
         df_validation = df_used.groupby(self.class_column_header).sample(frac=self.validation_set_size) ##TODO Both lines same results, why ?
         df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
 
-
-
-        ## Make new csv files with rows marked for the different sets
         #df[test] = ???
         df["valid"] = df.index.isin(df_validation.index)
         df["train"] = df.index.isin(df_train.index)
 
         ## Get information of distribution between classes and groupings in the different set
-
+        ## TODO
         ## Save information 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
@@ -136,7 +133,16 @@ class LeaveOneOut:
             print("made the output dir")
 
         df.to_csv(self.output_dir + "/Labels.csv")
-        # with open(self.output_dir + "/Labels.csv", 'w', newline = '') as new_labels_file:
+        self.write_images_to_new_folders(df)
+            
+        print("Finished leave one out")
+    
+    def run(self):
+        self.main()
+
+    def write_images_to_new_folders(self, df_full):
+        print("This is not implemented")
+             # with open(self.output_dir + "/Labels.csv", 'w', newline = '') as new_labels_file:
         #     wr = csv.writer(new_labels_file, delimiter=",")
         #     wr.writerow(header)
         #     wr.writerows(train_rows)
@@ -152,117 +158,7 @@ class LeaveOneOut:
         #     for row in test_rows:
         #         if row != header:
         #             self.sort_into_test_folder(row, "Test")
-            
-        print("Finished leave one out")
-    
-    def run(self):
-        self.main()
-
-
-    def get_randomized_sets_leave_one_out(self, csv_list, included_groups, seperate_on_wells = True):
-        nested_dict = {}
-        test_rows = []
-        validation_rows = []
-        train_rows = []
-        included_rows = []
-
-        for entry in csv_list:
-            class_for_row = entry[self.class_index] 
-            leave_out_entry = entry[self.leave_out_index]
-            include_entry = entry[self.include_index]
-            well = entry[self.well_index]
-            if len(included_groups)==0 or include_entry in included_groups :
-                if class_for_row not in nested_dict:
-                    nested_dict[class_for_row] = {}
-                if leave_out_entry not in nested_dict[class_for_row]:
-                    nested_dict[class_for_row][leave_out_entry] = {}
-                if well not in nested_dict[class_for_row][leave_out_entry]:
-                    nested_dict[class_for_row][leave_out_entry][well] = []
-                nested_dict[class_for_row][leave_out_entry][well].append(entry)
-
-        #print(self.k_folds.keys())
-        leave_out = self.k_folds[self.k_fold]
-        for class_key in nested_dict:
-            compound_dict = nested_dict[class_key]
-            if class_key == 'control':
-                new_training_rows, new_validation_rows, new_test_rows = self.get_training_validation_rows(compound_dict, control= True, seperate_on_wells = seperate_on_wells)
-                train_rows.append(new_training_rows) 
-                validation_rows.append(new_validation_rows)
-                test_rows.append(new_test_rows) # check if done on well level
-            else:
-                if(seperate_on_wells):
-                    for leave_out_entry in compound_dict:
-                        if leave_out_entry in leave_out:
-                            test_rows = test_rows +list(compound_dict[leave_out_entry].values())
-                        else:
-                            new_training_rows, new_validation_rows, _ = self.get_training_validation_rows(compound_dict[leave_out_entry],seperate_on_wells = seperate_on_wells)
-                            train_rows.append(new_training_rows) 
-                            validation_rows.append(new_validation_rows)
-                else:
-                    new_training_rows, new_validation_rows, new_test_rows = self.get_training_validation_rows(compound_dict,seperate_on_wells = seperate_on_wells)
-                    train_rows.append(new_training_rows) 
-                    validation_rows.append(new_validation_rows)
-                    test_rows.append(new_test_rows)
-
-
-        train_rows = [item for sublist in train_rows for item in sublist]
-        validation_rows = [item for sublist in validation_rows for item in sublist]
-        test_rows = [item for sublist in test_rows for item in sublist]
-
-        return train_rows, validation_rows,test_rows
-
-## TOdo change names from well compound etc.
-    def get_training_validation_rows(self,compound_dictionary, control = False, seperate_on_wells = True, k_fold = True):
-        well_training_rows = []
-        well_validation_rows = []
-        well_test_rows = []
-        well_test_keys = []
-
-        if not seperate_on_wells and not control:
-            for leave_out_entry in compound_dictionary:
-                        if (k_fold and leave_out_entry in self.k_folds[self.k_fold]) or (not k_fold and leave_out_entry in self.name_to_leave_out):
-                            well_test_keys.append(leave_out_entry)
         
-        well_keys = np.array(list(compound_dictionary.keys()))
-        well_keys = np.setdiff1d(well_keys, well_test_keys)
-
-        data_size =len(well_keys)
-        if(data_size == 1):
-            raise Exception("Note enough data to have both a validation and a training entry. Key: " + str(well_keys))
-
-        validation_set_size = int(data_size * self.validation_set_size)
-        if validation_set_size <= 0 :
-            validation_set_size = 1
-
-        indices = np.arange(data_size)
-        np.random.shuffle(indices)
-
-        well_validation_keys = well_keys[indices[:validation_set_size]]
-        if control: 
-            well_training_keys = well_keys[indices[validation_set_size:2*validation_set_size]]
-            well_test_keys = well_keys[indices[2*validation_set_size:]]
-        else: 
-            well_training_keys = well_keys[indices[validation_set_size:]]
-
-        for key in well_training_keys:
-            well_training_rows.append(compound_dictionary[key])
-        for key in well_validation_keys:
-            well_validation_rows.append(compound_dictionary[key])
-        for key in well_test_keys:
-            well_test_rows.append(compound_dictionary[key])
-
-        if(not seperate_on_wells) or control:
-            well_training_rows = [item for dictionary in well_training_rows for sublist in dictionary.values() for item in sublist]
-            well_validation_rows = [item for dictionary in well_validation_rows for sublist in dictionary.values() for item in sublist]
-            well_test_rows = [item for dictionary in well_test_rows for sublist in dictionary.values() for item in sublist]
-        else:
-            well_training_rows = [item for sublist in well_training_rows for item in sublist]
-            well_validation_rows = [item for sublist in well_validation_rows for item in sublist]
-            well_test_rows = [item for sublist in well_test_rows for item in sublist]
-        
-        return well_training_rows, well_validation_rows, well_test_rows
-
-
     def sort_into_class_folders(self, row, category): #where category is train, validation or test
         current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
     
@@ -298,5 +194,6 @@ class LeaveOneOut:
             os.makedirs(dir_path)
             print(str(row))
         shutil.copyfile(current_path, target_path)
+
 if __name__ == "__main__":
     LeaveOneOut().main()
