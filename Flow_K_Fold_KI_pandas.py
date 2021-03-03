@@ -21,7 +21,7 @@ class LeaveOneOut:
     
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                output_dir = '/home/jovyan/scratch-shared/Ebba/Kinase_Leave_One_Out',
+                output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299',
                 image_name ='/%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
