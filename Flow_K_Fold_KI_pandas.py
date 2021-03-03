@@ -125,18 +125,22 @@ class LeaveOneOut:
         df["train"] = df.index.isin(df_train.index)
         df["test"] = 0 
 
-        print(df_used.size)
-        print(df_train.size)
-        print(df_validation.size)
-        print(df_validation2.size)
+        # print(df_used.size)
+        # print(df_train.size)
+        # print(df_validation.size)
+        # print(df_validation2.size)
         ## Get information of distribution between classes and groupings in the different set
         ## TODO
         ## Do this first so that we know if things are wrong before we do anything else....
-        df_statistics = df[[self.class_column_header, "valid", "train", "test"]]
-        print(df_statistics.count())
-        df_statistics.head()
-        print(df_statistics.groupby(self.class_column_header).count())
-        print(df_statistics[df_statistics["valid"]==1].groupby(self.class_column_header).count())
+        df_statistics_base = df[df[self.include_header].isin(groups)]
+        df_statistics_base = df_statistics_base[[self.class_column_header, "valid", "train", "test"]]
+        print(df_statistics_base.count())
+        df_statistics_base.head()
+        df_statistics = df_statistics_base.groupby(self.class_column_header).count()[["train"]]
+        df_statistics.rename(columns={"train": "total"})
+        print(df_statistics)
+        print(df_statistics_base.groupby(self.class_column_header).count())
+        print(df_statistics_base[df_statistics_base["valid"]==1].groupby(self.class_column_header).count())
 
 
         ## Save information 
