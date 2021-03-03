@@ -130,6 +130,12 @@ class LeaveOneOut:
         print(df_validation2.size)
         ## Get information of distribution between classes and groupings in the different set
         ## TODO
+        ## Do this first so that we know if things are wrong before we do anything else....
+
+        print(df_used[self.class_column_header].value_counts())
+        print(df_used.groupby(self.class_column_header).value_counts())
+
+
         ## Save information 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
