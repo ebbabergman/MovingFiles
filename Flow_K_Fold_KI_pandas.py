@@ -134,11 +134,12 @@ class LeaveOneOut:
         ## Do this first so that we know if things are wrong before we do anything else....
         df_statistics_base = df[df[self.include_header].isin(groups)]
         df_statistics_base = df_statistics_base[[self.class_column_header, "valid", "train", "test"]]
-        print(df_statistics_base.count())
-        df_statistics_base.head()
-        df_statistics = df_statistics_base.groupby(self.class_column_header).count()[["train"]]
-        df_statistics.rename(columns={"train": "total"})
+        #df_statistics = df_statistics_base.groupby(self.class_column_header).count()[["train"]]
+        df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[["train"]].reset_index().values, columns=["group", "train"])
+        df_statistics.rename(columns={"train": "total"}, inplace=True)
         print(df_statistics)
+
+
         print(df_statistics_base.groupby(self.class_column_header).count())
         print(df_statistics_base[df_statistics_base["valid"]==1].groupby(self.class_column_header).count())
 
