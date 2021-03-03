@@ -10,7 +10,7 @@ class MakeKFolds:
    
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
+                output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out/',
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
                 class_column_header = 'group',
@@ -59,8 +59,13 @@ class MakeKFolds:
 
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
-            print("made the output dir")      
+            print("made the output dir")   
 
+        df_statistics.to_csv(self.output_dir + "k_fold_statistics.csv")
+        for k_fold in range(0,number_of_folds):
+            df_fold = k_folds[k_fold] 
+            df_fold.to_csv(self.output_dir + "k_fold_"+ str(k_fold +1)+".csv")
+            
         print("Finished. Find output in: " + self.output_dir)
 
 
