@@ -152,15 +152,12 @@ class LeaveOneOut:
 
         
     def sort_into_class_folders(self, image_number, class_name, category): #where category is train, validation or test
-        
         if(image_number == ''):
             return
         
         current_path = self.image_dir + self.image_name  % str(image_number)
         dir_path = self.output_dir+"/"  + category +"/" + str(class_name) 
         target_path = dir_path +"/" +str(image_number) + ".png"
-
-
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
@@ -180,11 +177,11 @@ class LeaveOneOut:
 
         shutil.copyfile(current_path, target_path)
 
-    def sort_into_one_folder(self, row):
-        current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
+    def sort_into_one_folder(self, image_number):
+        current_path = self.image_dir + self.image_name  % str(image_number)
     
         dir_path = self.output_dir + "/images"
-        target_path = dir_path +"/" +str(row[self.image_number_index]) + ".png"
+        target_path = dir_path +"/" +str(image_number) + ".png"
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
