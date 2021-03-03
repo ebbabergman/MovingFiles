@@ -114,10 +114,10 @@ class LeaveOneOut:
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
        
-        df_validation2 = df_used.group.sample(frac = self.validation_set_size) ##TODO Both lines same results, why ?
-        df_validation = df_used.groupby(self.class_column_header).apply(lambda x: x.sample(frac=self.validation_set_size))
-        
-        
+        #df_validation = df_used.group.sample(frac = self.validation_set_size) ##TODO Both lines same results, why ?
+        df_validation = df_used.groupby(self.class_column_header).sample(frac = self.validation_set_size) ##TODO Both lines same results, why ?
+        df_validation2 = df_used.groupby(self.class_column_header).apply(lambda x: x.sample(frac=self.validation_set_size))
+
         df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
 
         #df[test] = ???
