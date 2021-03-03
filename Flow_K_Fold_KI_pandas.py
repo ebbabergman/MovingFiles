@@ -110,7 +110,8 @@ class LeaveOneOut:
         print("Starting leave one out")
 
         df = pd.read_csv(self.labels_path , delimiter= ";")
-        df = df.loc([self.include_header].isin(self.included_groups))
+        df = df.loc[df[self.include_header].isin(self.included_groups)]
+     
         # df_grouped = df.groupby(["type"])[self.class_column_header]
         # df_grouped = df_grouped.apply(pd.DataFrame.loc,df_grouped[self.include_header].isin(self.included_groups)) # ADD not in test set later
         df_validation = df.apply(pd.DataFrame.sample, frac = self.validation_set_size).reset_index(drop=True) 
