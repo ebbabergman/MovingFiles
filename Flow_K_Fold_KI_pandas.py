@@ -123,6 +123,7 @@ class LeaveOneOut:
         #df[test] = ???
         df["valid"] = df.index.isin(df_validation.index)
         df["train"] = df.index.isin(df_train.index)
+        df["test"] = 0 
 
         print(df_used.size)
         print(df_train.size)
@@ -131,9 +132,10 @@ class LeaveOneOut:
         ## Get information of distribution between classes and groupings in the different set
         ## TODO
         ## Do this first so that we know if things are wrong before we do anything else....
-
-        print(df_used[self.class_column_header].value_counts())
-        print(df_used.groupby(self.class_column_header).value_counts())
+        df_statistics = df[[self.class_column_header, "valid", "train", "test"]]
+        print(df_statistics.count())
+        df_statistics.head()
+        print(df_statistics[self.class_column_header].groupby(self.class_column_header).count())
 
 
         ## Save information 
