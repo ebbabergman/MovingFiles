@@ -33,43 +33,33 @@ class MakeKFolds:
         print("Started get info.")
         entries_list = []
 
-        with open(self.labels_path, 'r') as read_obj:
-            df = pd.read_csv(self.labels_path , delimiter= ";")
-            ## Todo, remove test, or mark test somehow in labels
-            groups = self.included_groups
-            df_used = df[df[self.include_header].isin(groups)]
+        
+        df = pd.read_csv(self.labels_path , delimiter= ";")
+        groups = self.included_groups
+        df_used = df[df[self.include_header].isin(groups)]
 
-            k_folds = self.get_k_folds(df_used)
+        k_folds = self.get_k_folds(df_used)
 
-     
-            ## todo: handle controls s o that not all of them end up in test - percentage value at top? Filter away from used and then just go?
-             ##Make some statistics 
-            df_statistics_base = df[df[self.include_header].isin(groups)]
-            df_statistics_base = df_statistics_base[[self.class_column_header, self.other_header_with_numbers]]
+        ## todo: handle controls s o that not all of them end up in test - percentage value at top? Filter away from used and then just go?
+            ##Make some statistics 
+        df_statistics_base = df[df[self.include_header].isin(groups)]
+        df_statistics_base = df_statistics_base[[self.class_column_header, self.other_header_with_numbers]]
 
-            df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[[self.other_header_with_numbers]].reset_index().values, columns=[self.class_column_header,self.other_header_with_numbers])
-            df_statistics.rename(columns={self.other_header_with_numbers: "total"}, inplace=True)
-            
-            print (df_statistics)
+        df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[[self.other_header_with_numbers]].reset_index().values, columns=[self.class_column_header,self.other_header_with_numbers])
+        df_statistics.rename(columns={self.other_header_with_numbers: "total"}, inplace=True)
+    
+        number_of_folds = self.k_folds
+        for k_fold in range(0,number_of_folds):
+            df_fold = k_folds[k_fold] 
+            df_statistics[str(k_fold)] = df_fold.groupby(self.class_column_header).count().reset_index()[[self.other_header_with_numbers]]
+       
+        ##Write out data 
+        if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
+            shutil.rmtree(self.output_dir)
 
-            number_of_folds = self.k_folds
-            for k_fold in range(0,number_of_folds):
-                df_fold = k_folds[k_fold] 
-                df_statistics[str(k_fold)] = df_fold.groupby(self.class_column_header).count().reset_index()[[self.other_header_with_numbers]]
-           
-            print (df_statistics)
-            
-            if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
-                shutil.rmtree(self.output_dir)
-
-            if not os.path.exists(self.output_dir):
-                os.makedirs(self.output_dir)
-                print("made the output dir")
-
-        ## Write output 
-        # file_object = open(self.output_dir + self. + ".txt", "w+")
-        # for entry in entries_list:
-        #     file_object.write("\"" output_file_name+ str(entry)+ "\"" +"\n") 
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+            print("made the output dir")      
 
         print("Finished. Find output in: " + self.output_dir)
 
@@ -89,8 +79,7 @@ class MakeKFolds:
             for group in self.included_groups:
                 df_group = df_used[df_used[self.include_header].isin([group])]
                 df_group = df_group.sample(n = group_n[group])
-                df_fold.append(df_group)
-                df_fold.append(pd.DataFrame(df_group))
+                df_fold = df_fold.append(df_group)
             df_used = pd.concat([df_used, df_fold, df_fold]).drop_duplicates(keep=False)
             k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_used
