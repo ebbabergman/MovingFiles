@@ -110,38 +110,28 @@ class LeaveOneOut:
         print("Starting leave one out")
 
         df = pd.read_csv(self.labels_path , delimiter= ";")
-        ## Todo, remove test, or mark test somehow in labels
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
        
-        #df_validation = df_used.group.sample(frac = self.validation_set_size) ##TODO Both lines same results, why ?
-        df_validation = df_used.groupby(self.class_column_header).sample(frac = self.validation_set_size) ##TODO Both lines same results, why ?
-        df_validation2 = df_used.groupby(self.class_column_header).apply(lambda x: x.sample(frac=self.validation_set_size))
-
+        df_validation = df_used.group.sample(frac = self.validation_set_size)
         df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
 
-        #df[test] = ???
         df["valid"] = df.index.isin(df_validation.index)
         df["train"] = df.index.isin(df_train.index)
-        df["test"] = 0 
+        df["test"] = 0 # TODO fix
 
-        # print(df_used.size)
-        # print(df_train.size)
-        # print(df_validation.size)
-        # print(df_validation2.size)
-        ## Get information of distribution between classes and groupings in the different set
-        ## TODO
-        ## Do this first so that we know if things are wrong before we do anything else....
+        ##Make some statistics 
         df_statistics_base = df[df[self.include_header].isin(groups)]
         df_statistics_base = df_statistics_base[[self.class_column_header, "valid", "train", "test"]]
-        #df_statistics = df_statistics_base.groupby(self.class_column_header).count()[["train"]]
+
         df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[["train"]].reset_index().values, columns=["group", "train"])
         df_statistics.rename(columns={"train": "total"}, inplace=True)
-        print(df_statistics)
-
-
-        print(df_statistics_base.groupby(self.class_column_header).count())
-        print(df_statistics_base[df_statistics_base["valid"]==1].groupby(self.class_column_header).count())
+        df_statistics["train"] = df_statistics_base[df_statistics_base["train"]==1].groupby(self.class_column_header).count().reset_index()[["train"]]
+        df_statistics["percentage_train"] = df_statistics["train"] /df_statistics["total"] 
+        df_statistics["valid"] = df_statistics_base[df_statistics_base["valid"]==1].groupby(self.class_column_header).count().reset_index()[["valid"]]
+        df_statistics["percentage_valid"] = df_statistics["valid"] /df_statistics["total"] 
+        df_statistics["test"] = df_statistics_base[df_statistics_base["test"]==1].groupby(self.class_column_header).count().reset_index()[["test"]]
+        df_statistics["percentage_test"] = df_statistics["test"] /df_statistics["total"] 
 
 
         ## Save information 
@@ -153,6 +143,7 @@ class LeaveOneOut:
             print("made the output dir")
 
         df.to_csv(self.output_dir + "/Labels.csv")
+        df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"))
         self.write_images_to_new_folders(df)
             
         print("Finished leave one out")
