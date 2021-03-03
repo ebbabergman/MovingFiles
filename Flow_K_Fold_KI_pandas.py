@@ -132,56 +132,52 @@ class LeaveOneOut:
             print("made the output dir")
 
         df.to_csv(self.output_dir + "/Labels.csv")
+
         df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"))
-        self.write_images_to_new_folders(df)
+
+        train_rows = df_train[[self.image_number_heading,self.class_column_header]].to_numpy()
+        validation_rows = df_validation[[self.image_number_heading,self.class_column_header]].to_numpy()
+        test_rows = df_test[[self.image_number_heading,self.class_column_header]].to_numpy()
+        for row in train_rows:
+            self.sort_into_class_folders(row, "Train")
+        for row in validation_rows:
+            self.sort_into_class_folders(row, "Validation")
+        for row in test_rows:
+            self.sort_into_test_folder(row, "Test")
             
         print("Finished leave one out")
     
     def run(self):
         self.main()
 
-    def write_images_to_new_folders(self, df_full):
-        print("This is not implemented")
-             # with open(self.output_dir + "/Labels.csv", 'w', newline = '') as new_labels_file:
-        #     wr = csv.writer(new_labels_file, delimiter=",")
-        #     wr.writerow(header)
-        #     wr.writerows(train_rows)
-        #     wr.writerows(validation_rows)
-        #     wr.writerows(test_rows)
-
-        #     for row in train_rows:
-        #         if row != header:
-        #             self.sort_into_class_folders(row, "Train")
-        #     for row in validation_rows:
-        #         if row != header:
-        #             self.sort_into_class_folders(row, "Validation")
-        #     for row in test_rows:
-        #         if row != header:
-        #             self.sort_into_test_folder(row, "Test")
         
-    def sort_into_class_folders(self, row, category): #where category is train, validation or test
-        current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
-    
-        dir_path = self.output_dir+"/"  + category +"/" + str(row[self.class_index]) 
-        target_path = dir_path +"/" +str(row[self.image_number_index]) + ".png"
-
-        if(str(row[self.image_number_index]) == ''):
+    def sort_into_class_folders(self, image_number, class_name, category): #where category is train, validation or test
+        
+        if(image_number == ''):
             return
+        
+        current_path = self.image_dir + self.image_name  % str(image_number)
+        dir_path = self.output_dir+"/"  + category +"/" + str(class_name) 
+        target_path = dir_path +"/" +str(image_number) + ".png"
+
+
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
-            print(str(row))
+
         shutil.copyfile(current_path, target_path)
 
-    def sort_into_test_folder(self, row, category): #where category is train, validation or test
-        current_path = self.image_dir + self.image_name  % str(row[self.image_number_index])
-    
+    def sort_into_test_folder(self, image_number, category): #where category is train, validation or test
+        if(image_number == ''):
+            return
+       
+        current_path = self.image_dir + self.image_name  % str(image_number)
         dir_path = self.output_dir+"/"  + category + "/" +category #dataflow needs a subfolder, but test subfolder should not be class
-        target_path = dir_path +"/" +str(row[self.image_number_index]) + ".png"
+        target_path = dir_path +"/" +str(image_number) + ".png"
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
-            print(str(row))
+
         shutil.copyfile(current_path, target_path)
 
     def sort_into_one_folder(self, row):
@@ -192,7 +188,7 @@ class LeaveOneOut:
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
-            print(str(row))
+
         shutil.copyfile(current_path, target_path)
 
 if __name__ == "__main__":
