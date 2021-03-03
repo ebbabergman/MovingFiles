@@ -135,7 +135,8 @@ class LeaveOneOut:
         df_statistics = df[[self.class_column_header, "valid", "train", "test"]]
         print(df_statistics.count())
         df_statistics.head()
-        print(df_statistics[self.class_column_header].groupby(self.class_column_header).count())
+        print(df_statistics.groupby(self.class_column_header).count())
+        print(df_statistics[df_statistics["valid"]==1].groupby(self.class_column_header).count())
 
 
         ## Save information 
