@@ -111,7 +111,9 @@ class LeaveOneOut:
 
         df = pd.read_csv(self.labels_path , delimiter= ";")
 
-        df_validation = df.groupby(["type"])[self.class_column_header].sample(frac=0.2)
+        df_grouped = df.groupby(["type"])[self.class_column_header]
+
+        df_validation = df_grouped.apply(pd.DataFrame.sample, frac = self.validation_set_size).reset_index(drop=True) 
 
 
 
