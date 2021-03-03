@@ -11,8 +11,6 @@ class MakeKFolds:
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
-                image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299',
-                image_name ='/%s.png', #Where %s is the image number,
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
                 class_column_header = 'group',
@@ -22,8 +20,6 @@ class MakeKFolds:
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
-        self.image_dir = image_dir
-        self.image_name  = image_name
         self.included_groups = include_groups
         self.include_header = include_header
         self.class_column_header =  class_column_header 
