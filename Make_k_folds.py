@@ -23,15 +23,10 @@ class MakeKFolds:
         self.output_dir = output_dir
         self.image_dir = image_dir
         self.image_name  = image_name
-        self.validation_set_size = validation_set_size
         self.included_groups = include_groups
         self.include_header = include_header
         self.class_column_header =  class_column_header 
-        self.well_index =  well_index
-        self.leave_out_index =  leave_out_index
-        self.image_number_index = image_number_index
-        self.name_to_leave_out =  name_to_leave_out
-        self.output_size = output_size
+        self.other_header_with_numbers = other_header_with_numbers
         self.k_folds = int(k_folds)
 
     def main(self):
