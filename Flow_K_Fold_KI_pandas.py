@@ -114,8 +114,8 @@ class LeaveOneOut:
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
         
-        df_validation = df_used.group.sample(frac = self.validation_set_size)
-        df_validation = df_used.df.groupby(self.class_column_header).sample(frac=self.validation_set_size) 
+        #df_validation = df_used.group.sample(frac = self.validation_set_size)
+        df_validation = df_used.groupby(self.class_column_header).sample(frac=self.validation_set_size) 
         
         print(df.size)
         print(df_used.size)
