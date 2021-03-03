@@ -129,7 +129,7 @@ class LeaveOneOut:
 
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
-            print("made the output dir")
+            print("Made the output directory: " + self.output_dir)
 
         df.to_csv(self.output_dir + "/Labels.csv")
 
