@@ -38,8 +38,10 @@ class MakeKFolds:
             ## Todo, remove test, or mark test somehow in labels
             groups = self.included_groups
             df_used = df[df[self.include_header].isin(groups)]
+
             k_folds = self.get_k_folds(df_used)
 
+     
             ## todo: handle controls s o that not all of them end up in test - percentage value at top? Filter away from used and then just go?
              ##Make some statistics 
             df_statistics_base = df[df[self.include_header].isin(groups)]
@@ -77,12 +79,13 @@ class MakeKFolds:
         k_fold_frac = 1/number_of_folds
         k_folds = [None]*number_of_folds
         group_n = [None]*number_of_folds
-
+# df_statistics_base[df_statistics_base["valid"]==1]
         index = 0
         for group in self.included_groups:
-           group_n[index] = int(df_used[self.inclu == group].count*k_fold_frac) 
-           index +=1
-           
+            test = df_used[df_used[self.include_header].isin([group])]
+            group_n[index] = int(test.count()[[self.other_header_with_numbers]]*k_fold_frac) 
+            index +=1
+
 
 
         
