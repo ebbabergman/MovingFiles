@@ -32,7 +32,7 @@ class LeaveOneOut:
                 class_column_header = 'group',
                 well_index = 3,
                 leave_out_index = 6,
-                image_number_index = 1,
+                image_number_heading = "nr",
                 name_to_leave_out = "" ,
                 k_fold = "1",
                 output_size = 1 # Percentage of original total size that should be used,
@@ -49,7 +49,7 @@ class LeaveOneOut:
         self.class_column_header =  class_column_header 
         self.well_index =  well_index
         self.leave_out_index =  leave_out_index
-        self.image_number_index = image_number_index
+        self.image_number_heading = image_number_heading
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
         self.k_fold = int(k_fold)
@@ -97,11 +97,14 @@ class LeaveOneOut:
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups)]
 
+        print("size:")
+        print(df_used.size)
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
+        df_test =df_used[df_used[self.image_number_heading].isin(df_test[self.image_number_heading])] 
 
         df_used = pd.concat([df_used, df_test, df_test]).drop_duplicates(keep=False)
-       
+
         df_validation = df_used.groupby(self.class_column_header).sample(frac = self.validation_set_size)
         df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
 
