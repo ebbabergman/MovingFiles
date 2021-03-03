@@ -139,11 +139,11 @@ class LeaveOneOut:
         validation_rows = df_validation[[self.image_number_heading,self.class_column_header]].to_numpy()
         test_rows = df_test[[self.image_number_heading,self.class_column_header]].to_numpy()
         for row in train_rows:
-            self.sort_into_class_folders(row, "Train")
+            self.sort_into_class_folders(row[0],row[1], "Train")
         for row in validation_rows:
-            self.sort_into_class_folders(row, "Validation")
+            self.sort_into_class_folders(row[0],row[1], "Validation")
         for row in test_rows:
-            self.sort_into_test_folder(row, "Test")
+            self.sort_into_test_folder(row[0], "Test")
             
         print("Finished leave one out")
     
