@@ -133,10 +133,10 @@ class LeaveOneOut:
             os.makedirs(self.output_dir)
             print("Made the output directory: " + self.output_dir)
 
-        df.to_csv(self.output_dir + "/Labels.csv")
+        df_used.to_csv(self.output_dir + "/Labels.csv")
         df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"))
 
-        df.to_csv(self.save_labels_dir + "/Labels.csv")
+        df_used.to_csv(self.save_labels_dir + "/Labels.csv")
         df_statistics.to_csv((self.save_labels_dir + "/LabelStatistics.csv"))
 
         train_rows = df_train[[self.image_number_heading,self.class_column_header]].to_numpy()
