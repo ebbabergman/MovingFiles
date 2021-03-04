@@ -88,12 +88,9 @@ class MakeKFolds:
             for group in self.included_groups:
                 df_group = df_used[df_used[self.include_header].isin([group])]
                 if group == 'control':
-                    if(df_group[self.well_column_header].count() == 0):
-                        df_group = df_used_wells
-                        df_used.append(df_used_wells)
-                    sampled_well = np.random.choice(df_group[self.well_column_header].unique(), group_n[group])
-                    df_sampled = df_group[df_group.isin({self.well_column_header: sampled_well})]
+                    df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n[group])
                     df_fold = df_fold.append(df_sampled)
+                    
                 else:
                     df_group = df_group.sample(n = group_n[group])
                     df_fold = df_fold.append(df_group)
@@ -101,7 +98,20 @@ class MakeKFolds:
             k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_used
 
+        if( df_used[df_used["group"] == 'control'].empty):
+            df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n['control'])
+            k_folds[number_of_folds-1] =  k_folds[number_of_folds-1].append(df_sampled)
+            
         return k_folds
+
+    def getControlSampel(self, df_group, df_used_wells, df_used, n_sample):
+        if(df_group[self.well_column_header].count() == 0):
+            df_group = df_used_wells
+            df_used.append(df_used_wells)
+        sampled_well = np.random.choice(df_group[self.well_column_header].unique(), n_sample)
+        df_sampled = df_group[df_group[self.well_column_header].isin(sampled_well)]
+        df_used_wells = df_used_wells.append(df_sampled)
+        return df_sampled, df_used_wells, df_used
 
 if __name__ == "__main__":
     MakeKFolds().main()
