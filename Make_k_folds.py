@@ -99,6 +99,7 @@ class MakeKFolds:
         k_folds[number_of_folds-1] = df_used
 
         if( df_used[df_used["group"] == 'control'].empty):
+            df_group = df_used[df_used[self.include_header].isin(['control'])]
             df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n['control'])
             k_folds[number_of_folds-1] =  k_folds[number_of_folds-1].append(df_sampled)
             
