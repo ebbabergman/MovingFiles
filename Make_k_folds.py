@@ -6,7 +6,6 @@ import random
 import pandas as pd
 
 class MakeKFolds:
-    ## TODO bryt ut funktioner
    
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
@@ -14,7 +13,7 @@ class MakeKFolds:
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
                 class_column_header = 'group',
-                other_header_with_numbers = 'well',
+                well_column_header = 'well',
                 k_folds = "10",
                 frac_of_controls_to_use = 0.20
                 ):
@@ -23,7 +22,7 @@ class MakeKFolds:
         self.included_groups = include_groups
         self.include_header = include_header
         self.class_column_header =  class_column_header 
-        self.other_header_with_numbers = other_header_with_numbers
+        self.well_column_header = well_column_header
         self.k_folds = int(k_folds)
         self.frac_of_controls_to_use = frac_of_controls_to_use
 
@@ -40,15 +39,15 @@ class MakeKFolds:
 
         ##Make some statistics 
         df_statistics_base = df_used
-        df_statistics_base = df_statistics_base[[self.class_column_header, self.other_header_with_numbers]]
+        df_statistics_base = df_statistics_base[[self.class_column_header, self.well_column_header]]
 
-        df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[[self.other_header_with_numbers]].reset_index().values, columns=[self.class_column_header,self.other_header_with_numbers])
-        df_statistics.rename(columns={self.other_header_with_numbers: "total"}, inplace=True)
+        df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[[self.well_column_header]].reset_index().values, columns=[self.class_column_header,self.well_column_header])
+        df_statistics.rename(columns={self.well_column_header: "total"}, inplace=True)
     
         number_of_folds = self.k_folds
         for k_fold in range(0,number_of_folds):
             df_fold = k_folds[k_fold] 
-            df_statistics[str(k_fold)] = df_fold.groupby(self.class_column_header).count().reset_index()[[self.other_header_with_numbers]]
+            df_statistics[str(k_fold)] = df_fold.groupby(self.class_column_header).count().reset_index()[[self.well_column_header]]
        
         print(df_statistics)
         ##Write out data 
@@ -75,12 +74,14 @@ class MakeKFolds:
 
         for group in self.included_groups:
             test = df_used[df_used[self.include_header].isin([group])]
-            group_n[group] = int(test.count()[[self.other_header_with_numbers]]*k_fold_frac) 
+            group_n[group] = int(test.count()[[self.well_column_header]]*k_fold_frac) 
 
         for k_fold in range(0,number_of_folds-1):
             df_fold= pd.DataFrame()
             for group in self.included_groups:
                 df_group = df_used[df_used[self.include_header].isin([group])]
+                if group == 'control':
+                    df_group = df_group.groupby(self.well_column_header)
                 df_group = df_group.sample(n = group_n[group])
                 df_fold = df_fold.append(df_group)
             df_used = pd.concat([df_used, df_fold, df_fold]).drop_duplicates(keep=False)
