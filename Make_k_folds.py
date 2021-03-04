@@ -75,7 +75,6 @@ class MakeKFolds:
 
         for group in self.included_groups:
             test = df_used[df_used[self.include_header].isin([group])]
-            #group_n[group] = int(test.count()[[self.well_column_header]]*k_fold_frac) 
             if group == 'control':
                 test = test.groupby(self.well_column_header)
                 group_n[group] = int(int(test[[self.include_header]].count().count())*k_fold_frac) 
