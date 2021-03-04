@@ -71,12 +71,14 @@ class MakeKFolds:
         k_fold_frac = 1/number_of_folds
         k_folds = [None]*number_of_folds
         group_n = {}
+        df_used_wells =  pd.DataFrame()
 
         for group in self.included_groups:
             test = df_used[df_used[self.include_header].isin([group])]
+            #group_n[group] = int(test.count()[[self.well_column_header]]*k_fold_frac) 
             if group == 'control':
-                test = test.groupby(test.count()*k_fold_frac)
-                group_n[group] = int(test[[self.include_header]]) 
+                test = test.groupby(self.well_column_header)
+                group_n[group] = int(int(test[[self.include_header]].count().count())*k_fold_frac) 
                 if group_n[group] < 1: group_n[group] = 1
             else:
                 group_n[group] = int(test.count()[[self.well_column_header]]*k_fold_frac) 
@@ -86,9 +88,15 @@ class MakeKFolds:
             for group in self.included_groups:
                 df_group = df_used[df_used[self.include_header].isin([group])]
                 if group == 'control':
-                    df_group = df_group.groupby(self.well_column_header)
-                df_group = df_group.sample(n = group_n[group])
-                df_fold = df_fold.append(df_group)
+                    if(df_group[self.well_column_header].count() == 0):
+                        df_group = df_used_wells
+                        df_used.append(df_used_wells)
+                    sampled_well = np.random.choice(df_group[self.well_column_header].unique(), group_n[group])
+                    df_sampled = df_group[self.well_column_header == sampled_well]
+                    df_fold = df_fold.append(df_group)
+                else:
+                    df_group = df_group.sample(n = group_n[group])
+                    df_fold = df_fold.append(df_group)
             df_used = pd.concat([df_used, df_fold, df_fold]).drop_duplicates(keep=False)
             k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_used
