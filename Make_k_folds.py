@@ -92,8 +92,8 @@ class MakeKFolds:
                         df_group = df_used_wells
                         df_used.append(df_used_wells)
                     sampled_well = np.random.choice(df_group[self.well_column_header].unique(), group_n[group])
-                    df_sampled = df_group[self.well_column_header == sampled_well]
-                    df_fold = df_fold.append(df_group)
+                    df_sampled = df_group[df_group.isin({self.well_column_header: sampled_well})]
+                    df_fold = df_fold.append(df_sampled)
                 else:
                     df_group = df_group.sample(n = group_n[group])
                     df_fold = df_fold.append(df_group)
