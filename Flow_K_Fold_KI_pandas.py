@@ -107,9 +107,6 @@ class LeaveOneOut:
         df_validation = df_used.groupby(self.class_column_header).sample( n=30)#frac = self.validation_set_size)
         df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
 
-        # ## Quick fix to get every class of the exact same size
-        df_train = df_train.groupby(self.class_column_header).sample(n=540) # 545 is the number of expected images remaining for the smallest (AGC) class
-
         df["valid"] = df.index.isin(df_validation.index)
         df["train"] = df.index.isin(df_train.index)
         df["test"] = df.index.isin(df_test.index)
