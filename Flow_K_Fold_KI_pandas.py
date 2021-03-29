@@ -30,6 +30,8 @@ class LeaveOneOut:
                 validation_set_size  = 0.20, #Percentage written as decimal,
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
+                exclude_groups = ['P009063','P009083'], #Empty for everything included,
+                exclude_header = 'plate',
                 class_column_header = 'group',
                 well_index = 3,
                 leave_out_index = 6,
@@ -47,6 +49,8 @@ class LeaveOneOut:
         self.validation_set_size = validation_set_size
         self.included_groups = include_groups
         self.include_header = include_header
+        self.exclude_groups = exclude_groups
+        self.exclude_header = exclude_header
         self.class_column_header =  class_column_header 
         self.well_index =  well_index
         self.leave_out_index =  leave_out_index
@@ -64,8 +68,10 @@ class LeaveOneOut:
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
-                include_index = 10,
-                class_index = 10,
+                include_header = 'group',
+                exclude_groups = ['P009063','P009083'], #Empty for everything included,
+                exclude_header = 'plate',
+                class_column_header = 'group',
                 well_index = 3,
                 leave_out_index = 6,
                 image_number_index = 1,
@@ -80,8 +86,10 @@ class LeaveOneOut:
         self.image_name  = image_name
         self.validation_set_size = validation_set_size
         self.included_groups = include_groups
-        self.include_index = include_index
-        self.class_index =  class_index 
+        self.include_header = include_header
+        self.exclude_groups = exclude_groups
+        self.exclude_header = exclude_header
+        self.class_column_header =  class_column_header 
         self.well_index =  well_index
         self.leave_out_index =  leave_out_index
         self.image_number_index = image_number_index
@@ -96,7 +104,7 @@ class LeaveOneOut:
 
         df = pd.read_csv(self.labels_path , delimiter= ";")
         groups = self.included_groups
-        df_used = df[df[self.include_header].isin(groups)]
+        df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
 
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
@@ -104,7 +112,7 @@ class LeaveOneOut:
 
         df_used = pd.concat([df_used, df_test, df_test]).drop_duplicates(keep=False)
 
-        df_validation = df_used.groupby(self.class_column_header).sample( n=30)#frac = self.validation_set_size)
+        df_validation = df_used.groupby(self.class_column_header).sample(frac = self.validation_set_size)
         df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
 
         df["valid"] = df.index.isin(df_validation.index)

@@ -10,8 +10,10 @@ class MakeKFolds:
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/Inputs/K_folds/',
-                include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
+                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
+                exclude_groups = ['P009063','P009083'], #Empty for everything included,
+                exclude_header = 'plate',
                 class_column_header = 'group',
                 well_column_header = 'well',
                 k_folds = "10",
@@ -21,6 +23,8 @@ class MakeKFolds:
         self.output_dir = output_dir
         self.included_groups = include_groups
         self.include_header = include_header
+        self.exclude_groups = exclude_groups
+        self.exclude_header = exclude_header
         self.class_column_header =  class_column_header 
         self.well_column_header = well_column_header
         self.k_folds = int(k_folds)
@@ -32,8 +36,7 @@ class MakeKFolds:
 
         
         df = pd.read_csv(self.labels_path , delimiter= ";")
-        groups = self.included_groups
-        df_used = df[df[self.include_header].isin(groups)]
+        df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
        
         k_folds = self.get_k_folds(df_used)
 
