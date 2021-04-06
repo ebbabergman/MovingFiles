@@ -21,6 +21,7 @@ class LeaveOneOut:
     
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
+                exclude_images_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/flags.csv',
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
                 save_labels_dir = '/home/jovyan/scratch-shared/Ebba/GPU2/Ebba_DL/Outputs',
                 k_fold_dir = '/home/jovyan/Inputs/K_folds/',
@@ -41,6 +42,7 @@ class LeaveOneOut:
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
+        self.exclude_images_path = exclude_images_path
         self.output_dir = output_dir
         self.k_fold_dir = k_fold_dir
         self.k_fold_name = k_fold_name
@@ -105,6 +107,14 @@ class LeaveOneOut:
         df = pd.read_csv(self.labels_path , delimiter= ";")
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        
+        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
+        df_bad_images["nr"] = df_bad_images["Unnamed: 0"]
+        df_bad_images["bad"] = df_bad_images[df_bad_images[df_bad_images.columns[4:19]] == 1].any(axis = "columns")
+        bad_image_numbers = df_bad_images[df_bad_images["bad"]][["nr"]]
+        mask = df_used["nr"].isin(bad_image_numbers)
+        df_used = df_used[mask]
+
 
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
