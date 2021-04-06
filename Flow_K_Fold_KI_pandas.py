@@ -109,12 +109,9 @@ class LeaveOneOut:
         df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
         
         df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
-        df_bad_images["nr"] = df_bad_images["Unnamed: 0"]
-        df_bad_images["bad"] = df_bad_images[df_bad_images[df_bad_images.columns[4:19]] == 1].any(axis = "columns")
-        bad_image_numbers = df_bad_images[df_bad_images["bad"]][["nr"]]
-        mask = df_used["nr"].isin(bad_image_numbers)
-        df_used = df_used[mask]
-
+        df_bad_images["nr"] = df_bad_images["Unnamed: 0"] #TODO make less specific
+        good_images = ~df_bad_images[df_bad_images[df_bad_images.columns[4:19]] == 1].any(axis = "columns")
+        df_used = df_used[df_used.nr.isin(df_bad_images[good_images]["nr"])]#TODO make less specific
 
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
