@@ -8,13 +8,13 @@ import pandas as pd
 class MakeKFolds:
    
     def __init__(self,
-                labels_path = '/home/jovyan/kensert_CNN/bbbc021_labels.csv',
+                labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/bbbc021_labels.csv',
                 output_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
-                include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
+                include_groups = ["moa"], #Empty for everything included,
                 include_header = 'group',
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'plate',
-                class_column_header = 'group',
+                class_column_header = 'moa',
                 well_column_header = 'well',
                 k_folds = "10",
                 frac_of_controls_to_use = 0.20
