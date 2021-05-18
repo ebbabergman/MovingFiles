@@ -65,7 +65,11 @@ class LeaveOneOut:
 
     def update_settings(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                output_dir = '/home/jovyan/scratch-shared/Ebba/Kinase_Leave_One_Out',
+                exclude_images_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/flags.csv',
+                output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
+                save_labels_dir = '/home/jovyan/scratch-shared/Ebba/GPU2/Ebba_DL/Outputs',
+                k_fold_dir = '/home/jovyan/Inputs/K_folds/',
+                k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
@@ -76,14 +80,16 @@ class LeaveOneOut:
                 class_column_header = 'group',
                 well_index = 3,
                 leave_out_index = 6,
-                image_number_index = 1,
-                name_to_leave_out = "CBK013405" ,
-                k_fold = 1,
-                k_folds = {},
+                image_number_heading = "nr",
+                name_to_leave_out = "" ,
+                k_fold = "1",
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
+        self.exclude_images_path = exclude_images_path
         self.output_dir = output_dir
+        self.k_fold_dir = k_fold_dir
+        self.k_fold_name = k_fold_name
         self.image_dir = image_dir
         self.image_name  = image_name
         self.validation_set_size = validation_set_size
@@ -94,10 +100,12 @@ class LeaveOneOut:
         self.class_column_header =  class_column_header 
         self.well_index =  well_index
         self.leave_out_index =  leave_out_index
-        self.image_number_index = image_number_index
+        self.image_number_heading = image_number_heading
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
         self.k_fold = int(k_fold)
+        self.save_labels_dir = save_labels_dir
+       
        
 
 
