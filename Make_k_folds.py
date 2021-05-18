@@ -15,7 +15,7 @@ class MakeKFolds:
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
                 class_column_header = 'group',
-                intact_group_header = 'compound',
+                intact_group_header = 'compoundname',
                 intact_control_group_header = 'well',
                 k_folds = "10",
                 has_controls = False,
@@ -84,7 +84,7 @@ class MakeKFolds:
         for group in self.included_groups:
             test = df_used[df_used[self.include_header].isin([group])]
             if self.has_controls and group == 'control':
-                test = test.groupby(self.intact_group_header)
+                test = test.groupby(self.intact_control_group_header)
                 group_n[group] = int(int(test[[self.include_header]].count().count())*k_fold_frac) 
                 if group_n[group] < 1: group_n[group] = 1
             else:
