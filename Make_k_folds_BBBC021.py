@@ -29,7 +29,7 @@ class MakeKFolds:
         self.class_column_header =  class_column_header 
         self.well_column_header = well_column_header
         self.k_folds = int(k_folds)
-        self.has_controls = has_controls,
+        self.has_controls = has_controls
         self.frac_of_controls_to_use = frac_of_controls_to_use
 
     def main(self):
@@ -39,6 +39,9 @@ class MakeKFolds:
         
         df = pd.read_csv(self.labels_path , delimiter= ",")
        
+        ## if no included groups are included then all groups are included
+        #included_groups
+        df[self.include_header]
         df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
        
         k_folds = self.get_k_folds(df_used)
@@ -103,7 +106,7 @@ class MakeKFolds:
             k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_used
 
-        if self.has_controls and df_used[df_used[class_column_header] == 'control'].empty:
+        if self.has_controls and df_used[df_used[self.class_column_header] == 'control'].empty:
             df_group = df_used[df_used[self.include_header].isin(['control'])]
             df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n['control'])
             k_folds[number_of_folds-1] =  k_folds[number_of_folds-1].append(df_sampled)
