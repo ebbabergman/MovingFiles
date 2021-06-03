@@ -10,7 +10,7 @@ class MakeKFolds:
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds/',
-                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
+                include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
