@@ -4,6 +4,7 @@ import shutil
 import numpy as np
 import random
 import pandas as pd
+import math
 
 class MakeKFolds:
    
@@ -15,10 +16,11 @@ class MakeKFolds:
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'plate',
                 class_column_header = 'moa',
-                well_column_header = 'well',
+                well_column_header = 'compound',
                 k_folds = "10",
                 has_controls = False,
-                frac_of_controls_to_use = 0.20
+                frac_of_controls_to_use = 0.20,
+                divide_on_header = 'compound'
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
@@ -31,6 +33,7 @@ class MakeKFolds:
         self.k_folds = int(k_folds)
         self.has_controls = has_controls
         self.frac_of_controls_to_use = frac_of_controls_to_use
+        self.divide_on_header = divide_on_header
 
     def main(self):
         print("Started get info.")
@@ -39,9 +42,7 @@ class MakeKFolds:
         
         df = pd.read_csv(self.labels_path , delimiter= ",")
        
-        ## if no included groups are included then all groups are included
-        #included_groups
-        df[self.include_header]
+        self.included_groups = df[self.include_header].unique()
         df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
        
         k_folds = self.get_k_folds(df_used)
@@ -89,7 +90,7 @@ class MakeKFolds:
                 group_n[group] = int(int(test[[self.include_header]].count().count())*k_fold_frac) 
                 if group_n[group] < 1: group_n[group] = 1
             else:
-                group_n[group] = int(test.count()[[self.well_column_header]]*k_fold_frac) 
+                group_n[group] = math.floor(test[[self.divide_on_header]].count()*k_fold_frac) 
 
         for k_fold in range(0,number_of_folds-1):
             df_fold= pd.DataFrame()
