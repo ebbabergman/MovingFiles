@@ -128,7 +128,7 @@ class LeaveOneOut:
         df["test"] = df.index.isin(df_test.index)
 
         ##Make some statistics 
-        df_statistics_base = df[df[self.include_header].isin(groups)]
+        df_statistics_base = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
         df_statistics_base = df_statistics_base[[self.class_column_header, "valid", "train", "test"]]
 
         df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[["train"]].reset_index().values, columns=["group", "train"])
