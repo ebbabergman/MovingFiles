@@ -41,8 +41,8 @@ class MakeKFolds:
 
         
         df = pd.read_csv(self.labels_path , delimiter= ",")
-       
-        self.included_groups = df[self.include_header].unique()
+        if(len(self.included_groups) == 0):
+         self.included_groups = df[self.include_header].unique()
         df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
        
         k_folds = self.get_k_folds(df_used)

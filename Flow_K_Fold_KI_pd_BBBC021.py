@@ -63,22 +63,25 @@ class LeaveOneOut:
        
 
     def update_settings(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                output_dir = '/home/jovyan/scratch-shared/Ebba/Kinase_Leave_One_Out',
-                image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
+                 labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/Labels.csv',
+                output_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
+                save_labels_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
+                k_fold_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
+                k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
+                image_dir= '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
-                include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
-                include_header = 'group',
-                exclude_groups = ['P009063','P009083'], #Empty for everything included,
-                exclude_header = 'plate',
-                class_column_header = 'group',
-                well_index = 3,
-                leave_out_index = 6,
-                image_number_index = 1,
-                name_to_leave_out = "CBK013405" ,
-                k_fold = 1,
-                k_folds = {},
+                include_groups = [], #Empty for everything included,
+                include_header = 'moa',
+                exclude_groups = ["Cholesterol-lowering","Eg5 inhibitors"], #Empty for everything included,
+                exclude_header = 'moa',
+                class_column_header = 'moa',
+                well_column_header = 'compound',
+                well_index = 1,
+                leave_out_index = 1,
+                image_number_heading = "image_number",
+                name_to_leave_out = "" ,
+                k_fold = "1",
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
@@ -103,7 +106,11 @@ class LeaveOneOut:
     def main(self):
         print("Starting leave one out")
 
-        df = pd.read_csv(self.labels_path , delimiter= ";")
+        df = pd.read_csv(self.labels_path , delimiter= ",")
+
+        if(len(self.included_groups) == 0):
+            self.included_groups = df[self.include_header].unique()
+
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
 
