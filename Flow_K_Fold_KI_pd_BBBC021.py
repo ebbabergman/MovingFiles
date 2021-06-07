@@ -63,7 +63,7 @@ class LeaveOneOut:
        
 
     def update_settings(self,
-                 labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/Labels.csv',
+                labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/Labels.csv',
                 output_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
                 save_labels_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
                 k_fold_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
@@ -86,6 +86,8 @@ class LeaveOneOut:
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
+        self.k_fold_dir = k_fold_dir
+        self.k_fold_name = k_fold_name
         self.image_dir = image_dir
         self.image_name  = image_name
         self.validation_set_size = validation_set_size
@@ -96,10 +98,11 @@ class LeaveOneOut:
         self.class_column_header =  class_column_header 
         self.well_index =  well_index
         self.leave_out_index =  leave_out_index
-        self.image_number_index = image_number_index
+        self.image_number_heading = image_number_heading
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
         self.k_fold = int(k_fold)
+        self.save_labels_dir = save_labels_dir
        
 
 
