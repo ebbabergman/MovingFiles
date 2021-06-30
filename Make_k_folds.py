@@ -10,6 +10,7 @@ class MakeKFolds:
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds/',
+                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/QC_KinaseInhibitors_OnlyFlaggedAut_AllPlates.csv',
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
@@ -23,6 +24,7 @@ class MakeKFolds:
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
+        self.exclude_images_path = exclude_images_path
         self.included_groups = include_groups
         self.include_header = include_header
         self.exclude_groups = exclude_groups
@@ -40,8 +42,13 @@ class MakeKFolds:
 
         
         df = pd.read_csv(self.labels_path , delimiter= ";")
-       
         df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+
+        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
+        df_bad_images["nr"] = df_bad_images["Unnamed: 0"] #TODO make less specific
+        good_images = ~df_bad_images[df_bad_images[df_bad_images.columns[4:]] == 1].any(axis = "columns")
+        df_used = df_used[df_used.nr.isin(df_bad_images[good_images]["nr"])]
+     
        
         k_folds = self.get_k_folds(df_used)
 
