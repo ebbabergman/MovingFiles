@@ -21,7 +21,7 @@ class LeaveOneOut:
     
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/QC_KinaseInhibitors_OnlyFlaggedAut_AllPlates.csv',
+                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_Strict_and_Aut.csv',
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
                 save_labels_dir = '/home/jovyan/scratch-shared/Ebba/GPU2/Ebba_DL/Outputs',
                 k_fold_dir = '/home/jovyan/Inputs/K_folds/',
@@ -34,6 +34,7 @@ class LeaveOneOut:
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
                 class_column_header = 'group',
+                meta_data_header = ['plate', 'well', 'site'],
                 well_index = 3,
                 leave_out_index = 6,
                 image_number_heading = "nr",
@@ -54,6 +55,7 @@ class LeaveOneOut:
         self.exclude_groups = exclude_groups
         self.exclude_header = exclude_header
         self.class_column_header =  class_column_header 
+        self.meta_data_header = meta_data_header
         self.well_index =  well_index
         self.leave_out_index =  leave_out_index
         self.image_number_heading = image_number_heading
@@ -65,7 +67,7 @@ class LeaveOneOut:
 
     def update_settings(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                exclude_images_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/flags.csv',
+                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_Strict_and_Aut.csv',
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
                 save_labels_dir = '/home/jovyan/scratch-shared/Ebba/GPU2/Ebba_DL/Outputs',
                 k_fold_dir = '/home/jovyan/Inputs/K_folds/',
@@ -78,6 +80,7 @@ class LeaveOneOut:
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
                 class_column_header = 'group',
+                meta_data_header = ['plate', 'well', 'site'],
                 well_index = 3,
                 leave_out_index = 6,
                 image_number_heading = "nr",
@@ -98,6 +101,7 @@ class LeaveOneOut:
         self.exclude_groups = exclude_groups
         self.exclude_header = exclude_header
         self.class_column_header =  class_column_header 
+        self.meta_data_header = meta_data_header
         self.well_index =  well_index
         self.leave_out_index =  leave_out_index
         self.image_number_heading = image_number_heading
@@ -117,9 +121,10 @@ class LeaveOneOut:
         df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
         
         df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
-        df_bad_images["nr"] = df_bad_images["Unnamed: 0"] #TODO make less specific
-        good_images = ~df_bad_images[df_bad_images[df_bad_images.columns[4:19]] == 1].any(axis = "columns")
-        df_used = df_used[df_used.nr.isin(df_bad_images[good_images]["nr"])]#TODO make less specific
+        df_bad_images.columns= df_bad_images.columns.str.lower()
+        df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" ) # This is not working out correctly due to missmatches in plate names
+        df_do_not_use = df_do_not_use[df_do_not_use["total"] == 1 ]
+        df_used = df_used(df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading]))
 
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
