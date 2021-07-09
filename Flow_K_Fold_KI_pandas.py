@@ -21,7 +21,7 @@ class LeaveOneOut:
     
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_Strict_and_Aut.csv',
+                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_CP_and_Aut.csv',
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
                 save_labels_dir = '/home/jovyan/scratch-shared/Ebba/GPU2/Ebba_DL/Outputs',
                 k_fold_dir = '/home/jovyan/Inputs/K_folds/',
@@ -67,7 +67,7 @@ class LeaveOneOut:
 
     def update_settings(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_Strict_and_Aut.csv',
+                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_CP_and_Aut.csv',
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
                 save_labels_dir = '/home/jovyan/scratch-shared/Ebba/GPU2/Ebba_DL/Outputs',
                 k_fold_dir = '/home/jovyan/Inputs/K_folds/',
