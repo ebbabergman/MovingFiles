@@ -66,9 +66,7 @@ class MakeKFolds:
 
 
     def get_k_folds(self, df_used):
-        number_of_folds = self.k_folds
-        k_fold_frac = 1/number_of_folds
-        k_folds = [None]*number_of_folds
+        k_folds = []
         group_n = {}
         df_used_wells =  pd.DataFrame()
 
@@ -76,30 +74,32 @@ class MakeKFolds:
             test = df_used[df_used[self.include_header].isin([group])]
             if self.has_controls and group == 'control':
                 test = test.groupby(self.intact_control_group_header)
-                group_n[group] = int(int(test[[self.include_header]].count().count())*k_fold_frac) 
-                if group_n[group] < 1: group_n[group] = 1
+                group_n[group] = int(int(test[[self.include_header]].count().count())) 
             else:
-                group_n[group] = int(test.count()[[self.intact_group_header]]*k_fold_frac) 
+                group_n[group] = int(test.count()[[self.intact_group_header]]) 
+                
 
-        for k_fold in range(0,number_of_folds-1):
-            df_fold= pd.DataFrame()
-            for group in self.included_groups:
+        for group in self.included_groups:
+            number_of_examples = group_n[group]
+            for group_sample_number in number_of_examples:
                 df_group = df_used[df_used[self.include_header].isin([group])]
                 if self.has_controls and group == 'control':
-                    df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n[group])
+                    df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, 1)
                     df_fold = df_fold.append(df_sampled)
-                    
                 else:
-                    df_group = df_group.sample(n = group_n[group])
+                    df_group = df_group.sample(n = 1)
                     df_fold = df_fold.append(df_group)
             df_used = pd.concat([df_used, df_fold, df_fold]).drop_duplicates(keep=False)
-            k_folds[k_fold] = df_fold
-        k_folds[number_of_folds-1] = df_used
+            k_folds.extend(df_fold)
 
         if self.has_controls and df_used[df_used[self.class_column_header] == 'control'].empty:
             df_group = df_used[df_used[self.include_header].isin(['control'])]
-            df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n['control'])
-            k_folds[number_of_folds-1] =  k_folds[number_of_folds-1].append(df_sampled)
+            controls_left_to_do = True
+            while  controls_left_to_do:
+                df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, 1)
+                k_folds.extend(df_sampled)
+                controls_left_to_do: # TODO 
+
             
         return k_folds
 
