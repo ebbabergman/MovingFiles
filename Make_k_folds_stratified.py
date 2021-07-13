@@ -48,19 +48,6 @@ class MakeKFolds:
        
         k_folds = self.get_k_folds(df_used)
 
-        ##Make some statistics 
-        df_statistics_base = df_used
-        df_statistics_base = df_statistics_base[[self.class_column_header, self.intact_group_header]]
-
-        df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[[self.intact_group_header]].reset_index().values, columns=[self.class_column_header,self.intact_group_header])
-        df_statistics.rename(columns={self.intact_group_header: "total"}, inplace=True)
-    
-        number_of_folds = self.k_folds
-        for k_fold in range(0,number_of_folds):
-            df_fold = k_folds[k_fold] 
-            df_statistics[str(k_fold)] = df_fold.groupby(self.class_column_header).count().reset_index()[[self.intact_group_header]]
-       
-        print(df_statistics)
         ##Write out data 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
@@ -69,10 +56,11 @@ class MakeKFolds:
             os.makedirs(self.output_dir)
             print("made the output dir")   
 
-        df_statistics.to_csv(self.output_dir + "k_fold_statistics.csv")
-        for k_fold in range(0,number_of_folds):
+        fold_number = 1
+        for k_fold in k_folds:
             df_fold = k_folds[k_fold] 
-            df_fold.to_csv(self.output_dir + "k_fold_"+ str(k_fold +1)+".csv")
+            df_fold.to_csv(self.output_dir + "k_fold_"+ str(fold_number)+".csv")
+            fold_number = fold_number + 1
 
         print("Finished. Find output in: " + self.output_dir)
 
