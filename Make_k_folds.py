@@ -112,6 +112,7 @@ class MakeKFolds:
             k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_used
 
+        # TODO EBBA doubel check that this is right, if correct write an explainable comment
         if self.has_controls and df_used[df_used[self.class_column_header] == 'control'].empty:
             df_group = df_used[df_used[self.include_header].isin(['control'])]
             df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n['control'])
