@@ -122,7 +122,7 @@ class LeaveOneOut:
         
         df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
         df_bad_images.columns= df_bad_images.columns.str.lower()
-        df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" ) # This is not working out correctly due to missmatches in plate names
+        df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" )
         df_do_not_use = df_do_not_use[df_do_not_use["total"] == 1 ]
         df_used = df_used[df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
 
