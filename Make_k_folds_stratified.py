@@ -9,7 +9,7 @@ class MakeKFolds:
    
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                output_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds/',
+                output_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds_one_by_one/',
                 exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/QC_KinaseInhibitors_OnlyFlaggedAut_AllPlates.csv',
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
@@ -18,6 +18,7 @@ class MakeKFolds:
                 class_column_header = 'group',
                 intact_group_header = 'compoundname',
                 intact_control_group_header = 'well',
+                meta_data_header = ['plate', 'well', 'site'],
                 has_controls = False,
                 frac_of_controls_to_use = 0.20
                 ):
@@ -28,6 +29,7 @@ class MakeKFolds:
         self.include_header = include_header
         self.exclude_groups = exclude_groups
         self.exclude_header = exclude_header
+        self.meta_data_header = meta_data_header
         self.class_column_header =  class_column_header 
         self.intact_group_header = intact_group_header
         self.intact_control_group_header = intact_control_group_header
@@ -93,24 +95,20 @@ class MakeKFolds:
             k_folds.extend(df_fold)
 
         if self.has_controls and df_used[df_used[self.class_column_header] == 'control'].empty:
-            df_group = df_used[df_used[self.include_header].isin(['control'])]
+            df_group = df_used[df_used[self.include_header].isin(['control'])].copy()
             controls_left_to_do = True
-            while  controls_left_to_do:
-                df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, 1)
-                k_folds.extend(df_sampled)
-                controls_left_to_do: # TODO fix
-
-            
+            while  controls_left_to_do: # for length of df_group
+                controls_left_to_do, df_sampled, df_used_wells, df_used = self.getControlSampel(df_group, df_used_wells, df_used, 1)
+                k_folds.extend(df_sampled)                        
         return k_folds
 
     def getControlSampel(self, df_group, df_used_wells, df_used, n_sample):
         if(df_group[self.intact_control_group_header].count() == 0):
-            df_group = df_used_wells
-            df_used.append(df_used_wells)
+            return False
         sampled_well = np.random.choice(df_group[self.intact_control_group_header].unique(), n_sample)
         df_sampled = df_group[df_group[self.intact_control_group_header].isin(sampled_well)]
         df_used_wells = df_used_wells.append(df_sampled)
-        return df_sampled, df_used_wells, df_used
+        return True, df_sampled, df_used_wells, df_used
 
 if __name__ == "__main__":
     MakeKFolds().main()
