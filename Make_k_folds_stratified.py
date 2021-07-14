@@ -95,7 +95,7 @@ class MakeKFolds:
             k_fold = df_control[df_control[self.intact_control_group_headers] == combo]
             k_folds.append(k_fold)
 
-        return []
+        return k_folds
 
 
     def getControlSampel(self, df_group, df_used_wells, df_used, n_sample):
