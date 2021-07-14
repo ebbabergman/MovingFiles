@@ -98,7 +98,7 @@ class MakeKFolds:
             while  controls_left_to_do:
                 df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, 1)
                 k_folds.extend(df_sampled)
-                controls_left_to_do: # TODO 
+                controls_left_to_do: # TODO fix
 
             
         return k_folds
