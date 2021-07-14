@@ -58,8 +58,7 @@ class MakeKFolds:
             print("made the output dir")   
 
         fold_number = 1
-        for fold in k_folds:
-            df_fold = k_folds[fold] 
+        for df_fold in k_folds:
             df_fold.to_csv(self.output_dir + "k_fold_"+ str(fold_number)+".csv")
             fold_number = fold_number + 1
 
