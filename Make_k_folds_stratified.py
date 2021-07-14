@@ -10,7 +10,7 @@ class MakeKFolds:
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds_one_by_one/',
-                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/QC_KinaseInhibitors_OnlyFlaggedAut_AllPlates.csv',
+                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_CP_and_Aut.csv",
                 include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
@@ -19,6 +19,7 @@ class MakeKFolds:
                 intact_group_header = 'compoundname',
                 intact_control_group_header = 'well',
                 meta_data_header = ['plate', 'well', 'site'],
+                image_number_heading = "nr",   
                 has_controls = False,
                 frac_of_controls_to_use = 0.20
                 ):
@@ -30,6 +31,7 @@ class MakeKFolds:
         self.exclude_groups = exclude_groups
         self.exclude_header = exclude_header
         self.meta_data_header = meta_data_header
+        self.image_number_heading = image_number_heading
         self.class_column_header =  class_column_header 
         self.intact_group_header = intact_group_header
         self.intact_control_group_header = intact_control_group_header
@@ -83,7 +85,7 @@ class MakeKFolds:
 
         for group in self.included_groups:
             number_of_examples = group_n[group]
-            for group_sample_number in number_of_examples:
+            for group_sample_number in range(0, number_of_examples):
                 df_group = df_used[df_used[self.include_header].isin([group])]
                 if self.has_controls and group == 'control':
                     df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, 1)
