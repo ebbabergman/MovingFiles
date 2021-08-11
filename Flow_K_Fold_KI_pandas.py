@@ -2,7 +2,6 @@
 ## DataFlowSort.py
 ## Moves files into a structure that works with data flow, 
 
-
 ##Backgroung from https://data.broadinstitute.org/bbbc/BBBC021/
 
 # #NOTE: When evaluating accuracy of MOA classification, it is critical to ensure that the cross-validation is set up correctly. 
@@ -110,9 +109,6 @@ class LeaveOneOut:
         self.k_fold = int(k_fold)
         self.save_labels_dir = save_labels_dir
        
-       
-
-
     def main(self):
         print("Starting leave one out")
 
@@ -152,7 +148,6 @@ class LeaveOneOut:
         df_statistics["test"] = df_statistics_base[df_statistics_base["test"]==1].groupby(self.class_column_header).count().reset_index()[["test"]]
         df_statistics["percentage_test"] = df_statistics["test"] /df_statistics["total"] 
 
-
         ## Save information 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
@@ -182,7 +177,6 @@ class LeaveOneOut:
     
     def run(self):
         self.main()
-
         
     def sort_into_class_folders(self, image_number, class_name, category): #where category is train, validation or test
         if(image_number == ''):
