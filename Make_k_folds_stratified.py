@@ -17,7 +17,7 @@ class MakeKFolds:
                 exclude_header = 'plate',
                 class_column_header = 'group',
                 intact_group_header = 'compoundname',
-                intact_control_group_headers = ['plate', 'well'],
+                intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
                 meta_data_header = ['plate', 'well', 'site'],
                 image_number_heading = "nr",   
                 has_controls = False,
@@ -43,10 +43,11 @@ class MakeKFolds:
       
         df = pd.read_csv(self.labels_path , delimiter= ";")
        
-        k_folds = self.get_k_folds(df)
+        #k_folds = self.get_k_folds(df)
 
-        # controll_k_folds = self.get_k_folds_control(df)
-        # k_folds.extend(controll_k_folds)
+        k_folds = []
+        controll_k_folds = self.get_k_folds_control(df)
+        k_folds.extend(controll_k_folds)
 
         print("Made " + str(len(k_folds)) +" k-folds")
 
@@ -95,7 +96,7 @@ class MakeKFolds:
         df_control = df[df['type'] == "control"]
         unique_combos = df_control[df_control.columns & self.intact_control_group_headers].drop_duplicates().to_numpy()
         for combo in unique_combos:
-            k_fold = df_control[df_control[self.intact_control_group_headers] == combo]
+            k_fold = df_control[(df_control[self.intact_control_group_headers[0]] == combo[0]) & (self.intact_control_group_headers[1] == combo[1])]
             k_folds.append(k_fold)
 
         return k_folds
