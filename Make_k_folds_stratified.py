@@ -9,7 +9,7 @@ class MakeKFolds:
    
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                output_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds_one_by_one/',
+                output_dir = '/home/jovyan/Inputs/TEST_Kinase_compound_K_folds_one_by_one/',
                 exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_CP_and_Aut.csv",
                 include_groups = ['TK','CMGC','AGC'], #Empty for everything included,
                 include_header = 'group',
@@ -45,9 +45,10 @@ class MakeKFolds:
        
         k_folds = self.get_k_folds(df)
 
-        controll_k_folds = self.get_k_folds_control(df)
+        # controll_k_folds = self.get_k_folds_control(df)
+        # k_folds.extend(controll_k_folds)
 
-        k_folds.extend(controll_k_folds)
+        print("Made " + str(len(k_folds)) +" k-folds")
 
         ##Write out data 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
@@ -57,10 +58,12 @@ class MakeKFolds:
             os.makedirs(self.output_dir)
             print("made the output dir")   
 
+        print("Starting to write to files")
         fold_number = 1
         for df_fold in k_folds:
             df_fold.to_csv(self.output_dir + "k_fold_"+ str(fold_number)+".csv")
             fold_number = fold_number + 1
+
 
         print("Finished. Find output in: " + self.output_dir)
 
