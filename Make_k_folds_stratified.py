@@ -43,9 +43,8 @@ class MakeKFolds:
       
         df = pd.read_csv(self.labels_path , delimiter= ";")
        
-        #k_folds = self.get_k_folds(df)
+        k_folds = self.get_k_folds(df)
 
-        k_folds = []
         controll_k_folds = self.get_k_folds_control(df)
         k_folds.extend(controll_k_folds)
 
