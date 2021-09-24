@@ -61,7 +61,7 @@ class MakeKFolds:
         print("Starting to write to files")
         fold_number = 1
         for df_fold in k_folds:
-            df_fold.to_csv(self.output_dir + "k_fold_"+ str(fold_number)+".csv")
+            df_fold.to_csv(self.output_dir + "k_fold_"+ str(fold_number)+".csv", index = False)
             fold_number = fold_number + 1
 
 

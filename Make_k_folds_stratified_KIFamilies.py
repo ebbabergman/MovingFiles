@@ -4,6 +4,7 @@ import shutil
 import numpy as np
 import random
 import pandas as pd
+from pandas.core import indexing
 
 class MakeKFolds:
    
@@ -41,7 +42,7 @@ class MakeKFolds:
     def main(self):
         print("Started get info.")
       
-        df = pd.read_csv(self.labels_path , delimiter= ";")
+        df = pd.read_csv(self.labels_path , delimiter= ";", index_col=False)
        
         k_folds = self.get_k_folds(df)
 
@@ -61,7 +62,7 @@ class MakeKFolds:
         print("Starting to write to files")
         fold_number = 1
         for df_fold in k_folds:
-            df_fold.to_csv(self.output_dir + "k_fold_"+ str(fold_number)+".csv")
+            df_fold.to_csv(self.output_dir + "k_fold_"+ str(fold_number)+".csv", index = False)
             fold_number = fold_number + 1
 
 
