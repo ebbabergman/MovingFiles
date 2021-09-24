@@ -97,6 +97,7 @@ class MakeKFolds:
         unique_combos = df_control[df_control.columns & self.intact_control_group_headers].drop_duplicates().to_numpy()
         for combo in unique_combos:
             k_fold = df_control[(df_control[self.intact_control_group_headers[0]] == combo[0]) & (df_control[self.intact_control_group_headers[1]] == combo[1])]
+            k_fold[self.class_column_header] = 'control'
             k_folds.append(k_fold)
 
         return k_folds
