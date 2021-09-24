@@ -160,8 +160,8 @@ class LeaveOneOut:
         df_save.to_csv(self.output_dir + "/Labels.csv")
         df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"))
 
-        df_save.to_csv(self.save_labels_dir + "/Labels.csv")
-        df_statistics.to_csv((self.save_labels_dir + "/LabelStatistics.csv"))
+        df_save.to_csv(self.save_labels_dir + "/Labels.csv", index = False)
+        df_statistics.to_csv(self.save_labels_dir + "/LabelStatistics.csv", index = False)
 
         train_rows = df_train[[self.image_number_heading,self.class_column_header]].to_numpy()
         validation_rows = df_validation[[self.image_number_heading,self.class_column_header]].to_numpy()
