@@ -157,8 +157,8 @@ class LeaveOneOut:
             print("Made the output directory: " + self.output_dir)
 
         df_save = df[df[self.include_header].isin(groups)]
-        df_save.to_csv(self.output_dir + "/Labels.csv")
-        df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"))
+        df_save.to_csv(self.output_dir + "/Labels.csv", index = False)
+        df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"), index = False)
 
         df_save.to_csv(self.save_labels_dir + "/Labels.csv", index = False)
         df_statistics.to_csv(self.save_labels_dir + "/LabelStatistics.csv", index = False)

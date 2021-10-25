@@ -73,10 +73,10 @@ class MakeKFolds:
             os.makedirs(self.output_dir)
             print("made the output dir")   
 
-        df_statistics.to_csv(self.output_dir + "k_fold_statistics.csv")
+        df_statistics.to_csv(self.output_dir + "k_fold_statistics.csv", index = False)
         for k_fold in range(0,number_of_folds):
             df_fold = k_folds[k_fold] 
-            df_fold.to_csv(self.output_dir + "k_fold_"+ str(k_fold +1)+".csv")
+            df_fold.to_csv(self.output_dir + "k_fold_"+ str(k_fold +1)+".csv", index = False)
 
         print("Finished. Find output in: " + self.output_dir)
 
