@@ -19,7 +19,7 @@ import pandas as pd
 class LeaveOneOut:
     
     def __init__(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
+                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/Labels.csv',
                 exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv" ,
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
                 save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
@@ -65,20 +65,20 @@ class LeaveOneOut:
        
 
     def update_settings(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_CP_and_Aut.csv',
-                output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
-                save_labels_dir = '/home/jovyan/scratch-shared/Ebba/GPU2/Ebba_DL/Outputs',
-                k_fold_dir = '/home/jovyan/Inputs/K_folds/',
+                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/Labels.csv',
+                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv" ,
+                output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
+                save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
+                k_fold_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds_one_by_one_Family/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
-                include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
+                include_groups = ['control', 'EGFR', 'PIKK','CDK'], #Empty for everything included,
                 include_header = 'family',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
-                class_column_header = 'group',
+                class_column_header = 'family',
                 meta_data_header = ['plate', 'well', 'site'],
                 well_index = 3,
                 leave_out_index = 6,
@@ -112,7 +112,7 @@ class LeaveOneOut:
     def main(self):
         print("Starting leave one out")
 
-        df = pd.read_csv(self.labels_path , delimiter= ";")
+        df = pd.read_csv(self.labels_path , delimiter= ",")
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
         
