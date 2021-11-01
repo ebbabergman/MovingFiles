@@ -63,7 +63,6 @@ class LeaveOneOut:
         self.k_fold = int(k_fold)
         self.save_labels_dir = save_labels_dir
        
-
     def update_settings(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/Labels.csv',
                 exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv" ,
@@ -118,14 +117,8 @@ class LeaveOneOut:
             self.included_groups = df[self.include_header].unique()
 
         groups = self.included_groups
-        df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        df_used = self.get_usable_images(df,groups)
         
-        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
-        df_bad_images.columns= df_bad_images.columns.str.lower()
-        df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" )
-        df_do_not_use = df_do_not_use[df_do_not_use["total"] == 1 ] ## total ==1 means at least one flag has been raised and the image should be excluded
-        df_used = df_used[df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
-
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
         df_test =df_used[df_used[self.image_number_heading].isin(df_test[self.image_number_heading])] 
@@ -140,12 +133,11 @@ class LeaveOneOut:
         df["test"] = df.index.isin(df_test.index)
 
         ##Make some statistics 
-        df_statistics_base = df[df[self.include_header].isin(groups)]
+        df_statistics_base = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
         df_statistics_base = df_statistics_base[[self.class_column_header, "valid", "train", "test"]]
         
-        df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
-        df_used = df_used[df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
-        
+        df_used = self.get_usable_images(df,groups)
+    
         df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[["train"]].reset_index().values, columns=["group", "train"])
         df_statistics.rename(columns={"train": "total"}, inplace=True)
         df_statistics["used"] = df_used.groupby(self.class_column_header).count().reset_index()[[self.image_number_heading]]
@@ -222,6 +214,23 @@ class LeaveOneOut:
             os.makedirs(dir_path)
 
         shutil.copyfile(current_path, target_path)
+
+    def get_usable_images(self,df,groups):
+        df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        df_used = self.use_only_good_images(df_used)
+        return df_used
+
+    def use_only_good_images(self, df_used):
+        if(self.exclude_images_path == ""):
+            return df_used
+        
+        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
+        df_bad_images.columns= df_bad_images.columns.str.lower()
+        df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" )
+        df_do_not_use = df_do_not_use[df_do_not_use["total"] == 1 ] ## total ==1 means at least one flag has been raised and the image should be excluded
+        df_used = df_used[~df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
+        return df_used
+
 
 if __name__ == "__main__":
     LeaveOneOut().main()
