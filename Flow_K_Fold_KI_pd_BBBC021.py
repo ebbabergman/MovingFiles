@@ -55,7 +55,7 @@ class LeaveOneOut:
         self.exclude_header = exclude_header
         self.class_column_header =  class_column_header 
         self.well_index =  well_index
-        self.well_comlumn_header = well_column_header
+        self.well_column_header = well_column_header
         self.meta_data_header = meta_data_header
         self.leave_out_index =  leave_out_index
         self.image_number_heading = image_number_heading
@@ -103,7 +103,7 @@ class LeaveOneOut:
         self.exclude_header = exclude_header
         self.class_column_header =  class_column_header 
         self.well_index =  well_index
-        self.well_comlumn_header = well_column_header
+        self.well_column_header = well_column_header
         self.meta_data_header = meta_data_header
         self.leave_out_index =  leave_out_index
         self.image_number_heading = image_number_heading
