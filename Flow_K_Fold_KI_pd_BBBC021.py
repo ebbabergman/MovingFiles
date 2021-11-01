@@ -137,7 +137,7 @@ class LeaveOneOut:
         df["test"] = df.index.isin(df_test.index)
 
         ##Make some statistics 
-        df_statistics_base = df[df[self.include_header].isin(groups)]
+        df_statistics_base = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
         df_statistics_base = df_statistics_base[[self.class_column_header, "valid", "train", "test"]]
         
         df_used = self.get_usable_images(df,groups)
