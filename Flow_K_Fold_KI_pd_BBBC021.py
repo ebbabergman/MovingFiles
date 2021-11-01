@@ -33,6 +33,7 @@ class LeaveOneOut:
                 exclude_header = 'moa',
                 class_column_header = 'moa',
                 well_column_header = 'compound',
+                meta_data_header = ['plate', 'well', 'site'],
                 well_index = 1,
                 leave_out_index = 1,
                 image_number_heading = "image_number",
@@ -54,6 +55,8 @@ class LeaveOneOut:
         self.exclude_header = exclude_header
         self.class_column_header =  class_column_header 
         self.well_index =  well_index
+        self.well_comlumn_header = well_column_header
+        self.meta_data_header = meta_data_header
         self.leave_out_index =  leave_out_index
         self.image_number_heading = image_number_heading
         self.name_to_leave_out =      name_to_leave_out
@@ -78,6 +81,7 @@ class LeaveOneOut:
                 exclude_header = 'moa',
                 class_column_header = 'moa',
                 well_column_header = 'compound',
+                meta_data_header = ['plate', 'well', 'site'],
                 well_index = 1,
                 leave_out_index = 1,
                 image_number_heading = "image_number",
@@ -99,6 +103,8 @@ class LeaveOneOut:
         self.exclude_header = exclude_header
         self.class_column_header =  class_column_header 
         self.well_index =  well_index
+        self.well_comlumn_header = well_column_header
+        self.meta_data_header = meta_data_header
         self.leave_out_index =  leave_out_index
         self.image_number_heading = image_number_heading
         self.name_to_leave_out =      name_to_leave_out
