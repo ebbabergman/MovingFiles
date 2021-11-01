@@ -10,19 +10,18 @@
 # #Therefore, the evaluation should be a leave-one-compound-out cross validation: 
 # #in each iteration, hold out one compound (all replicates and at all concentrations), train on the remaining, and test on the held out compound.
 
-import csv
 import os
 import shutil
 import numpy as np
-import random
 import pandas as pd
 
 class LeaveOneOut:
     
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/Labels.csv',
-                output_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
-                save_labels_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
+                exclude_images_path = "", # Empty for none
+                output_dir = '/home/jovyan/Outputs/TEST_BBBC021_Leave_One_Out',
+                save_labels_dir = '/home/jovyan/Outputs/TEST_BBBC021_Leave_One_Out',
                 k_fold_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/',
@@ -42,6 +41,7 @@ class LeaveOneOut:
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
+        self.exclude_images_path = exclude_images_path 
         self.output_dir = output_dir
         self.k_fold_dir = k_fold_dir
         self.k_fold_name = k_fold_name
@@ -64,8 +64,9 @@ class LeaveOneOut:
 
     def update_settings(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/Labels.csv',
-                output_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
-                save_labels_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
+                exclude_images_path = "", # Empty for none
+                output_dir = '/home/jovyan/Outputs/TEST_BBBC021_Leave_One_Out',
+                save_labels_dir = '/home/jovyan/Outputs/TEST_BBBC021_Leave_One_Out',
                 k_fold_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/',
@@ -85,6 +86,7 @@ class LeaveOneOut:
                 output_size = 1 # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
+        self.exclude_images_path = exclude_images_path 
         self.output_dir = output_dir
         self.k_fold_dir = k_fold_dir
         self.k_fold_name = k_fold_name
@@ -103,8 +105,6 @@ class LeaveOneOut:
         self.output_size = output_size
         self.k_fold = int(k_fold)
         self.save_labels_dir = save_labels_dir
-       
-
 
     def main(self):
         print("Starting leave one out")
@@ -117,8 +117,10 @@ class LeaveOneOut:
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
         
-        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
-        df_bad_images.columns= df_bad_images.columns.str.lower()
+        df_bad_images = pd.DataFrame()
+        if(self.exclude_images_path != ""):
+            df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
+            df_bad_images.columns= df_bad_images.columns.str.lower()
         df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" )
         df_do_not_use = df_do_not_use[df_do_not_use["total"] == 1 ] ## total ==1 means at least one flag has been raised and the image should be excluded
         df_used = df_used[df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
