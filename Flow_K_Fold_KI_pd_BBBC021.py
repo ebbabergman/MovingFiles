@@ -110,12 +110,18 @@ class LeaveOneOut:
         print("Starting leave one out")
 
         df = pd.read_csv(self.labels_path , delimiter= ",")
-
+        
         if(len(self.included_groups) == 0):
             self.included_groups = df[self.include_header].unique()
 
         groups = self.included_groups
         df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        
+        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
+        df_bad_images.columns= df_bad_images.columns.str.lower()
+        df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" )
+        df_do_not_use = df_do_not_use[df_do_not_use["total"] == 1 ] ## total ==1 means at least one flag has been raised and the image should be excluded
+        df_used = df_used[df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
 
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
@@ -131,18 +137,21 @@ class LeaveOneOut:
         df["test"] = df.index.isin(df_test.index)
 
         ##Make some statistics 
-        df_statistics_base = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        df_statistics_base = df[df[self.include_header].isin(groups)]
         df_statistics_base = df_statistics_base[[self.class_column_header, "valid", "train", "test"]]
-
+        
+        df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        df_used = df_used[df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
+        
         df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[["train"]].reset_index().values, columns=["group", "train"])
         df_statistics.rename(columns={"train": "total"}, inplace=True)
+        df_statistics["used"] = df_used.groupby(self.class_column_header).count().reset_index()[[self.image_number_heading]]
         df_statistics["train"] = df_statistics_base[df_statistics_base["train"]==1].groupby(self.class_column_header).count().reset_index()[["train"]]
-        df_statistics["percentage_train"] = df_statistics["train"] /df_statistics["total"] 
+        df_statistics["percentage_train"] = df_statistics["train"] /df_statistics["used"] 
         df_statistics["valid"] = df_statistics_base[df_statistics_base["valid"]==1].groupby(self.class_column_header).count().reset_index()[["valid"]]
-        df_statistics["percentage_valid"] = df_statistics["valid"] /df_statistics["total"] 
+        df_statistics["percentage_valid"] = df_statistics["valid"] /df_statistics["used"] 
         df_statistics["test"] = df_statistics_base[df_statistics_base["test"]==1].groupby(self.class_column_header).count().reset_index()[["test"]]
-        df_statistics["percentage_test"] = df_statistics["test"] /df_statistics["total"] 
-
+        df_statistics["percentage_test"] = df_statistics["test"] /df_statistics["used"] 
 
         ## Save information 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
@@ -152,12 +161,12 @@ class LeaveOneOut:
             os.makedirs(self.output_dir)
             print("Made the output directory: " + self.output_dir)
 
-        df_save = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        df_save = df[df[self.include_header].isin(groups)& ~df[self.exclude_header].isin(self.exclude_groups)]
         df_save.to_csv(self.output_dir + "/Labels.csv", index = False)
         df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"), index = False)
 
         df_save.to_csv(self.save_labels_dir + "/Labels.csv", index = False)
-        df_statistics.to_csv((self.save_labels_dir + "/LabelStatistics.csv"), index = False)
+        df_statistics.to_csv(self.save_labels_dir + "/LabelStatistics.csv", index = False)
 
         train_rows = df_train[[self.image_number_heading,self.class_column_header]].to_numpy()
         validation_rows = df_validation[[self.image_number_heading,self.class_column_header]].to_numpy()
@@ -173,7 +182,6 @@ class LeaveOneOut:
     
     def run(self):
         self.main()
-
         
     def sort_into_class_folders(self, image_number, class_name, category): #where category is train, validation or test
         if(image_number == ''):
