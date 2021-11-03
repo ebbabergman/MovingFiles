@@ -23,7 +23,7 @@ class LeaveOneOut:
                 labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/Labels.csv',
                 output_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
                 save_labels_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
-                k_fold_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
+                k_fold_dir = '/home/jovyan/scratch-shared/Ebba/BBBC021_K_folds/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/',
                 image_name ='%s.png', #Where %s is the image number,
@@ -66,7 +66,7 @@ class LeaveOneOut:
                 labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/Labels.csv',
                 output_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
                 save_labels_dir = '/home/jovyan/Outputs/BBBC021_Leave_One_Out',
-                k_fold_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
+                k_fold_dir = '/home/jovyan/scratch-shared/Ebba/BBBC021_K_folds/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/',
                 image_name ='%s.png', #Where %s is the image number,
