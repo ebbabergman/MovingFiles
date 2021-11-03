@@ -19,7 +19,7 @@ import pandas as pd
 class LeaveOneOut:
     
     def __init__(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
+                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/Labels.csv',
                 exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv" ,
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
                 save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
@@ -63,22 +63,21 @@ class LeaveOneOut:
         self.k_fold = int(k_fold)
         self.save_labels_dir = save_labels_dir
        
-
     def update_settings(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_CP_and_Aut.csv',
-                output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out',
-                save_labels_dir = '/home/jovyan/scratch-shared/Ebba/GPU2/Ebba_DL/Outputs',
-                k_fold_dir = '/home/jovyan/Inputs/K_folds/',
+                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/Labels.csv',
+                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv" ,
+                output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
+                save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
+                k_fold_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds_one_by_one_Family/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
-                include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
+                include_groups = ['control', 'EGFR', 'PIKK','CDK'], #Empty for everything included,
                 include_header = 'family',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
-                class_column_header = 'group',
+                class_column_header = 'family',
                 meta_data_header = ['plate', 'well', 'site'],
                 well_index = 3,
                 leave_out_index = 6,
@@ -108,20 +107,18 @@ class LeaveOneOut:
         self.output_size = output_size
         self.k_fold = int(k_fold)
         self.save_labels_dir = save_labels_dir
-       
+
     def main(self):
         print("Starting leave one out")
 
-        df = pd.read_csv(self.labels_path , delimiter= ";")
-        groups = self.included_groups
-        df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        df = pd.read_csv(self.labels_path , delimiter= ",")
         
-        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
-        df_bad_images.columns= df_bad_images.columns.str.lower()
-        df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" )
-        df_do_not_use = df_do_not_use[df_do_not_use["total"] == 1 ]
-        df_used = df_used[df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
+        if(len(self.included_groups) == 0):
+            self.included_groups = df[self.include_header].unique()
 
+        groups = self.included_groups
+        df_used = self.get_usable_images(df,groups)
+        
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
         df_test =df_used[df_used[self.image_number_heading].isin(df_test[self.image_number_heading])] 
@@ -136,17 +133,20 @@ class LeaveOneOut:
         df["test"] = df.index.isin(df_test.index)
 
         ##Make some statistics 
-        df_statistics_base = df[df[self.include_header].isin(groups)]
+        df_statistics_base = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
         df_statistics_base = df_statistics_base[[self.class_column_header, "valid", "train", "test"]]
-
+        
+        df_used = self.get_usable_images(df,groups)
+    
         df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[["train"]].reset_index().values, columns=["group", "train"])
         df_statistics.rename(columns={"train": "total"}, inplace=True)
+        df_statistics["used"] = df_used.groupby(self.class_column_header).count().reset_index()[[self.image_number_heading]]
         df_statistics["train"] = df_statistics_base[df_statistics_base["train"]==1].groupby(self.class_column_header).count().reset_index()[["train"]]
-        df_statistics["percentage_train"] = df_statistics["train"] /df_statistics["total"] 
+        df_statistics["percentage_train"] = df_statistics["train"] /df_statistics["used"] 
         df_statistics["valid"] = df_statistics_base[df_statistics_base["valid"]==1].groupby(self.class_column_header).count().reset_index()[["valid"]]
-        df_statistics["percentage_valid"] = df_statistics["valid"] /df_statistics["total"] 
+        df_statistics["percentage_valid"] = df_statistics["valid"] /df_statistics["used"] 
         df_statistics["test"] = df_statistics_base[df_statistics_base["test"]==1].groupby(self.class_column_header).count().reset_index()[["test"]]
-        df_statistics["percentage_test"] = df_statistics["test"] /df_statistics["total"] 
+        df_statistics["percentage_test"] = df_statistics["test"] /df_statistics["used"] 
 
         ## Save information 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
@@ -156,7 +156,7 @@ class LeaveOneOut:
             os.makedirs(self.output_dir)
             print("Made the output directory: " + self.output_dir)
 
-        df_save = df[df[self.include_header].isin(groups)]
+        df_save = df[df[self.include_header].isin(groups)& ~df[self.exclude_header].isin(self.exclude_groups)]
         df_save.to_csv(self.output_dir + "/Labels.csv", index = False)
         df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"), index = False)
 
@@ -214,6 +214,23 @@ class LeaveOneOut:
             os.makedirs(dir_path)
 
         shutil.copyfile(current_path, target_path)
+
+    def get_usable_images(self,df,groups):
+        df_used = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        df_used = self.use_only_good_images(df_used)
+        return df_used
+
+    def use_only_good_images(self, df_used):
+        if(self.exclude_images_path == ""):
+            return df_used
+        
+        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
+        df_bad_images.columns= df_bad_images.columns.str.lower()
+        df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" )
+        df_do_not_use = df_do_not_use[df_do_not_use["total"] == 1 ] ## total ==1 means at least one flag has been raised and the image should be excluded
+        df_used = df_used[~df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
+        return df_used
+
 
 if __name__ == "__main__":
     LeaveOneOut().main()

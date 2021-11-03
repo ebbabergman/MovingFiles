@@ -10,7 +10,7 @@ class MakeKFolds:
    
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                output_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds_one_by_one_Family/',
+                output_dir = '/home/jovyan/Inputs/Kinase_Family_No_Compound_K_Fold/',
                 exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_CP_and_Aut.csv",
                 include_groups = ['EGFR', 'PIKK','CDK'], #Empty for everything included,
                 include_header = 'family',
@@ -21,7 +21,7 @@ class MakeKFolds:
                 intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
                 meta_data_header = ['plate', 'well', 'site'],
                 image_number_heading = "nr",   
-                has_controls = True,
+                has_controls = False,
                 frac_of_controls_to_use = 0.20
                 ):
         self.labels_path = labels_path
