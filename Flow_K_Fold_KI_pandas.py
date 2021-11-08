@@ -20,15 +20,15 @@ class LeaveOneOut:
     
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/Labels.csv',
-                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv" ,
+                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv",
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
                 save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
-                k_fold_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds_one_by_one_Family/',
+                k_fold_dir = '/home/jovyan/Inputs/Kinase_Family_No_Compound_K_Fold/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
-                include_groups = ['control', 'EGFR', 'PIKK','CDK'], #Empty for everything included,
+                include_groups = ['EGFR', 'PIKK','CDK'], #Empty for everything included,
                 include_header = 'family',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
@@ -120,8 +120,11 @@ class LeaveOneOut:
         df_used = self.get_usable_images(df,groups)
         
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
-        df_test = pd.read_csv(k_fold_file)
-        df_test =df_used[df_used[self.image_number_heading].isin(df_test[self.image_number_heading])] 
+        df_test_all = pd.read_csv(k_fold_file)
+        df_test =df_used[df_used[self.image_number_heading].isin(df_test_all[self.image_number_heading])] 
+        
+        if df_test.empty:
+            df_test =df[df[self.image_number_heading].isin(df_test_all[self.image_number_heading])] 
 
         df_used = pd.concat([df_used, df_test, df_test]).drop_duplicates(keep=False)
 
