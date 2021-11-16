@@ -10,9 +10,9 @@ class MakeKFolds:
    
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                output_dir = '/home/jovyan/Inputs/Kinase_Family_No_Compound_K_Fold/',
-                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_CP_and_Aut.csv",
-                include_groups = ['EGFR', 'PIKK','CDK'], #Empty for everything included,
+                output_dir = '/home/jovyan/Inputs/Kinase_Family_Aut/',
+                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_Automatic_only.csv",
+                include_groups = ['CDK', 'PIKK','STE7', 'control'], #Empty for everything included,
                 include_header = 'family',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
@@ -21,7 +21,7 @@ class MakeKFolds:
                 intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
                 meta_data_header = ['plate', 'well', 'site'],
                 image_number_heading = "nr",   
-                has_controls = False,
+                has_controls = True,
                 frac_of_controls_to_use = 0.20
                 ):
         self.labels_path = labels_path
@@ -77,8 +77,8 @@ class MakeKFolds:
         df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
         df_bad_images.columns= df_bad_images.columns.str.lower()
         df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" ) # rename metadata_well to well in pre prossessing step
-        df_do_not_use = df_do_not_use[df_do_not_use["total"] == 1 ]
-        df_used = df_used[df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
+        df_do_use = df_do_not_use[df_do_not_use["total"] == 0 ]
+        df_used = df_used[df_used[self.image_number_heading].isin(df_do_use[self.image_number_heading])]
        
 
         #group by metadataheaders except sites 

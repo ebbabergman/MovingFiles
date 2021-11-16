@@ -11,7 +11,7 @@ class MakeKFolds:
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds/',
                 exclude_images_path = '/home/jovyan/Inputs/Kinase_Flagged_Sites/QC_KinaseInhibitors_OnlyFlaggedAut_AllPlates.csv',
-                include_groups = ['control', 'TK','CMGC','AGC'], #Empty for everything included,
+                include_groups = ['EGFR', 'PIKK','MAPK', 'control'], #Empty for everything included,
                 include_header = 'group',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
