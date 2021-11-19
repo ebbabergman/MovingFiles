@@ -9,10 +9,10 @@ from pandas.core import indexing
 class MakeKFolds:
    
     def __init__(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                output_dir = '/home/jovyan/Inputs/Kinase_Family_Aut/',
-                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_Automatic_only.csv",
-                include_groups = ['CDK', 'PIKK','STE7', 'control'], #Empty for everything included,
+                labels_path = "~/Inputs/KinasInhibitors/New_labels/Labels.csv",
+                output_dir = '/home/jovyan/Inputs/Kinase_Family_Strict/',
+                exclude_images_path = "~/Inputs/Kinase_Flagged_Sites/QC_KinaseInhibitors_OnlyStrictFlags_AllPlates.csv",
+                include_groups = [], #Empty for everything included,
                 include_header = 'family',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
@@ -22,7 +22,7 @@ class MakeKFolds:
                 meta_data_header = ['plate', 'well', 'site'],
                 image_number_heading = "nr",   
                 has_controls = True,
-                frac_of_controls_to_use = 0.20
+                frac_of_controls_to_use = 0.80
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
@@ -42,8 +42,11 @@ class MakeKFolds:
     def main(self):
         print("Started get info.")
       
-        df = pd.read_csv(self.labels_path , delimiter= ";", index_col=False)
+        df = pd.read_csv(self.labels_path , delimiter= ",", index_col=False)
        
+        if(len(self.included_groups) == 0):
+            self.included_groups = df[self.include_header].unique()
+
         k_folds = self.get_k_folds(df)
 
         controll_k_folds = self.get_k_folds_control(df)
