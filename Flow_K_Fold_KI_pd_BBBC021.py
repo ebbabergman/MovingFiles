@@ -117,7 +117,8 @@ class LeaveOneOut:
         print("Starting leave one out")
 
         df = pd.read_csv(self.labels_path , delimiter= ",")
-        
+        df.dropna(subset = [self.class_column_header], inplace=True)
+
         if(len(self.included_groups) == 0):
             self.included_groups = df[self.include_header].unique()
 
