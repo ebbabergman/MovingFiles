@@ -20,7 +20,7 @@ import General
 class LeaveOneOut:
     
     def __init__(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/Labels.csv',
+                labels_path = "~/Inputs/KinasInhibitors/New_labels/Labels.csv",
                 exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv",
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
                 save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
@@ -29,14 +29,14 @@ class LeaveOneOut:
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
-                include_groups = ['EGFR', 'PIKK','CDK'], #Empty for everything included,
+                include_groups = [], #Empty for everything included,
                 include_header = 'family',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
                 class_column_header = 'family',
                 meta_data_header = ['plate', 'well', 'site'],
-                well_index = 3,
-                leave_out_index = 6,
+                well_header = "well",
+                leave_out_header = "compound",
                 image_number_heading = "nr",
                 name_to_leave_out = "" ,
                 k_fold = "1",
@@ -56,8 +56,8 @@ class LeaveOneOut:
         self.exclude_header = exclude_header
         self.class_column_header =  class_column_header 
         self.meta_data_header = meta_data_header
-        self.well_index =  well_index
-        self.leave_out_index =  leave_out_index
+        self.well_header =  well_header
+        self.leave_out_header =  leave_out_header
         self.image_number_heading = image_number_heading
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
@@ -65,23 +65,23 @@ class LeaveOneOut:
         self.save_labels_dir = save_labels_dir
        
     def update_settings(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/Labels.csv',
-                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv" ,
+                labels_path = "~/Inputs/KinasInhibitors/New_labels/Labels.csv",
+                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv",
                 output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
                 save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
-                k_fold_dir = '/home/jovyan/Inputs/Kinase_compound_K_folds_one_by_one_Family/',
+                k_fold_dir = '/home/jovyan/Inputs/Kinase_Family_No_Compound_K_Fold/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
-                include_groups = ['control', 'EGFR', 'PIKK','CDK'], #Empty for everything included,
+                include_groups = [], #Empty for everything included,
                 include_header = 'family',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
                 class_column_header = 'family',
                 meta_data_header = ['plate', 'well', 'site'],
-                well_index = 3,
-                leave_out_index = 6,
+                well_header = "well",
+                leave_out_header = "compound",
                 image_number_heading = "nr",
                 name_to_leave_out = "" ,
                 k_fold = "1",
@@ -101,8 +101,8 @@ class LeaveOneOut:
         self.exclude_header = exclude_header
         self.class_column_header =  class_column_header 
         self.meta_data_header = meta_data_header
-        self.well_index =  well_index
-        self.leave_out_index =  leave_out_index
+        self.well_header =  well_header
+        self.leave_out_header =  leave_out_header
         self.image_number_heading = image_number_heading
         self.name_to_leave_out =      name_to_leave_out
         self.output_size = output_size
