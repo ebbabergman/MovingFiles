@@ -57,7 +57,9 @@ class MakeKFolds:
         number_of_folds = self.k_folds
         for k_fold in range(0,number_of_folds):
             df_fold = k_folds[k_fold] 
-            df_statistics[str(k_fold)] = df_fold.groupby(self.class_column_header).count().reset_index()[[self.well_column_header]]
+            df_grouped = df_fold.groupby(self.class_column_header)
+            df_statistics[str(k_fold)] = df_grouped[self.divide_on_header].nunique().values
+
        
         print(df_statistics.to_latex())
         ##Write out data 
