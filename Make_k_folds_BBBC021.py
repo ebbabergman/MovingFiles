@@ -48,17 +48,16 @@ class MakeKFolds:
         k_folds = self.get_k_folds(df)
 
         ##Make some statistics 
-        df_statistics_base = df
-        df_statistics_base = df_statistics_base[[self.class_column_header, self.well_column_header]]
+        s_statistics = df.groupby(self.class_column_header)[self.divide_on_header].nunique()
+        df_statistics = pd.DataFrame(s_statistics.index)
+        df_statistics["Total"] = s_statistics.values
 
-        df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[[self.well_column_header]].reset_index().values, columns=[self.class_column_header,self.well_column_header])
-        df_statistics.rename(columns={self.well_column_header: "total"}, inplace=True)
-    
         number_of_folds = self.k_folds
         for k_fold in range(0,number_of_folds):
             df_fold = k_folds[k_fold] 
             df_grouped = df_fold.groupby(self.class_column_header)
-            df_statistics[self.divide_on_header+"in_fold_"str(k_fold)] = df_grouped[self.divide_on_header].nunique().values
+            statistic_column_header = self.divide_on_header+"s_in_fold_"+str(k_fold)
+            df_statistics[statistic_column_header] = df_grouped[self.divide_on_header].nunique().values
 
        
         print(df_statistics.to_latex())
