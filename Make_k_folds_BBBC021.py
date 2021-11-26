@@ -39,7 +39,6 @@ class MakeKFolds:
         print("Started get info.")
         entries_list = []
 
-        
         df = pd.read_csv(self.labels_path , delimiter= ",")
         df.dropna(subset = [self.class_column_header], inplace=True)
 
@@ -61,7 +60,7 @@ class MakeKFolds:
             df_fold = k_folds[k_fold] 
             df_statistics[str(k_fold)] = df_fold.groupby(self.class_column_header).count().reset_index()[[self.well_column_header]]
        
-        print(df_statistics)
+        print(df_statistics.to_latex())
         ##Write out data 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
@@ -86,14 +85,13 @@ class MakeKFolds:
         df_used_wells =  pd.DataFrame()
 
         for group in self.included_groups:
-            test = df_used[df_used[self.include_header].isin([group])]
+            df_group = df_used[df_used[self.include_header].isin([group])]
             if self.has_controls and group == 'control':
-                test = test.groupby(self.well_column_header)
-                group_n[group] = int(int(test[[self.include_header]].count().count())*k_fold_frac) 
-                if group_n[group] < 1: group_n[group] = 1
+                group_n[group] = math.floor(df_group[self.well_column_header].nunique()*k_fold_frac)
             else:
-                group_n[group] = math.floor(test[[self.divide_on_header]].count()*k_fold_frac) 
-
+                group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*k_fold_frac)
+            if group_n[group] < 1: group_n[group] = 1
+                ## EBBA TODO  THis groupby header does not seem to be correct, double check and adjust
         for k_fold in range(0,number_of_folds-1):
             df_fold= pd.DataFrame()
             for group in self.included_groups:
@@ -105,7 +103,7 @@ class MakeKFolds:
                 else:
                     df_group = df_group.sample(n = group_n[group])
                     df_fold = df_fold.append(df_group)
-            df_used = pd.concat([df_used, df_fold, df_fold]).drop_duplicates(keep=False)
+                df_used = pd.concat([df_used, df_fold, df_fold]).drop_duplicates(keep=False)
             k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_used
 
