@@ -86,15 +86,16 @@ class MakeKFolds:
 
 ## rename df_used. Have one that's df, one that is df_used as in used up
 #think of better names to use for df_ that are actually being used, maybe rename the ones that aren't?
-    def get_k_folds(self, df_used):
+    def get_k_folds(self, df):
         number_of_folds = self.k_folds
         k_fold_frac = 1/number_of_folds
         k_folds = [None]*number_of_folds
         group_n = {}
         df_used_wells =  pd.DataFrame()
+        df_unused = df.copy()
 
         for group in self.included_groups:
-            df_group = df_used[df_used[self.include_header].isin([group])]
+            df_group = df[df[self.include_header].isin([group])]
             if self.has_controls and group == 'control':
                 group_n[group] = math.floor(df_group[self.well_column_header].nunique()*k_fold_frac)
             else:
@@ -104,23 +105,28 @@ class MakeKFolds:
         for k_fold in range(0,number_of_folds-1):
             df_fold= pd.DataFrame()
             for group in self.included_groups:
-                df_group = df_used[df_used[self.include_header].isin([group])]
+                df_group = df_unused[df_unused[self.include_header].isin([group])]
+                if df_group.empty:
+                    df_used = df[df[self.include_header].isin([group])]
+                    df_unused.append(df_used)
+                    df_group = df_unused[df_unused[self.include_header].isin([group])]
+                    print("Every unit from group had been used, re-using values for group " + str(group) + ".")
+                
                 if self.has_controls and group == 'control':
-                    df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n[group])
+                    df_sampled, df_used_wells, df = self.getControlSampel( df_group, df_used_wells, df, group_n[group])
                     df_fold = df_fold.append(df_sampled)
-                    
                 else:
                     unique_entries = df_group[self.well_column_header].unique()
-                    group_choice = unique_entries.sample(n = group_n[group])
-                    df_group_coice = df_group[df_group[self.divide_on_header] == group_choice]
+                    group_choice = np.random.choice(unique_entries, size = group_n[group])
+                    df_group_coice = df_group[df_group[self.divide_on_header].isin(group_choice)]
                     df_fold = df_fold.append(df_group_coice)
-                df_used = pd.concat([df_used, df_fold, df_fold]).drop_duplicates(keep=False)
+                df_unused = pd.concat([df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
             k_folds[k_fold] = df_fold
-        k_folds[number_of_folds-1] = df_used
+        k_folds[number_of_folds-1] = df_unused
 
-        if self.has_controls and df_used[df_used[self.class_column_header] == 'control'].empty:
-            df_group = df_used[df_used[self.include_header].isin(['control'])]
-            df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n['control'])
+        if self.has_controls and df[df[self.class_column_header] == 'control'].empty:
+            df_group = df[df[self.include_header].isin(['control'])]
+            df_sampled, df_used_wells, df = self.getControlSampel( df_group, df_used_wells, df, group_n['control'])
             k_folds[number_of_folds-1] =  k_folds[number_of_folds-1].append(df_sampled)
             
         return k_folds
