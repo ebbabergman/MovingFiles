@@ -43,7 +43,10 @@ class MakeKFolds:
         df.dropna(subset = [self.class_column_header], inplace=True)
 
         if(len(self.included_groups) == 0):
-         self.included_groups = df[self.include_header].unique()
+            self.included_groups = df[self.include_header].unique()
+            if self.include_header == self.exclude_header:
+                self.included_groups = [group for group in self.include_header if group not in self.exclude_header]
+
         df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
        
         k_folds = self.get_k_folds(df_used)
