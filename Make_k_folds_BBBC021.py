@@ -42,10 +42,7 @@ class MakeKFolds:
         df = pd.read_csv(self.labels_path , delimiter= ",")
         df.dropna(subset = [self.class_column_header], inplace=True)
 
-        if(len(self.included_groups) == 0):
-            self.included_groups = df[self.include_header].unique()
-            if self.include_header == self.exclude_header:
-                self.included_groups = [group for group in self.include_header if group not in self.exclude_header]
+        self.included_groups = self.get_included_groups()
 
         df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
        
@@ -78,6 +75,12 @@ class MakeKFolds:
             df_fold.to_csv(self.output_dir + "k_fold_"+ str(k_fold +1)+".csv", index = False)
 
         print("Finished. Find output in: " + self.output_dir)
+
+    def get_included_groups(self):
+        if(len(self.included_groups) == 0):
+            self.included_groups = df[self.include_header].unique()
+            
+        self.included_groups = [group for group in self.include_header if group not in self.exclude_header]
 
 
     def get_k_folds(self, df_used):
