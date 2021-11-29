@@ -14,6 +14,7 @@ import os
 import shutil
 import numpy as np
 import pandas as pd
+import General
 
 class LeaveOneOut:
     
@@ -116,7 +117,8 @@ class LeaveOneOut:
         print("Starting leave one out")
 
         df = pd.read_csv(self.labels_path , delimiter= ",")
-        
+        df.dropna(subset = [self.class_column_header], inplace=True)
+
         if(len(self.included_groups) == 0):
             self.included_groups = df[self.include_header].unique()
 
@@ -156,10 +158,9 @@ class LeaveOneOut:
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
 
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
-            print("Made the output directory: " + self.output_dir)
-
+        General.make_non_existing_path(self.output_dir)
+        General.make_non_existing_path(self.save_labels_dir)
+       
         df_save = df[df[self.include_header].isin(groups)& ~df[self.exclude_header].isin(self.exclude_groups)]
         df_save.to_csv(self.output_dir + "/Labels.csv", index = False)
         df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"), index = False)

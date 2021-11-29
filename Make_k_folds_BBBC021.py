@@ -37,29 +37,30 @@ class MakeKFolds:
 
     def main(self):
         print("Started get info.")
-        entries_list = []
 
-        
-        df = pd.read_csv(self.labels_path , delimiter= ",")
-        if(len(self.included_groups) == 0):
-         self.included_groups = df[self.include_header].unique()
-        df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        df_base = pd.read_csv(self.labels_path , delimiter= ",")
+        df_base.dropna(subset = [self.class_column_header], inplace=True)
+        df_base.drop_duplicates(inplace=True)
+
+        self.included_groups = self.get_included_groups(df_base)
+        df = df_base[df_base[self.include_header].isin(self.included_groups) & ~df_base[self.exclude_header].isin(self.exclude_groups)]
        
-        k_folds = self.get_k_folds(df_used)
+        k_folds = self.get_k_folds(df)
 
         ##Make some statistics 
-        df_statistics_base = df_used
-        df_statistics_base = df_statistics_base[[self.class_column_header, self.well_column_header]]
+        s_statistics = df.groupby(self.class_column_header)[self.divide_on_header].nunique()
+        df_statistics = pd.DataFrame(s_statistics.index)
+        df_statistics["Total"] = s_statistics.values
 
-        df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[[self.well_column_header]].reset_index().values, columns=[self.class_column_header,self.well_column_header])
-        df_statistics.rename(columns={self.well_column_header: "total"}, inplace=True)
-    
         number_of_folds = self.k_folds
         for k_fold in range(0,number_of_folds):
             df_fold = k_folds[k_fold] 
-            df_statistics[str(k_fold)] = df_fold.groupby(self.class_column_header).count().reset_index()[[self.well_column_header]]
+            df_grouped = df_fold.groupby(self.class_column_header)
+            statistic_column_header = self.divide_on_header+"s_in_fold_"+str(k_fold)
+            df_statistics[statistic_column_header] = df_grouped[self.divide_on_header].nunique().values
+
        
-        print(df_statistics)
+        print(df_statistics.to_latex())
         ##Write out data 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
@@ -75,41 +76,58 @@ class MakeKFolds:
 
         print("Finished. Find output in: " + self.output_dir)
 
+    def get_included_groups(self, df):
+        included_groups = self.included_groups
+        if(len(included_groups) == 0):
+            included_groups = df[self.include_header].unique()
+            
+        included_groups = [group for group in included_groups if group not in self.exclude_groups]
+        return included_groups
 
-    def get_k_folds(self, df_used):
+
+## rename df_used. Have one that's df, one that is df_used as in used up
+#think of better names to use for df_ that are actually being used, maybe rename the ones that aren't?
+    def get_k_folds(self, df):
         number_of_folds = self.k_folds
         k_fold_frac = 1/number_of_folds
         k_folds = [None]*number_of_folds
         group_n = {}
         df_used_wells =  pd.DataFrame()
+        df_unused = df.copy()
 
         for group in self.included_groups:
-            test = df_used[df_used[self.include_header].isin([group])]
+            df_group = df[df[self.include_header].isin([group])]
             if self.has_controls and group == 'control':
-                test = test.groupby(self.well_column_header)
-                group_n[group] = int(int(test[[self.include_header]].count().count())*k_fold_frac) 
-                if group_n[group] < 1: group_n[group] = 1
+                group_n[group] = math.floor(df_group[self.well_column_header].nunique()*k_fold_frac)
             else:
-                group_n[group] = math.floor(test[[self.divide_on_header]].count()*k_fold_frac) 
+                group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*k_fold_frac)
+            if group_n[group] < 1: group_n[group] = 1
 
         for k_fold in range(0,number_of_folds-1):
             df_fold= pd.DataFrame()
             for group in self.included_groups:
-                df_group = df_used[df_used[self.include_header].isin([group])]
+                df_group = df_unused[df_unused[self.include_header].isin([group])]
+                if df_group.empty:
+                    df_used = df[df[self.include_header].isin([group])]
+                    df_unused.append(df_used)
+                    df_group = df_unused[df_unused[self.include_header].isin([group])]
+                    print("Every unit from group had been used, re-using values for group " + str(group) + ".")
+                
                 if self.has_controls and group == 'control':
-                    df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n[group])
+                    df_sampled, df_used_wells, df = self.getControlSampel( df_group, df_used_wells, df, group_n[group])
                     df_fold = df_fold.append(df_sampled)
-                    
                 else:
-                    df_group = df_group.sample(n = group_n[group])
-                    df_fold = df_fold.append(df_group)
-            df_used = pd.concat([df_used, df_fold, df_fold]).drop_duplicates(keep=False)
+                    unique_entries = df_group[self.well_column_header].unique()
+                    group_choice = np.random.choice(unique_entries, size = group_n[group])
+                    df_group_coice = df_group[df_group[self.divide_on_header].isin(group_choice)]
+                    df_fold = df_fold.append(df_group_coice)
+                df_unused = pd.concat([df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
             k_folds[k_fold] = df_fold
-        k_folds[number_of_folds-1] = df_used
+        k_folds[number_of_folds-1] = df_unused
 
-        if self.has_controls and df_used[df_used[self.class_column_header] == 'control'].empty:
-            df_group = df_used[df_used[self.include_header].isin(['control'])]
-            df_sampled, df_used_wells, df_used = self.getControlSampel( df_group, df_used_wells, df_used, group_n['control'])
+        if self.has_controls and df[df[self.class_column_header] == 'control'].empty:
+            df_group = df[df[self.include_header].isin(['control'])]
+            df_sampled, df_used_wells, df = self.getControlSampel( df_group, df_used_wells, df, group_n['control'])
             k_folds[number_of_folds-1] =  k_folds[number_of_folds-1].append(df_sampled)
             
         return k_folds
