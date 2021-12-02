@@ -10,9 +10,9 @@ class MakeKFolds:
    
     def __init__(self,
                 labels_path = "~/Inputs/KinasInhibitors/New_labels/Labels.csv",
-                output_dir = '/home/jovyan/Inputs/10_fold_Kinase_300Family_Strict/',
+                output_dir = '/home/jovyan/Inputs/3_fold_Kinase_3Family_Strict/',
                 exclude_images_path = "~/Inputs/Kinase_Flagged_Sites/QC_KinaseInhibitors_OnlyStrictFlags_AllPlates.csv",
-                include_groups = ["control","PI3K","EGFR", "PIKK","PDGFR","CDK","JAK","STE7","VEGFR","Aur","MAPK"], #Empty for everything included,
+                include_groups = ["control","PI3K","EGFR", "PIKK"], #Empty for everything included,
                 include_header = 'family',
                 exclude_groups = ['P009063','P009083'], #Empty for everything included,
                 exclude_header = 'plate',
@@ -23,7 +23,7 @@ class MakeKFolds:
                 image_number_heading = "nr",   
                 has_controls = True,
                 frac_of_controls_to_use = 1,
-                k_folds = "10",
+                k_folds = "3",
                 divide_on_header = 'compoundname',
                 ):
         self.labels_path = labels_path
