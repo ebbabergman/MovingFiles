@@ -39,7 +39,7 @@ class MakeKFolds:
         self.class_column_header =  class_column_header 
         self.intact_group_header = intact_group_header
         self.intact_control_group_headers = intact_control_group_headers
-        self.has_controls = has_controls,
+        self.has_controls = has_controls
         self.frac_of_controls_to_use = frac_of_controls_to_use
 
     def main(self):
@@ -53,9 +53,10 @@ class MakeKFolds:
         df = df_base[df_base[self.include_header].isin(self.included_groups) & ~df_base[self.exclude_header].isin(self.exclude_groups)]
        
         k_folds = self.get_k_folds(df)
-
-        controll_k_folds = self.get_k_folds_control(df)
-        k_folds.extend(controll_k_folds)
+        
+        if self.has_controls:
+            controll_k_folds = self.get_k_folds_control(df)
+            k_folds.extend(controll_k_folds)
 
         print("Made " + str(len(k_folds)) +" k-folds")
 
