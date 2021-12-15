@@ -48,6 +48,8 @@ class MakeKFolds:
         self.included_groups = self.get_included_groups(df_base)
         df = df_base[df_base[self.include_header].isin(self.included_groups) & ~df_base[self.exclude_header].isin(self.exclude_groups)]
        
+
+        self.k_folds = self.get_number_of_k_folds(df)       
         k_folds = self.get_k_folds(df)
 
         ##Make some statistics 
@@ -87,9 +89,15 @@ class MakeKFolds:
         included_groups = [group for group in included_groups if group not in self.exclude_groups]
         return included_groups
 
+    def get_number_of_k_folds(self,df):
+        k_folds = 0
+        if self.has_controls:
+            raise ValueError("This has not been implemented yet for using controls yet")
+        
+        k_folds =k_folds +  df[self.intact_group_header].value_counts()
+        return k_folds
+        
 
-## rename df_used. Have one that's df, one that is df_used as in used up
-#think of better names to use for df_ that are actually being used, maybe rename the ones that aren't?
     def get_k_folds(self, df):
         number_of_folds = self.k_folds
         k_fold_frac = 1/number_of_folds
