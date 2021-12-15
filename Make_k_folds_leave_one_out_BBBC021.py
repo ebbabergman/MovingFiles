@@ -43,7 +43,12 @@ class MakeKFolds:
     def main(self):
         print("Started get info.")
       
-        df = pd.read_csv(self.labels_path , delimiter= ";")
+        df_base = pd.read_csv(self.labels_path , delimiter= ";")
+        df_base.dropna(subset = [self.class_column_header], inplace=True)
+        df_base.drop_duplicates(inplace=True)
+
+        self.included_groups = self.get_included_groups(df_base)
+        df = df_base[df_base[self.include_header].isin(self.included_groups) & ~df_base[self.exclude_header].isin(self.exclude_groups)]
        
         k_folds = self.get_k_folds(df)
 
@@ -69,10 +74,16 @@ class MakeKFolds:
 
         print("Finished. Find output in: " + self.output_dir)
 
+    def get_included_groups(self, df):
+        included_groups = self.included_groups
+        if(len(included_groups) == 0):
+            included_groups = df[self.include_header].unique()
+            
+        included_groups = [group for group in included_groups if group not in self.exclude_groups]
+        return included_groups
 
     def get_k_folds(self, df):
         k_folds = []
-
         df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
        
         df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")

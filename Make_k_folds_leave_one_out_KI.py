@@ -8,7 +8,7 @@ import math
 
 class MakeKFolds:
    
-       def __init__(self,
+    def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
                 output_dir = '/home/jovyan/Inputs/TEST_Kinase_compound_K_folds_one_by_one/',
                 exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_CP_and_Aut.csv",
@@ -42,7 +42,13 @@ class MakeKFolds:
     def main(self):
         print("Started get info.")
       
-        df = pd.read_csv(self.labels_path , delimiter= ";")
+        df_base = pd.read_csv(self.labels_path , delimiter= ";")
+        df_base.dropna(subset = [self.class_column_header], inplace=True)
+        df_base.drop_duplicates(inplace=True)
+
+        self.included_groups = self.get_included_groups(df_base)
+        df = df_base[df_base[self.include_header].isin(self.included_groups) & ~df_base[self.exclude_header].isin(self.exclude_groups)]
+       
        
         k_folds = self.get_k_folds(df)
 
@@ -67,6 +73,14 @@ class MakeKFolds:
 
 
         print("Finished. Find output in: " + self.output_dir)
+
+    def get_included_groups(self, df):
+        included_groups = self.included_groups
+        if(len(included_groups) == 0):
+            included_groups = df[self.include_header].unique()
+            
+        included_groups = [group for group in included_groups if group not in self.exclude_groups]
+        return included_groups
 
 
     def get_k_folds(self, df):
