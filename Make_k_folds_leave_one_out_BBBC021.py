@@ -20,7 +20,7 @@ class MakeKFolds:
                 class_column_header = 'moa',
                 meta_data_header = ['plate', 'well', 'site'],
                 image_number_heading = "image_number",
-                divide_on_header = 'compound',
+                intact_group_header = 'compound',
                 has_controls = False,
                 frac_of_controls_to_use = 0.0,
                 intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
