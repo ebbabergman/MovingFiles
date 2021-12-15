@@ -36,7 +36,7 @@ class MakeKFolds:
         self.class_column_header =  class_column_header 
         self.intact_group_header = intact_group_header
         self.intact_control_group_headers = intact_control_group_headers
-        self.has_controls = has_controls,
+        self.has_controls = has_control
         self.frac_of_controls_to_use = frac_of_controls_to_use
 
     def main(self):
