@@ -9,20 +9,20 @@ class MakeKFolds:
    
 
     def __init__(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/dataframe.csv',
-                output_dir = '/home/jovyan/Inputs/TEST_Kinase_compound_K_folds_one_by_one/',
-                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/KinaseInhibitor_CP_and_Aut.csv",
-                include_groups = ['TK','CMGC','AGC'], #Empty for everything included,
-                include_header = 'group',
-                exclude_groups = ['P009063','P009083'], #Empty for everything included,
-                exclude_header = 'plate',
-                class_column_header = 'group',
-                intact_group_header = 'compoundname',
-                intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
+                 labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/Labels.csv',
+                exclude_images_path = "", # Empty for none
+                output_dir = '/home/jovyan/Outputs/TEST_BBBC021_Leave_One_Out',
+                include_groups = [], #Empty for everything included,
+                include_header = 'moa',
+                exclude_groups = ["Cholesterol-lowering","Eg5 inhibitors"], #Empty for everything included,
+                exclude_header = 'moa',
+                class_column_header = 'moa',
                 meta_data_header = ['plate', 'well', 'site'],
-                image_number_heading = "nr",   
+                image_number_heading = "image_number",
+                intact_group_header = 'compoundname',
                 has_controls = False,
-                frac_of_controls_to_use = 0.20
+                frac_of_controls_to_use = 0.0,
+                intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
