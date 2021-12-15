@@ -6,6 +6,8 @@ import random
 import pandas as pd
 import math
 
+import General
+
 class MakeKFolds:
    
 
@@ -43,7 +45,7 @@ class MakeKFolds:
     def main(self):
         print("Started get info.")
       
-        df_base = pd.read_csv(self.labels_path , delimiter= ";")
+        df_base = pd.read_csv(self.labels_path , delimiter= ",")
         df_base.dropna(subset = [self.class_column_header], inplace=True)
         df_base.drop_duplicates(inplace=True)
 
@@ -86,13 +88,8 @@ class MakeKFolds:
         k_folds = []
         df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
        
-        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ";")
-        df_bad_images.columns= df_bad_images.columns.str.lower()
-        df_do_not_use = pd.merge(df_used,df_bad_images, on = self.meta_data_header, how = "left" ) # rename metadata_well to well in pre prossessing step
-        df_do_not_use = df_do_not_use[df_do_not_use["total"] == 1 ]
-        df_used = df_used[df_used[self.image_number_heading].isin(df_do_not_use[self.image_number_heading])]
+        df_used = General.use_only_good_images(self.exclude_images_path,self.image_number_heading, self.meta_data_header, df_used)
        
-
         #group by metadataheaders except sites 
         df_used = df_used[df_used[self.include_header].isin(self.included_groups)]
         groups = df_used[self.intact_group_header].unique()
