@@ -116,37 +116,48 @@ class LeaveOneOut:
     def main(self):
         print("Starting leave one out")
 
-        df = pd.read_csv(self.labels_path , delimiter= ",")
-        df.dropna(subset = [self.class_column_header], inplace=True)
+        df_origin = pd.read_csv(self.labels_path , delimiter= ",")
+        df_origin.dropna(subset = [self.class_column_header], inplace=True)
 
         if(len(self.included_groups) == 0):
-            self.included_groups = df[self.include_header].unique()
+            self.included_groups = df_origin[self.include_header].unique()
 
         groups = self.included_groups
-        df_used = self.get_usable_images(df,groups)
+        df = self.get_usable_images(df_origin,groups)
         
         k_fold_file = self.k_fold_dir + self.k_fold_name  % str(self.k_fold)
         df_test = pd.read_csv(k_fold_file)
-        df_test =df_used[df_used[self.image_number_heading].isin(df_test[self.image_number_heading])] 
+        df_test =df[df[self.image_number_heading].isin(df_test[self.image_number_heading])] 
 
-        df_used = pd.concat([df_used, df_test, df_test]).drop_duplicates(keep=False)
+        df = pd.concat([df, df_test, df_test]).drop_duplicates(keep=False)
 
-        df_validation = df_used.groupby(self.class_column_header).sample(frac = self.validation_set_size)
-        df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
+        df_validation = df.groupby(self.class_column_header).sample(frac = self.validation_set_size)
+        df_train = pd.concat([df, df_validation, df_validation]).drop_duplicates(keep=False)
 
-        df["valid"] = df.index.isin(df_validation.index)
-        df["train"] = df.index.isin(df_train.index)
-        df["test"] = df.index.isin(df_test.index)
+        df_origin["valid"] = df_origin.index.isin(df_validation.index)
+        df_origin["train"] = df_origin.index.isin(df_train.index)
+        df_origin["test"] = df_origin.index.isin(df_test.index)
+
+        # s_statistics = df.groupby(self.class_column_header)[self.divide_on_header].nunique()
+        # df_statistics = pd.DataFrame(s_statistics.index)
+        # df_statistics["Total"] = s_statistics.values
+
+        # number_of_folds = self.k_folds
+        # for k_fold in range(0,number_of_folds):
+        #     df_fold = k_folds[k_fold] 
+        #     df_grouped = df_fold.groupby(self.class_column_header)
+        #     statistic_column_header = self.divide_on_header+"s_in_fold_"+str(k_fold)
+        #     df_statistics[statistic_column_header] = df_grouped[self.divide_on_header].nunique().values
 
         ##Make some statistics 
-        df_statistics_base = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
+        df_statistics_base = df_origin[df_origin[self.include_header].isin(groups) & ~df_origin[self.exclude_header].isin(self.exclude_groups)]
         df_statistics_base = df_statistics_base[[self.class_column_header, "valid", "train", "test"]]
         
-        df_used = self.get_usable_images(df,groups)
+        df = self.get_usable_images(df_origin,groups)
     
         df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[["train"]].reset_index().values, columns=["group", "train"])
         df_statistics.rename(columns={"train": "total"}, inplace=True)
-        df_statistics["used"] = df_used.groupby(self.class_column_header).count().reset_index()[[self.image_number_heading]]
+        df_statistics["used"] = df.groupby(self.class_column_header).count().reset_index()[[self.image_number_heading]]
         df_statistics["train"] = df_statistics_base[df_statistics_base["train"]==1].groupby(self.class_column_header).count().reset_index()[["train"]]
         df_statistics["percentage_train"] = df_statistics["train"] /df_statistics["used"] 
         df_statistics["valid"] = df_statistics_base[df_statistics_base["valid"]==1].groupby(self.class_column_header).count().reset_index()[["valid"]]
@@ -161,7 +172,7 @@ class LeaveOneOut:
         General.make_non_existing_path(self.output_dir)
         General.make_non_existing_path(self.save_labels_dir)
        
-        df_save = df[df[self.include_header].isin(groups)& ~df[self.exclude_header].isin(self.exclude_groups)]
+        df_save = df_origin[df_origin[self.include_header].isin(groups)& ~df_origin[self.exclude_header].isin(self.exclude_groups)]
         df_save.to_csv(self.output_dir + "/Labels.csv", index = False)
         df_statistics.to_csv((self.output_dir + "/LabelStatistics.csv"), index = False)
 
