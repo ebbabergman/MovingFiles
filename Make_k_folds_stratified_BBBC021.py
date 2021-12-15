@@ -4,40 +4,36 @@ import shutil
 import numpy as np
 import random
 import pandas as pd
+import math
 
 class MakeKFolds:
    
-
     def __init__(self,
                 labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/Labels.csv',
-                exclude_images_path = "", # Empty for none
-                output_dir = '/home/jovyan/Inputs/BBBC021_Stratified_Kfolds',
+                output_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
                 include_groups = [], #Empty for everything included,
                 include_header = 'moa',
                 exclude_groups = ["Cholesterol-lowering","Eg5 inhibitors"], #Empty for everything included,
                 exclude_header = 'moa',
                 class_column_header = 'moa',
-                meta_data_header = ['plate', 'well', 'site'],
-                image_number_heading = "image_number",
-                intact_group_header = 'compoundname',
+                well_column_header = 'compound',
+                k_folds = "3",
                 has_controls = False,
-                frac_of_controls_to_use = 0.0,
-                intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
+                frac_of_controls_to_use = 0.20,
+                divide_on_header = 'compound'
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
-        self.exclude_images_path = exclude_images_path
         self.included_groups = include_groups
         self.include_header = include_header
         self.exclude_groups = exclude_groups
         self.exclude_header = exclude_header
-        self.meta_data_header = meta_data_header
-        self.image_number_heading = image_number_heading
         self.class_column_header =  class_column_header 
-        self.intact_group_header = intact_group_header
-        self.intact_control_group_headers = intact_control_group_headers
+        self.well_column_header = well_column_header
+        self.k_folds = int(k_folds)
         self.has_controls = has_controls
         self.frac_of_controls_to_use = frac_of_controls_to_use
+        self.divide_on_header = divide_on_header
 
     def main(self):
         print("Started get info.")
@@ -49,7 +45,6 @@ class MakeKFolds:
         self.included_groups = self.get_included_groups(df_base)
         df = df_base[df_base[self.include_header].isin(self.included_groups) & ~df_base[self.exclude_header].isin(self.exclude_groups)]
        
-        self.k_folds = self.get_number_of_k_folds(df)       
         k_folds = self.get_k_folds(df)
 
         ##Make some statistics 
@@ -89,14 +84,9 @@ class MakeKFolds:
         included_groups = [group for group in included_groups if group not in self.exclude_groups]
         return included_groups
 
-    def get_number_of_k_folds(self,df):
-        k_folds = 0
-        if self.has_controls:
-            raise ValueError("This has not been implemented yet for using controls yet")
-        
-        k_folds =k_folds +  df[self.intact_group_header].value_counts()
-        return k_folds
 
+## rename df_used. Have one that's df, one that is df_used as in used up
+#think of better names to use for df_ that are actually being used, maybe rename the ones that aren't?
     def get_k_folds(self, df):
         number_of_folds = self.k_folds
         k_fold_frac = 1/number_of_folds
