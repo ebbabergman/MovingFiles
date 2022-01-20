@@ -84,9 +84,6 @@ class MakeKFolds:
         included_groups = [group for group in included_groups if group not in self.exclude_groups]
         return included_groups
 
-
-## rename df_used. Have one that's df, one that is df_used as in used up
-#think of better names to use for df_ that are actually being used, maybe rename the ones that aren't?
     def get_k_folds(self, df):
         number_of_folds = self.k_folds
         k_fold_frac = 1/number_of_folds
