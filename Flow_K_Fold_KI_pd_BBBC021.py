@@ -23,7 +23,7 @@ class LeaveOneOut:
                 exclude_images_path = "", # Empty for none
                 output_dir = '/home/jovyan/Outputs/TEST_BBBC021_Leave_One_Out',
                 save_labels_dir = '/home/jovyan/Outputs/TEST_BBBC021_Leave_One_Out',
-                k_fold_dir = '/home/jovyan/scratch-shared/Ebba/BBBC021_K_folds/',
+                k_fold_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/',
                 image_name ='%s.png', #Where %s is the image number,
@@ -71,7 +71,7 @@ class LeaveOneOut:
                 exclude_images_path = "", # Empty for none
                 output_dir = '/home/jovyan/Outputs/TEST_BBBC021_Leave_One_Out',
                 save_labels_dir = '/home/jovyan/Outputs/TEST_BBBC021_Leave_One_Out',
-                k_fold_dir = '/home/jovyan/scratch-shared/Ebba/BBBC021_K_folds/',
+                k_fold_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/',
                 image_name ='%s.png', #Where %s is the image number,
@@ -118,6 +118,7 @@ class LeaveOneOut:
 
         df_origin = pd.read_csv(self.labels_path , delimiter= ",")
         df_origin.dropna(subset = [self.class_column_header], inplace=True)
+        df_origin.drop_duplicates(inplace=True)
 
         if(len(self.included_groups) == 0):
             self.included_groups = df_origin[self.include_header].unique()
