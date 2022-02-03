@@ -9,18 +9,18 @@ import math
 class MakeKFolds:
    
     def __init__(self,
-                labels_path = '/home/jovyan/scratch-shared/Ebba/BBBC021_Filtered_Data/Labels.csv',
-                output_dir = '/home/jovyan/Inputs/BBBC021_K_folds/',
-                include_groups = [], #Empty for everything included,
-                include_header = 'moa',
-                exclude_groups = ["Cholesterol-lowering","Eg5 inhibitors"], #Empty for everything included,
+                labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
+                output_dir = '/home/jovyan/Inputs/SPECS_Top3_K_folds/',
+                include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #Empty for everything included,
+                include_header = "selected_mechanism",
+                exclude_groups = [], #Empty for everything included,
                 exclude_header = 'moa',
-                class_column_header = 'moa',
-                well_column_header = 'compound',
+                class_column_header = "selected_mechanism",
+                well_column_header = 'compound_id',
                 k_folds = "3",
                 has_controls = False,
                 frac_of_controls_to_use = 0.20,
-                divide_on_header = 'compound'
+                divide_on_header = 'compound_id'
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
