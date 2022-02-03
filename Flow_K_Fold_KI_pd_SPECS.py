@@ -2,13 +2,6 @@
 ## DataFlowSort.py
 ## Moves files into a structure that works with data flow, 
 
-##Backgroung from https://data.broadinstitute.org/bbbc/BBBC021/
-
-# #NOTE: When evaluating accuracy of MOA classification, it is critical to ensure that the cross-validation is set up correctly. 
-# #MOA classification is the task of classifying the MOA of an unseen compound. 
-# #Therefore, the evaluation should be a leave-one-compound-out cross validation: 
-# #in each iteration, hold out one compound (all replicates and at all concentrations), train on the remaining, and test on the held out compound.
-
 import csv
 import os
 import shutil
@@ -20,24 +13,24 @@ import General
 class LeaveOneOut:
     
     def __init__(self,
-                labels_path = "~/Inputs/KinasInhibitors/New_labels/Labels.csv",
+                labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
+                output_dir = '/home/jovyan/Inputs/SPECS_Top3_K_folds/',
+                include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #Empty for everything included,
+                include_header = "selected_mechanism",
+                exclude_groups = [], #Empty for everything included,
+                exclude_header = 'selected_mechanism',
+                class_column_header = "selected_mechanism",
                 exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv",
-                output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
                 save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
                 k_fold_dir = '/home/jovyan/Inputs/Kinase_Family_No_Compound_K_Fold/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
-                include_groups = [], #Empty for everything included,
-                include_header = 'family',
-                exclude_groups = ['P009063','P009083'], #Empty for everything included,
-                exclude_header = 'plate',
-                class_column_header = 'family',
                 meta_data_header = ['plate', 'well', 'site'],
                 well_header = "well",
-                leave_out_header = "compound",
-                image_number_heading = "nr",
+                leave_out_header = "compound_id",
+                image_number_heading = "ImageNr",
                 name_to_leave_out = "" ,
                 k_fold = "1",
                 output_size = 1 # Percentage of original total size that should be used,
@@ -64,25 +57,24 @@ class LeaveOneOut:
         self.k_fold = int(k_fold)
         self.save_labels_dir = save_labels_dir
        
-    def update_settings(self,
-                labels_path = "~/Inputs/KinasInhibitors/New_labels/Labels.csv",
+    def update_settings(labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
+                output_dir = '/home/jovyan/Inputs/SPECS_Top3_K_folds/',
+                include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #Empty for everything included,
+                include_header = "selected_mechanism",
+                exclude_groups = [], #Empty for everything included,
+                exclude_header = 'selected_mechanism',
+                class_column_header = "selected_mechanism",
                 exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv",
-                output_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
                 save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
                 k_fold_dir = '/home/jovyan/Inputs/Kinase_Family_No_Compound_K_Fold/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
-                include_groups = [], #Empty for everything included,
-                include_header = 'family',
-                exclude_groups = ['P009063','P009083'], #Empty for everything included,
-                exclude_header = 'plate',
-                class_column_header = 'family',
                 meta_data_header = ['plate', 'well', 'site'],
                 well_header = "well",
-                leave_out_header = "compound",
-                image_number_heading = "nr",
+                leave_out_header = "compound_id",
+                image_number_heading = "ImageNr",
                 name_to_leave_out = "" ,
                 k_fold = "1",
                 output_size = 1 # Percentage of original total size that should be used,
