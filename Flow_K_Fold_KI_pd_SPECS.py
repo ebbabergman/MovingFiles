@@ -20,7 +20,7 @@ class LeaveOneOut:
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
                 class_column_header = "selected_mechanism",
-                exclude_images_path = "/home/jovyan/Inputs/Kinase_Flagged_Sites/Kinase_Flags_CP_Strict.csv",
+                exclude_images_path = "",
                 save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
                 k_fold_dir = '/home/jovyan/Inputs/Kinase_Family_No_Compound_K_Fold/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
