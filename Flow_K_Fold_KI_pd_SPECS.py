@@ -21,10 +21,10 @@ class LeaveOneOut:
                 exclude_header = 'selected_mechanism',
                 class_column_header = "selected_mechanism",
                 exclude_images_path = "",
-                save_labels_dir = '/home/jovyan/Outputs/Kinase_Leave_One_Out_test/',
-                k_fold_dir = '/home/jovyan/Inputs/Kinase_Family_No_Compound_K_Fold/',
+                save_labels_dir = '/home/jovyan/Inputs/SPECS_Top3_K_folds/',
+                k_fold_dir = '/home/jovyan/Inputs/SPECS_Top3_K_folds/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
-                image_dir= '/home/jovyan/scratch-shared/Ebba/KinaseInhibitorData/MiSyHo299/',
+                image_dir= '/home/jovyan/scratch-shared/Specs/MiPhHo/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
                 meta_data_header = ['plate', 'well', 'site'],
