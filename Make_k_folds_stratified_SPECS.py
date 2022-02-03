@@ -14,7 +14,7 @@ class MakeKFolds:
                 include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #Empty for everything included,
                 include_header = "selected_mechanism",
                 exclude_groups = [], #Empty for everything included,
-                exclude_header = 'moa',
+                exclude_header = 'selected_mechanism',
                 class_column_header = "selected_mechanism",
                 well_column_header = 'compound_id',
                 k_folds = "3",
