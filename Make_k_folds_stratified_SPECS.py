@@ -10,8 +10,8 @@ class MakeKFolds:
    
     def __init__(self,
                 labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
-                output_dir = '/home/jovyan/Inputs/SPECS_Top3_K_folds/',
-                include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #Empty for everything included,
+                output_dir = '/home/jovyan/Inputs/SPECS_K_folds/',
+                include_groups = [], #Empty for everything included,
                 include_header = "selected_mechanism",
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
