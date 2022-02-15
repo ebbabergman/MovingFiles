@@ -4,37 +4,47 @@ import shutil
 import numpy as np
 import random
 import pandas as pd
+from pandas.core import indexing
 import math
 
 class MakeKFolds:
-   
+                   
     def __init__(self,
-                labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
+labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
                 output_dir = '/home/jovyan/Inputs/SPECS_top4_K_folds/',
+                exclude_images_path = "~/Inputs/Kinase_Flagged_Sites/QC_KinaseInhibitors_OnlyStrictFlags_AllPlates.csv",
                 include_groups =  ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","HDAC inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 #include_groups = ["topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor", "DNA polymerase inhibitor"],#["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
-                include_header = "selected_mechanism",
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
                 class_column_header = "selected_mechanism",
-                well_column_header = 'compound_id',
-                k_folds = "3",
+                intact_group_header = 'compound_id',
+                #intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
+                meta_data_header = ['plate', 'well', 'site'],
+                image_number_heading = "nr",   
                 has_controls = False,
-                frac_of_controls_to_use = 0.20,
+                frac_of_controls_to_use = 1,
+                k_folds = "3",
                 divide_on_header = 'compound_id'
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
+        self.exclude_images_path = exclude_images_path
         self.included_groups = include_groups
         self.include_header = include_header
         self.exclude_groups = exclude_groups
         self.exclude_header = exclude_header
+        self.meta_data_header = meta_data_header
+        self.image_number_heading = image_number_heading
         self.class_column_header =  class_column_header 
-        self.well_column_header = well_column_header
-        self.k_folds = int(k_folds)
-        self.has_controls = has_controls
+        self.intact_group_header = intact_group_header
+        self.intact_control_group_headers = intact_control_group_headers
+        self.has_controls = has_controls,
         self.frac_of_controls_to_use = frac_of_controls_to_use
+        self.frac_of_controls_to_use = frac_of_controls_to_use
+        self.k_folds = int(k_folds)
         self.divide_on_header = divide_on_header
+
 
     def main(self):
         print("Started get info.")
@@ -96,7 +106,7 @@ class MakeKFolds:
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
             if self.has_controls and group == 'control':
-                group_n[group] = math.floor(df_group[self.well_column_header].nunique()*k_fold_frac)
+                group_n[group] = math.floor(df_group[self.intact_group_header].nunique()*k_fold_frac)
             else:
                 group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*k_fold_frac)
             if group_n[group] < 1: group_n[group] = 1
@@ -115,7 +125,7 @@ class MakeKFolds:
                     df_sampled, df_used_wells, df = self.getControlSampel( df_group, df_used_wells, df, group_n[group])
                     df_fold = df_fold.append(df_sampled)
                 else:
-                    unique_entries = df_group[self.well_column_header].unique()
+                    unique_entries = df_group[self.intact_group_header].unique()
                     group_choice = np.random.choice(unique_entries, size = group_n[group])
                     df_group_coice = df_group[df_group[self.divide_on_header].isin(group_choice)]
                     df_fold = df_fold.append(df_group_coice)
@@ -131,11 +141,11 @@ class MakeKFolds:
         return k_folds
 
     def getControlSampel(self, df_group, df_used_wells, df_used, n_sample):
-        if(df_group[self.well_column_header].count() == 0):
+        if(df_group[self.intact_group_header].count() == 0):
             df_group = df_used_wells
             df_used.append(df_used_wells)
-        sampled_well = np.random.choice(df_group[self.well_column_header].unique(), n_sample)
-        df_sampled = df_group[df_group[self.well_column_header].isin(sampled_well)]
+        sampled_well = np.random.choice(df_group[self.intact_group_header].unique(), n_sample)
+        df_sampled = df_group[df_group[self.intact_group_header].isin(sampled_well)]
         df_used_wells = df_used_wells.append(df_sampled)
         return df_sampled, df_used_wells, df_used
 
