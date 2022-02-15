@@ -11,8 +11,8 @@ class MakeKFolds:
                    
     def __init__(self,
 labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
-                output_dir = '/home/jovyan/Inputs/SPECS_top4_K_folds/',
-                exclude_images_path = "~/Inputs/Kinase_Flagged_Sites/QC_KinaseInhibitors_OnlyStrictFlags_AllPlates.csv",
+                output_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_top4_K_folds/',
+                exclude_images_path = "~/home/jovyan/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
                 include_groups =  ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","HDAC inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 #include_groups = ["topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor", "DNA polymerase inhibitor"],#["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 exclude_groups = [], #Empty for everything included,
