@@ -129,7 +129,7 @@ class MakeKFolds:
                     group_choice = np.random.choice(unique_entries, size = group_n[group])
                     df_group_coice = df_group[df_group[self.divide_on_header].isin(group_choice)]
                     df_fold = df_fold.append(df_group_coice)
-                df_unused = pd.concat([df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
+            df_unused =  df_unused[~df_unused.isin(df_fold)].dropna(how = 'all')
             k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_unused
 
