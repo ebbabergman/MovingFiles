@@ -11,11 +11,11 @@ class MakeKFolds:
                    
     def __init__(self,
 labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
-                output_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_top4_K_folds/',
+                output_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
                 exclude_images_path = "~/home/jovyan/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
                 #include_groups =  ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","HDAC inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 include_header = "selected_mechanism",
-                include_groups = ["topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor", "DNA polymerase inhibitor"],#["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
+                include_groups = ["[dmso]","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor", "DNA polymerase inhibitor"],#["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
                 class_column_header = "selected_mechanism",
@@ -23,7 +23,7 @@ labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
                 intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
                 meta_data_header = ['plate', 'well', 'site'],
                 image_number_heading = "nr",   
-                has_controls = False,
+                has_controls = True,
                 frac_of_controls_to_use = 1,
                 k_folds = "3",
                 divide_on_header = 'compound_id'
@@ -70,8 +70,7 @@ labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
             df_grouped = df_fold.groupby(self.class_column_header)
             statistic_column_header = self.divide_on_header+"s_in_fold_"+str(k_fold)
             df_statistics[statistic_column_header] = df_grouped[self.divide_on_header].nunique().values
-
-       
+   
         print(df_statistics.to_latex())
         ##Write out data 
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
@@ -101,13 +100,14 @@ labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
         k_fold_frac = 1/number_of_folds
         k_folds = [None]*number_of_folds
         group_n = {}
-        df_used_wells =  pd.DataFrame()
+        df_used_wells = pd.DataFrame()
         df_unused = df.copy()
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
-            if self.has_controls and group == 'control':
-                group_n[group] = math.floor(df_group[self.intact_group_header].nunique()*k_fold_frac)
+            if self.has_controls and group == '[dmso]':
+                unique_controls = len(df_group[self.intact_control_group_headers].groupby(self.intact_control_group_headers))
+                group_n[group] = math.floor(unique_controls*k_fold_frac)
             else:
                 group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*k_fold_frac)
             if group_n[group] < 1: group_n[group] = 1
@@ -122,33 +122,41 @@ labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
                     df_group = df_unused[df_unused[self.include_header].isin([group])]
                     print("Every unit from group had been used, re-using values for group " + str(group) + ".")
                 
-                if self.has_controls and group == 'control':
-                    df_sampled, df_used_wells, df = self.getControlSampel( df_group, df_used_wells, df, group_n[group])
+                if self.has_controls and group == '[dmso]':
+                    df_sampled, df_used_wells = self.getControlSampel( df_group, df_used_wells, group_n[group])
                     df_fold = df_fold.append(df_sampled)
                 else:
                     unique_entries = df_group[self.intact_group_header].unique()
                     group_choice = np.random.choice(unique_entries, size = group_n[group])
                     df_group_coice = df_group[df_group[self.divide_on_header].isin(group_choice)]
                     df_fold = df_fold.append(df_group_coice)
-                df_unused = pd.concat([df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
+    #                 pd.merge(df1, df2, on=['A','B'], how='outer', indicator=True).query("_merge != 'both'")
+    #    .drop('_merge', axis=1)
+    #    .reset_index(drop=True)
+            df_unused =  df_unused[~df_unused.isin(df_fold)].dropna(how = 'all')
             k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_unused
 
-        if self.has_controls and df[df[self.class_column_header] == 'control'].empty:
-            df_group = df[df[self.include_header].isin(['control'])]
-            df_sampled, df_used_wells, df = self.getControlSampel( df_group, df_used_wells, df, group_n['control'])
+        if self.has_controls and df[df[self.class_column_header] == '[dmso]'].empty:
+            df_group = df[df[self.include_header].isin(['[dmso]'])]
+            df_sampled, df_used_wells, df = self.getControlSampel( df_group, df_used_wells, df, group_n['[dmso]'])
             k_folds[number_of_folds-1] =  k_folds[number_of_folds-1].append(df_sampled)
             
         return k_folds
 
-    def getControlSampel(self, df_group, df_used_wells, df_used, n_sample):
-        if(df_group[self.intact_group_header].count() == 0):
+    def getControlSampel(self, df_group, df_used_wells, n_sample):
+        if df_group.empty:
             df_group = df_used_wells
-            df_used.append(df_used_wells)
-        sampled_well = np.random.choice(df_group[self.intact_group_header].unique(), n_sample)
-        df_sampled = df_group[df_group[self.intact_group_header].isin(sampled_well)]
+
+
+        df_control = pd.DataFrame({'count' : df_group[self.intact_control_group_headers].groupby(self.intact_control_group_headers).size()}).reset_index()
+        sampled_well_index = np.random.choice(df_control.index, n_sample)
+        sampled_wells = df_control.iloc[sampled_well_index]
+        df_sampled= df_group.merge(sampled_wells)
+        df_sampled.drop('count', axis = 1)
+
         df_used_wells = df_used_wells.append(df_sampled)
-        return df_sampled, df_used_wells, df_used
+        return df_sampled, df_used_wells, 
 
 if __name__ == "__main__":
     MakeKFolds().main()
