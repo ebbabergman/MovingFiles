@@ -15,14 +15,15 @@ class LeaveOneOut:
     def __init__(self,
                 labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
                 output_dir = '/home/jovyan/Inputs/Test/',
-                include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
+                include_groups = ["[dmso]","DNA polymerase inhibitor", "NFkB pathway inhibitor","mTOR inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
+                class_column_header = "selected_mechanism",
+                exclude_images_path = "~/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
+                save_labels_dir = "./Outputs/",
+                #k_fold_dir = '/home/jovyan/Inputs/SPECS_K_folds/',
+                k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
-                class_column_header = "selected_mechanism",
-                exclude_images_path = "",
-                save_labels_dir = '/home/jovyan/Inputs/Test/',
-                k_fold_dir = '/home/jovyan/Inputs/SPECS_10_K_folds/',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Specs/MiPhHo/',
                 image_name ='%s.png', #Where %s is the image number,
@@ -33,7 +34,11 @@ class LeaveOneOut:
                 image_number_heading = "ImageNr",
                 name_to_leave_out = "" ,
                 k_fold = "1",
-                output_size = 1 # Percentage of original total size that should be used,
+                output_size = 1, # Percentage of original total size that should be used,
+                # Below for debugging
+               
+        
+                
                 ):
         self.labels_path = labels_path
         self.exclude_images_path = exclude_images_path
