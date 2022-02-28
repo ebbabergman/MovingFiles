@@ -11,11 +11,11 @@ class MakeKFolds:
                    
     def __init__(self,
 labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
-                output_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
-                exclude_images_path = "~/home/jovyan/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
-                #include_groups =  ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","HDAC inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
+                output_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Control_top4_K_folds/',
+                exclude_images_path = "/home/jovyan/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
+                include_groups =  ["[dmso]","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","HDAC inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 include_header = "selected_mechanism",
-                include_groups = ["[dmso]","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor", "DNA polymerase inhibitor"],#["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
+                #include_groups = ["[dmso]","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor", "DNA polymerase inhibitor"],#["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
                 class_column_header = "selected_mechanism",
@@ -133,7 +133,8 @@ labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
     #                 pd.merge(df1, df2, on=['A','B'], how='outer', indicator=True).query("_merge != 'both'")
     #    .drop('_merge', axis=1)
     #    .reset_index(drop=True)
-            df_unused =  df_unused[~df_unused.isin(df_fold)].dropna(how = 'all')
+            df_unused = pd.concat([df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
+            #df_unused =  df_unused[~df_unused.isin(df_fold)].dropna(how = 'all')
             k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_unused
 
@@ -148,12 +149,11 @@ labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
         if df_group.empty:
             df_group = df_used_wells
 
-
         df_control = pd.DataFrame({'count' : df_group[self.intact_control_group_headers].groupby(self.intact_control_group_headers).size()}).reset_index()
         sampled_well_index = np.random.choice(df_control.index, n_sample)
         sampled_wells = df_control.iloc[sampled_well_index]
         df_sampled= df_group.merge(sampled_wells)
-        df_sampled.drop('count', axis = 1)
+        df_sampled.drop('count', axis = 1, inplace = True)
 
         df_used_wells = df_used_wells.append(df_sampled)
         return df_sampled, df_used_wells, 
