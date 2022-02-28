@@ -6,7 +6,7 @@ import random
 import pandas as pd
 import math
 
-import General
+import General_Moving
 
 class MakeKFolds:
    
@@ -49,7 +49,7 @@ class MakeKFolds:
         df_base.dropna(subset = [self.class_column_header], inplace=True)
         df_base.drop_duplicates(inplace=True)
 
-        self.included_groups = General.get_included_groups(self.include_header,self.included_groups,self.exclude_groups,df_base)
+        self.included_groups = General_Moving.get_included_groups(self.include_header,self.included_groups,self.exclude_groups,df_base)
         df = df_base[df_base[self.include_header].isin(self.included_groups) & ~df_base[self.exclude_header].isin(self.exclude_groups)]
        
         k_folds = self.get_k_folds(df)
@@ -83,7 +83,7 @@ class MakeKFolds:
         k_folds = []
         df_used = df[df[self.include_header].isin(self.included_groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
        
-        df_used = General.use_only_good_images(self.exclude_images_path,self.image_number_heading, self.meta_data_header, df_used)
+        df_used = General_Moving.use_only_good_images(self.exclude_images_path,self.image_number_heading, self.meta_data_header, df_used)
        
         #group by metadataheaders except sites 
         df_used = df_used[df_used[self.include_header].isin(self.included_groups)]

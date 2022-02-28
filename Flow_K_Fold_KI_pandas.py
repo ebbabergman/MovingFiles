@@ -15,7 +15,7 @@ import shutil
 import numpy as np
 import random
 import pandas as pd
-import General
+import General_Moving
 
 class LeaveOneOut:
     
@@ -157,8 +157,8 @@ class LeaveOneOut:
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
 
-        General.make_non_existing_path(self.output_dir)
-        General.make_non_existing_path(self.save_labels_dir)
+        General_Moving.make_non_existing_path(self.output_dir)
+        General_Moving.make_non_existing_path(self.save_labels_dir)
 
         df_save = df[df[self.include_header].isin(groups)& ~df[self.exclude_header].isin(self.exclude_groups)]
         df_save.to_csv(self.output_dir + "/Labels.csv", index = False)
