@@ -11,7 +11,7 @@ import math
 class MakeKFolds:
                    
     def __init__(self,
-l               labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
+                labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
                 output_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
                 include_groups = ["[dmso]","DNA polymerase inhibitor", "NFkB pathway inhibitor","mTOR inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
@@ -28,7 +28,7 @@ l               labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
                 has_controls = False,
                 frac_of_controls_to_use = 1,
                 k_folds = "3",
-                divide_on_header = 'compound_id'
+                divide_on_header = 'compound_id',
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
