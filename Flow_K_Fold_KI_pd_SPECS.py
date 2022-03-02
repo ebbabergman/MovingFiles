@@ -19,6 +19,7 @@ class LeaveOneOut:
                 include_header = "selected_mechanism",
                 class_column_header = "selected_mechanism",
                 exclude_images_path = "~/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
+                k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
                 save_labels_dir = "./Outputs/",
                 #k_fold_dir = '/home/jovyan/Inputs/SPECS_K_folds/',
                 k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',

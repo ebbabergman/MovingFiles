@@ -1,5 +1,6 @@
 import csv
 import os
+from pickle import FALSE
 import shutil
 import numpy as np
 import random
@@ -10,11 +11,12 @@ import math
 class MakeKFolds:
                    
     def __init__(self,
-labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
-                output_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Control_top4_K_folds/',
-                exclude_images_path = "/home/jovyan/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
-                include_groups =  ["[dmso]","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","HDAC inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
+l               labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
+                output_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
+                include_groups = ["[dmso]","DNA polymerase inhibitor", "NFkB pathway inhibitor","mTOR inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
+                class_column_header = "selected_mechanism",
+                exclude_images_path = "~/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
                 #include_groups = ["[dmso]","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor", "DNA polymerase inhibitor"],#["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
@@ -23,7 +25,7 @@ labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
                 intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
                 meta_data_header = ['plate', 'well', 'site'],
                 image_number_heading = "nr",   
-                has_controls = True,
+                has_controls = False,
                 frac_of_controls_to_use = 1,
                 k_folds = "3",
                 divide_on_header = 'compound_id'
