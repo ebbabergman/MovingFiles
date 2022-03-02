@@ -34,7 +34,7 @@ class LeaveOneOut:
                 leave_out_header = "compound_id",
                 image_number_heading = "ImageNr",
                 name_to_leave_out = "" ,
-                k_fold = "1",
+                k_fold = "3",
                 output_size = 1, # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
