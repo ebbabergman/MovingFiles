@@ -20,7 +20,7 @@ class MakeKFolds:
                 #include_groups = ["[dmso]","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor", "DNA polymerase inhibitor"],#["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor"], #"DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
-                class_column_header = "selected_mechanism",
+                #class_column_header = "selected_mechanism",
                 intact_group_header = 'compound_id',
                 intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
                 meta_data_header = ['plate', 'well', 'site'],
