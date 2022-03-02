@@ -22,7 +22,7 @@ class LeaveOneOut:
                 k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
                 save_labels_dir = "./Outputs/",
                 #k_fold_dir = '/home/jovyan/Inputs/SPECS_K_folds/',
-                k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
+                #k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
                 k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
