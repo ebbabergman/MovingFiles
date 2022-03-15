@@ -12,10 +12,10 @@ class MakeKFolds:
                    
     def __init__(self,
                 labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
-                output_dir='/home/jovyan/Inputs/SPECS_QC_Automatic_Control_top4_K_folds/',
+                output_dir='/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top3_K_folds/',
         #      include_groups = [], #Empty for everything included,
                 #include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
-                include_groups = ["[dmso]","DNA polymerase inhibitor", "NFkB pathway inhibitor","mTOR inhibitor", "topoisomerase inhibitor"],
+                include_groups = ["[dmso]","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
                 class_column_header = "selected_mechanism",
                 exclude_groups = [],
