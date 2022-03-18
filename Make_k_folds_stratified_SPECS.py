@@ -15,7 +15,7 @@ class MakeKFolds:
                 output_dir='/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top3_K_folds/',
         #      include_groups = [], #Empty for everything included,
                 #include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
-                include_groups = ["[dmso]","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
+                include_groups = ["negcon","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
                 class_column_header = "selected_mechanism",
                 exclude_groups = [],
@@ -107,7 +107,7 @@ class MakeKFolds:
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
-            if self.has_controls and group == '[dmso]':
+            if self.has_controls and group == 'negcon':
                 unique_controls = len(df_group[self.intact_control_group_headers].groupby(self.intact_control_group_headers))
                 group_n[group] = math.floor(unique_controls*k_fold_frac)
             else:
@@ -124,7 +124,7 @@ class MakeKFolds:
                     df_group = df_unused[df_unused[self.include_header].isin([group])]
                     print("Every unit from group had been used, re-using values for group " + str(group) + ".")
                 
-                if self.has_controls and group == '[dmso]':
+                if self.has_controls and group == 'negcon':
                     df_sampled, df_used_wells = self.getControlSampel( df_group, df_used_wells, group_n[group])
                     df_fold = df_fold.append(df_sampled)
                 else:
