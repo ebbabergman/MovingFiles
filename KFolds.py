@@ -42,12 +42,16 @@ class MakeKFolds:
                 all_data = np.genfromtxt(self.labels_path, delimiter=',', names=True, dtype=None)
                 self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
 
+                test = all_data.dtype
+                for i in range(0,len(test)):
+                        print(i)
+
 # # TODO: new_array = np.array(array, dtype = [("name", object), 
 #                                      ("N1", int), 
 #                                      ("N2", int),
 #                                      ("N3", float)])
 
-                all_data[self.class_header].astype('str_')
+                all_data[self.class_header ]=  all_data[self.class_header].astype('str_')
                 # Find out how to find all the data
                 if len(self.included_classes) == 0:
                         # TODO set list to all unique values
