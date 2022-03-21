@@ -16,7 +16,7 @@ class GroupRows:
             in_group = np_unique(size =(1,min_per_fold) ,replace = False)
             groups[i] = in_group
         
-        #Should I return dataframes or just 
+        #Should I return remaining np_unique or just divide them now?
 
 
         return groups, np_unique # return "left over" groups?
