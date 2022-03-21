@@ -1,6 +1,5 @@
 import csv
 import numpy as np
-from pymysql import NULL
 
 import GroupRows
 
@@ -43,13 +42,13 @@ class MakeKFolds:
                 self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
 
                 test = all_data.dtype
+                new_test = np.empty(shape = len(test))
+                a = test[3]
                 for i in range(0,len(test)):
-                        print(i)
-
-# # TODO: new_array = np.array(array, dtype = [("name", object), 
-#                                      ("N1", int), 
-#                                      ("N2", int),
-#                                      ("N3", float)])
+                        if test[i].char == 'S':
+                                print(i)
+                        else:
+                                new_test[i] = test[i]
 
                 all_data[self.class_header ]=  all_data[self.class_header].astype('str_')
                 # Find out how to find all the data
