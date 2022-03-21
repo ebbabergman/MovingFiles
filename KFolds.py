@@ -42,6 +42,12 @@ class MakeKFolds:
                 all_data = np.genfromtxt(self.labels_path, delimiter=',', names=True, dtype=None)
                 self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
 
+# # TODO: new_array = np.array(array, dtype = [("name", object), 
+#                                      ("N1", int), 
+#                                      ("N2", int),
+#                                      ("N3", float)])
+
+                all_data[self.class_header].astype('str_')
                 # Find out how to find all the data
                 if len(self.included_classes) == 0:
                         # TODO set list to all unique values
@@ -50,9 +56,13 @@ class MakeKFolds:
                 folds = np.empty(shape = (self.k_folds))
                 remaining = []
                 
+                a = np.array(["hello", "world"])
+                print(a == "world")
+                # TODO Ebba change datatype so that it becomes string? Other way to solve it?
                 # Make K-folds by GroupRows
                 for group_name in self.included_classes:
-                        rows = np.where(all_data[:,self.class_header] == group_name)
+                        #rows = np.where(all_data[self.class_header].equals(group_name) )
+                        rows = np.where(all_data[self.class_header] == group_name)
                         group_data = all_data[rows]
 
                         new_k_folds, remaining_rows = GroupRows.GroupRows.group_rows(group_data, self.intact_group_index, self.k_folds)
