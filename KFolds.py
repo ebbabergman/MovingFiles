@@ -40,25 +40,24 @@ class MakeKFolds:
                 # df_base.drop_duplicates(inplace=True)
               
                 all_data = np.genfromtxt(self.labels_path, delimiter=',', names=True, dtype=None)
-                #self.include_header_index = divide_on_header
+                self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
 
                 # Find out how to find all the data
-                if self.included_classes.empty():
+                if len(self.included_classes) == 0:
                         # TODO set list to all unique values
                         print("todo - implement now")
                 
                 folds = np.empty(shape = (self.k_folds))
                 remaining = []
                 
-                
-
                 # Make K-folds by GroupRows
-
                 for group_name in self.included_classes:
                         rows = np.where(all_data[:,self.class_header] == group_name)
                         group_data = all_data[rows]
 
-                        new_k_folds, remaining_rows = GroupRows.GroupRows.group_rows(group_data, keep_complete_index, self.k_folds)
+                        new_k_folds, remaining_rows = GroupRows.GroupRows.group_rows(group_data, self.intact_group_index, self.k_folds)
+                        print(remaining_rows)
+                        remaining.append(remaining_rows)
                 # Pitch out remaining unique values equally?
 
                 # Save K-folds in output
