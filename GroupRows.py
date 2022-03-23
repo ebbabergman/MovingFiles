@@ -15,6 +15,7 @@ class GroupRows:
         for i in range(0,number_of_groups):
             in_group = np.random.choice(np_unique, size = min_per_fold ,replace = False)
             groups[i] = in_group
+            np_unique = np.setdiff1d(np_unique,in_group)
         
         #Should I return remaining np_unique or just divide them now?
 
