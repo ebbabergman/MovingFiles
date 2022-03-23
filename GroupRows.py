@@ -12,8 +12,8 @@ class GroupRows:
 
         min_per_fold = len(np_unique)//number_of_groups
 
-        for i in number_of_groups:
-            in_group = np_unique(size =(1,min_per_fold) ,replace = False)
+        for i in range(0,number_of_groups):
+            in_group = np.random.choice(np_unique, size = min_per_fold ,replace = False)
             groups[i] = in_group
         
         #Should I return remaining np_unique or just divide them now?
