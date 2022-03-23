@@ -6,7 +6,7 @@ import GroupRows
 class MakeKFolds:
 
         def __init__(self,
-                        labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
+                        labels_path = '/home/jovyan/Data/Specs/Labels.csv',
                         output_dir='/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top3_K_folds/',
                         # include_groups = [], #Empty for everything included,
                         # include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
@@ -38,13 +38,16 @@ class MakeKFolds:
                 # df_base.dropna(subset = [self.class_column_header], inplace=True)
                 # df_base.drop_duplicates(inplace=True)
               
-
-
-                with open(self.labels_path, 'r') as f:
-                        csv_data = list(csv.reader(f, delimiter=","))
-                
-                all_data = np.array(csv_data)
+                all_data = np.genfromtxt(self.labels_path, delimiter=',', names = True, dtype = None, encoding = None)
                 self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
+
+
+
+                # with open(self.labels_path, 'r') as f:
+                #         csv_data = list(csv.reader(f, delimiter=","))
+                
+                # all_data = np.array(csv_data)
+                # self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
 
                 # TODO look into more general way of doing this:
                 #  a = np.array(["hello", "world"])
