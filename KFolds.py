@@ -67,10 +67,7 @@ class MakeKFolds:
                         
                         np.savetxt(self.output_dir + str(fold) + "_fold.csv", folds[fold], delimiter=",")
 
-
-                print("Hello")
-
-                # Save K-folds in output
+                print("K-folds are done")
 
 if __name__ == "__main__":
     MakeKFolds().main()
