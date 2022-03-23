@@ -66,7 +66,7 @@ class MakeKFolds:
                         # TODO set list to all unique values
                         print("todo - implement now")
                 
-                folds = np.empty(shape = (self.k_folds))
+                folds = []
                 remaining = []
                 
                
@@ -81,7 +81,7 @@ class MakeKFolds:
                         print(remaining_rows)
                         remaining.append(remaining_rows)
                         for fold in range(0,self.k_folds):
-                                np.append(folds[fold],new_k_folds[fold]) 
+                               folds[fold].appned(new_k_folds[fold]) 
                 # Pitch out remaining unique values equally?
 
                 for fold in range(0,self.k_folds):
