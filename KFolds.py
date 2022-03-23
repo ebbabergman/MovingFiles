@@ -66,7 +66,7 @@ class MakeKFolds:
                         # TODO set list to all unique values
                         print("todo - implement now")
                 
-                folds = [[]] * self.k_folds
+                folds = [ [] for _ in range(self.k_folds) ]
                 remaining = []
                 
                
