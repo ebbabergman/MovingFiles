@@ -38,19 +38,26 @@ class MakeKFolds:
                 # df_base.dropna(subset = [self.class_column_header], inplace=True)
                 # df_base.drop_duplicates(inplace=True)
               
-                all_data = np.genfromtxt(self.labels_path, delimiter=',', names=True, dtype=None)
+
+
+                with open(self.labels_path, 'r') as f:
+                        csv_data = list(csv.reader(f, delimiter=","))
+                
+                all_data = np.array(csv_data)
                 self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
 
-                test = all_data.dtype
-                new_test = np.empty(shape = len(test))
-                a = test[3]
-                for i in range(0,len(test)):
-                        if test[i].char == 'S':
-                                print(i)
-                        else:
-                                new_test[i] = test[i]
+                # TODO look into more general way of doing this:
+                #  a = np.array(["hello", "world"])
+                # print(a == "world")
+                # test = all_data.dtype
+                # new_test = np.empty(shape = len(test))
+                # a = test[3]
+                # for i in range(0,len(test)):
+                #         if test[i].char == 'S':
+                #                 print(i)
+                #         else:
+                #                 print("hi")
 
-                all_data[self.class_header ]=  all_data[self.class_header].astype('str_')
                 # Find out how to find all the data
                 if len(self.included_classes) == 0:
                         # TODO set list to all unique values
@@ -59,16 +66,15 @@ class MakeKFolds:
                 folds = np.empty(shape = (self.k_folds))
                 remaining = []
                 
-                a = np.array(["hello", "world"])
-                print(a == "world")
+               
                 # TODO Ebba change datatype so that it becomes string? Other way to solve it?
                 # Make K-folds by GroupRows
+                classes =  all_data[self.class_header].astype('str_')   
                 for group_name in self.included_classes:
                         #rows = np.where(all_data[self.class_header].equals(group_name) )
-                        rows = np.where(all_data[self.class_header] == group_name)
+                        rows = np.where(classes == group_name)
                         group_data = all_data[rows]
-
-                        new_k_folds, remaining_rows = GroupRows.GroupRows.group_rows(group_data, self.intact_group_index, self.k_folds)
+                        new_k_folds, remaining_rows = GroupRows.GroupRows.group_rows(group_data, self.intact_group_header, self.k_folds)
                         print(remaining_rows)
                         remaining.append(remaining_rows)
                 # Pitch out remaining unique values equally?
