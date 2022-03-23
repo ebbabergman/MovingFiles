@@ -37,31 +37,11 @@ class MakeKFolds:
                 # df_base = pd.read_csv(self.labels_path , delimiter= ",")
                 # df_base.dropna(subset = [self.class_column_header], inplace=True)
                 # df_base.drop_duplicates(inplace=True)
+                # TODO Drop duplicates and NA or assume this is already done?
               
                 all_data = np.genfromtxt(self.labels_path, delimiter=',', names = True, dtype = None, encoding = None)
                 self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
 
-
-
-                # with open(self.labels_path, 'r') as f:
-                #         csv_data = list(csv.reader(f, delimiter=","))
-                
-                # all_data = np.array(csv_data)
-                # self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
-
-                # TODO look into more general way of doing this:
-                #  a = np.array(["hello", "world"])
-                # print(a == "world")
-                # test = all_data.dtype
-                # new_test = np.empty(shape = len(test))
-                # a = test[3]
-                # for i in range(0,len(test)):
-                #         if test[i].char == 'S':
-                #                 print(i)
-                #         else:
-                #                 print("hi")
-
-                # Find out how to find all the data
                 if len(self.included_classes) == 0:
                         # TODO set list to all unique values
                         print("todo - implement now")
@@ -69,12 +49,8 @@ class MakeKFolds:
                 folds = [ [] for _ in range(self.k_folds) ]
                 remaining = []
                 
-               
-                # TODO Ebba change datatype so that it becomes string? Other way to solve it?
-                # Make K-folds by GroupRows
                 classes =  all_data[self.class_header].astype('str_')   
                 for group_name in self.included_classes:
-                        #rows = np.where(all_data[self.class_header].equals(group_name) )
                         rows = np.where(classes == group_name)
                         group_data = all_data[rows]
                         new_k_folds, remaining_rows = GroupRows.GroupRows.group_rows(group_data, self.intact_group_header, self.k_folds)
@@ -82,9 +58,11 @@ class MakeKFolds:
                         remaining.append(remaining_rows)
                         for fold in range(0,self.k_folds):
                                folds[fold].append(new_k_folds[fold]) 
-                # Pitch out remaining unique values equally?
+                # TODO EBBA
+                # Pitch out remaining unique values equally
 
                 for fold in range(0,self.k_folds):
+                        # TODO EBBA
                         # Get each k_folds unique value and the take *all of the rows* into a new csv file with the right name
                         
                         np.savetxt(self.output_dir + str(fold) + "_fold.csv", folds[fold], delimiter=",")
@@ -94,8 +72,5 @@ class MakeKFolds:
 
                 # Save K-folds in output
 
-        # self.included_groups = self.get_included_groups(df_base)
-        #  df = df_base[df_base[self.include_header].isin(self.included_groups) & ~df_base[self.exclude_header].isin(self.exclude_groups)]
-        
 if __name__ == "__main__":
     MakeKFolds().main()
