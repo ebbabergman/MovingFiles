@@ -80,7 +80,17 @@ class MakeKFolds:
                         new_k_folds, remaining_rows = GroupRows.GroupRows.group_rows(group_data, self.intact_group_header, self.k_folds)
                         print(remaining_rows)
                         remaining.append(remaining_rows)
+                        for fold in range(0,self.k_folds):
+                                np.append(folds[fold],new_k_folds[fold]) 
                 # Pitch out remaining unique values equally?
+
+                for fold in range(0,self.k_folds):
+                        # Get each k_folds unique value and the take *all of the rows* into a new csv file with the right name
+                        
+                        np.savetxt(self.output_dir + str(fold) + "_fold.csv", folds[fold], delimiter=",")
+
+
+                print("Hello")
 
                 # Save K-folds in output
 
