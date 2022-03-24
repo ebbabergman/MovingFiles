@@ -9,7 +9,7 @@ class MakeKFolds:
 
         def __init__(self,
                         labels_path = '/home/jovyan/Data/Specs/Labels.csv',
-                        output_file='/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top3_K_folds/Fold_{0}_{1}.pdf', #  {0} used for insert number of k-fold, {1} for if test or train df
+                        output_file='/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top3_K_folds/Fold_{0}_{1}.csv', #  {0} used for insert number of k-fold, {1} for if test or train df
                         # include_groups = [], #Empty for everything included,
                         # include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                         included_classes = ["negcon","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
@@ -59,9 +59,10 @@ class MakeKFolds:
                         df_fold.to_csv(self.output_file.format(fold_index, "Test"), index = False)
 
                         if self.only_test:  continue
-                        
-                        data_for_fold = all_data[~mask]
-                        df_fold = pd.DataFrame(data_for_fold)
+
+                        # TODO make grouped version
+                        data_for_train = all_data[~mask]
+                        df_fold = pd.DataFrame(data_for_train)
                         df_fold.to_csv(self.output_file.format(fold_index, "Train"), index = False)
 
 
