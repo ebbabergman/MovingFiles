@@ -4,6 +4,7 @@ import numpy as np
 import GroupRows
 
 class MakeKFolds:
+## ASSUMPTION: labels_path file contains *no dublicates* and *no NA* values
 
         def __init__(self,
                         labels_path = '/home/jovyan/Data/Specs/Labels.csv',
@@ -32,12 +33,6 @@ class MakeKFolds:
 
         def main(self):
                 print("Started KFolds.")
-
-                #Make numpy
-                # df_base = pd.read_csv(self.labels_path , delimiter= ",")
-                # df_base.dropna(subset = [self.class_column_header], inplace=True)
-                # df_base.drop_duplicates(inplace=True)
-                # TODO Drop duplicates and NA or assume this is already done?
               
                 all_data = np.genfromtxt(self.labels_path, delimiter=',', names = True, dtype = None, encoding = None)
                 self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
@@ -46,20 +41,11 @@ class MakeKFolds:
                         # TODO set list to all unique values
                         print("todo - implement now")
                 
-                folds = [ [] for _ in range(self.k_folds) ]
-                remaining = []
+
                 
-                classes =  all_data[self.class_header].astype('str_')   
-                for group_name in self.included_classes:
-                        rows = np.where(classes == group_name)
-                        group_data = all_data[rows]
-                        new_k_folds, remaining_rows = GroupRows.GroupRows.group_rows(group_data, self.intact_group_header, self.k_folds)
-                        print(remaining_rows)
-                        remaining.append(remaining_rows)
-                        for fold in range(0,self.k_folds):
-                               folds[fold].append(new_k_folds[fold]) 
-                # TODO EBBA
-                # Pitch out remaining unique values equally
+                folds, unsorted_rows = self.get_folds(folds, unsorted_rows)
+                folds, unsorted_rows = self.add_remaining_rows(folds, unsorted_rows)
+
 
                 for fold in range(0,self.k_folds):
                         # TODO EBBA
@@ -68,6 +54,32 @@ class MakeKFolds:
                         np.savetxt(self.output_dir + str(fold) + "_fold.csv", folds[fold], delimiter=",")
 
                 print("K-folds are done")
+
+        def get_folds(self, all_data):
+                folds = [ [] for _ in range(self.k_folds) ]
+                unsorted_rows = []
+                classes =  all_data[self.class_header].astype('str_')   
+                for group_name in self.included_classes:
+                        rows = np.where(classes == group_name)
+                        group_data = all_data[rows]
+                        new_k_folds, remaining_rows = GroupRows.GroupRows.group_rows(group_data, self.intact_group_header, self.k_folds)
+                        print(remaining_rows)
+                        unsorted_rows.append(remaining_rows)
+                        for fold in range(0,self.k_folds):
+                               folds[fold].append(new_k_folds[fold]) 
+                return folds, unsorted_rows
+        
+        def add_remaining_rows(self, folds, unsorted_rows):
+                unsorted_per_fold = len(unsorted_rows)//self.k_folds
+                folds_numbered = list(range(0,self.kfolds))
+                for _ in range(0,self.kfolds):
+                        random_fold = np.random.choice(folds_numbered)
+                        random_rows = np.random.choice(unsorted_rows, replace= False, size = unsorted_per_fold)
+                        folds[random_fold].append(random_rows)                
+                        unsorted_rows = np.setdiff1d(unsorted_rows,random_rows)
+                        folds_numbered.remove(random_fold)
+        
+                return folds, unsorted_rows
 
 if __name__ == "__main__":
     MakeKFolds().main()
