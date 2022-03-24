@@ -70,7 +70,6 @@ class MakeKFolds:
                 return folds, unsorted_rows
         
         def add_remaining_rows(self, folds, unsorted_rows):
-                ## Do i need to do groupings?
                 unsorted_per_fold = len(unsorted_rows) // self.k_folds
                 folds_numbered = list(range(0, self.k_folds))
                 folds_to_extend = self.k_folds -1
