@@ -45,9 +45,8 @@ class MakeKFolds:
 
                 for fold_index in range(0,self.k_folds):
                         fold = folds[fold_index]
-                        # TODO make the folds the same dtype as in all_data?
                         mask = np.in1d(all_data[self.intact_group_header] , fold)
-                        data_for_fold = all_data[mask, :]
+                        data_for_fold = all_data[mask]
 
                         np.savetxt(self.output_dir + str(fold_index +1) + "_fold.csv", data_for_fold, delimiter=",")
 
