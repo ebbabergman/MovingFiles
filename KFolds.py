@@ -9,7 +9,7 @@ class MakeKFolds:
 
         def __init__(self,
                         labels_path = '/home/jovyan/Data/Specs/Labels.csv',
-                        output_dir='/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top3_K_folds/',
+                        output_file='/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top3_K_folds/Test_fold_{0}.pdf', # One {0} used for insert number of k-fold
                         # include_groups = [], #Empty for everything included,
                         # include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                         included_classes = ["negcon","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
@@ -22,7 +22,7 @@ class MakeKFolds:
                         divide_on_header = 'compound_id',
                         ):
                 self.labels_path = labels_path
-                self.output_dir = output_dir
+                self.output_file = output_file
                 self.exclude_images_path = exclude_images_path
                 self.included_classes = included_classes
                 self.class_header = class_header
@@ -51,7 +51,7 @@ class MakeKFolds:
 
                         # TODO Use this instead: https://www.geeksforgeeks.org/python-save-list-to-csv/ (Save to list, then to csv)
                         df_fold = pd.DataFrame(data_for_fold)
-                        df_fold.to_csv(self.output_dir + str(fold_index +1) + "_fold.csv", index = False)
+                        df_fold.to_csv(self.output_file.format(fold_index), index = False)
 
                 print("K-folds are done")
 
