@@ -52,7 +52,6 @@ class MakeKFolds:
                         # TODO Use this instead: https://www.geeksforgeeks.org/python-save-list-to-csv/ (Save to list, then to csv)
                         df_fold = pd.DataFrame(data_for_fold)
                         df_fold.to_csv(self.output_dir + str(fold_index +1) + "_fold.csv", index = False)
-                        #np.savetxt(self.output_dir + str(fold_index +1) + "_fold.csv", data_for_fold, delimiter=",")
 
                 print("K-folds are done")
 
