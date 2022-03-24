@@ -49,7 +49,6 @@ class MakeKFolds:
                         mask = np.in1d(all_data[self.intact_group_header] , fold)
                         data_for_fold = all_data[mask]
 
-
                         # TODO Use this instead: https://www.geeksforgeeks.org/python-save-list-to-csv/ (Save to list, then to csv)
                         df_fold = pd.DataFrame(data_for_fold)
                         df_fold.to_csv(self.output_dir + str(fold_index +1) + "_fold.csv", index = False)
