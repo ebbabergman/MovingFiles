@@ -38,14 +38,10 @@ class MakeKFolds:
                 self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
 
                 if len(self.included_classes) == 0:
-                        # TODO set list to all unique values
-                        print("todo - implement now")
-                
-
+                        print("todo - implement now: set list to all unique values")              
                 
                 folds, unsorted_rows = self.get_folds(folds, unsorted_rows)
                 folds, unsorted_rows = self.add_remaining_rows(folds, unsorted_rows)
-
 
                 for fold in range(0,self.k_folds):
                         # TODO EBBA
