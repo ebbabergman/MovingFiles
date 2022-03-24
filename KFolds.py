@@ -45,12 +45,11 @@ class MakeKFolds:
 
                 for fold_index in range(0,self.k_folds):
                         fold = folds[fold_index]
-                        
-                        data_for_fold = []#make numpy
-                        # TODO EBBA
-                        # Get each k_folds unique value and the take *all of the rows* into a new csv file with the right name
-                        
-                        np.savetxt(self.output_dir + str(fold_index +1) + "_fold.csv", folds[fold], delimiter=",")
+                        # TODO make the folds the same dtype as in all_data?
+                        mask = np.in1d(all_data[self.intact_group_header] , fold)
+                        data_for_fold = all_data[mask, :]
+
+                        np.savetxt(self.output_dir + str(fold_index +1) + "_fold.csv", data_for_fold, delimiter=",")
 
                 print("K-folds are done")
 
@@ -65,7 +64,7 @@ class MakeKFolds:
                         
                         unsorted_rows.extend(remaining_rows)
                         for fold in range(0,self.k_folds):
-                               folds[fold].append(new_k_folds[fold]) 
+                               folds[fold].extend(new_k_folds[fold]) 
                 return folds, unsorted_rows
         
         def add_remaining_rows(self, folds, unsorted_rows):
