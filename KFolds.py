@@ -40,7 +40,7 @@ class MakeKFolds:
                 if len(self.included_classes) == 0:
                         print("todo - implement now: set list to all unique values")              
                 
-                folds, unsorted_rows = self.get_folds(folds, unsorted_rows)
+                folds, unsorted_rows = self.get_folds(all_data)
                 folds, unsorted_rows = self.add_remaining_rows(folds, unsorted_rows)
 
                 for fold in range(0,self.k_folds):
@@ -67,14 +67,19 @@ class MakeKFolds:
         
         def add_remaining_rows(self, folds, unsorted_rows):
                 unsorted_per_fold = len(unsorted_rows)//self.k_folds
-                folds_numbered = list(range(0,self.kfolds))
-                for _ in range(0,self.kfolds):
+                folds_numbered = list(range(0,self.k_folds))
+                
+                for _ in range(0,self.kfolds-1):
                         random_fold = np.random.choice(folds_numbered)
                         random_rows = np.random.choice(unsorted_rows, replace= False, size = unsorted_per_fold)
                         folds[random_fold].append(random_rows)                
                         unsorted_rows = np.setdiff1d(unsorted_rows,random_rows)
                         folds_numbered.remove(random_fold)
-        
+
+                final_fold = folds_numbered[0]
+                folds[final_fold].append(unsorted_rows)                
+                unsorted_rows = np.setdiff1d(unsorted_rows,random_rows)
+
                 return folds, unsorted_rows
 
 if __name__ == "__main__":
