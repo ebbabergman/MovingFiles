@@ -66,19 +66,19 @@ class MakeKFolds:
                 return folds, unsorted_rows
         
         def add_remaining_rows(self, folds, unsorted_rows):
-                unsorted_per_fold = len(unsorted_rows)//self.k_folds
-                folds_numbered = list(range(0,self.k_folds))
-                
-                for _ in range(0,self.kfolds-1):
+                unsorted_per_fold = len(unsorted_rows) // self.k_folds
+                folds_numbered = list(range(0, self.k_folds))
+
+                for _ in range(0, self.kfolds - 1):
                         random_fold = np.random.choice(folds_numbered)
                         random_rows = np.random.choice(unsorted_rows, replace= False, size = unsorted_per_fold)
                         folds[random_fold].append(random_rows)                
-                        unsorted_rows = np.setdiff1d(unsorted_rows,random_rows)
+                        unsorted_rows = np.setdiff1d(unsorted_rows, random_rows)
                         folds_numbered.remove(random_fold)
 
                 final_fold = folds_numbered[0]
                 folds[final_fold].append(unsorted_rows)                
-                unsorted_rows = np.setdiff1d(unsorted_rows,random_rows)
+                unsorted_rows = np.setdiff1d(unsorted_rows, random_rows)
 
                 return folds, unsorted_rows
 
