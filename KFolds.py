@@ -43,11 +43,14 @@ class MakeKFolds:
                 folds, unsorted_rows = self.get_folds(all_data)
                 folds, unsorted_rows = self.add_remaining_rows(folds, unsorted_rows)
 
-                for fold in range(0,self.k_folds):
+                for fold_index in range(0,self.k_folds):
+                        fold = folds[fold_index]
+                        
+                        data_for_fold = []#make numpy
                         # TODO EBBA
                         # Get each k_folds unique value and the take *all of the rows* into a new csv file with the right name
                         
-                        np.savetxt(self.output_dir + str(fold) + "_fold.csv", folds[fold], delimiter=",")
+                        np.savetxt(self.output_dir + str(fold_index +1) + "_fold.csv", folds[fold], delimiter=",")
 
                 print("K-folds are done")
 
@@ -59,28 +62,35 @@ class MakeKFolds:
                         rows = np.where(classes == group_name)
                         group_data = all_data[rows]
                         new_k_folds, remaining_rows = GroupRows.GroupRows.group_rows(group_data, self.intact_group_header, self.k_folds)
-                        print(remaining_rows)
-                        unsorted_rows.append(remaining_rows)
+                        
+                        unsorted_rows.extend(remaining_rows)
                         for fold in range(0,self.k_folds):
                                folds[fold].append(new_k_folds[fold]) 
                 return folds, unsorted_rows
         
         def add_remaining_rows(self, folds, unsorted_rows):
+                ## Do i need to do groupings?
                 unsorted_per_fold = len(unsorted_rows) // self.k_folds
                 folds_numbered = list(range(0, self.k_folds))
+                folds_to_extend = self.k_folds -1
 
-                for _ in range(0, self.kfolds - 1):
+                if unsorted_per_fold == 0:
+                        folds_to_extend = len(unsorted_rows)
+                        unsorted_per_fold = 1
+
+                for _ in range(0, folds_to_extend):
                         random_fold = np.random.choice(folds_numbered)
                         random_rows = np.random.choice(unsorted_rows, replace= False, size = unsorted_per_fold)
                         folds[random_fold].append(random_rows)                
                         unsorted_rows = np.setdiff1d(unsorted_rows, random_rows)
                         folds_numbered.remove(random_fold)
 
-                final_fold = folds_numbered[0]
-                folds[final_fold].append(unsorted_rows)                
-                unsorted_rows = np.setdiff1d(unsorted_rows, random_rows)
+                if unsorted_per_fold != 0:
+                        final_fold = folds_numbered[0]
+                        folds[final_fold].append(unsorted_rows)                
+                        unsorted_rows = np.setdiff1d(unsorted_rows, unsorted_rows)
 
                 return folds, unsorted_rows
-
+        
 if __name__ == "__main__":
     MakeKFolds().main()
