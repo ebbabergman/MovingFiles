@@ -10,11 +10,11 @@ class MakeKFolds:
 
         def __init__(self,
                         labels_path = '/home/jovyan/Data/Specs/Labels.csv',
-                        output_folder = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top2_K_folds/',
+                        output_folder = '/home/jovyan/Inputs/SPECS_QC_Automatic_top10_K_folds/',
                         output_file = 'Fold_{0}_{1}.csv', #  {0} used for insert number of k-fold, {1} for if test or train df
                         # include_groups = [], #Empty for everything included,
-                        # include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
-                        included_classes = ["negcon","DNA polymerase inhibitor", "topoisomerase inhibitor"],
+                        included_classes = ["negcon","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
+                        #included_classes = ["negcon","DNA polymerase inhibitor", "topoisomerase inhibitor"],
                         class_header = "selected_mechanism",
                         exclude_images_path = "/home/jovyan/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
                         intact_group_header = 'compound_id',
