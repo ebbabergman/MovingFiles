@@ -71,7 +71,7 @@ class LeaveOneOut:
                 k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
-                k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
+                k_fold_name = 'Fold_{0}_Test.csv',#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Specs/MiPhHo/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
