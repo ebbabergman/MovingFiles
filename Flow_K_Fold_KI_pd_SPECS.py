@@ -13,9 +13,9 @@ import General_Moving
 class LeaveOneOut:
     
     def __init__(self,
-                labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
+                labels_path = '/home/jovyan/Data/Specs/Labels.csv',
                 output_dir = '/home/jovyan/Inputs/Test/',
-                include_groups = ["[dmso]","DNA polymerase inhibitor", "NFkB pathway inhibitor","mTOR inhibitor", "topoisomerase inhibitor"],
+                include_groups = ["negcon","DNA polymerase inhibitor", "NFkB pathway inhibitor","mTOR inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
                 class_column_header = "selected_mechanism",
                 exclude_images_path = "~/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
@@ -25,7 +25,7 @@ class LeaveOneOut:
                 #k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
-                k_fold_name = "k_fold_%s.csv",#where /%s is the k_fold number
+                k_fold_name = 'Fold_/%s_Test.csv',#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Specs/MiPhHo/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
