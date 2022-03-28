@@ -3,16 +3,18 @@ import numpy as np
 import pandas as pd 
 
 import GroupRows
+import General_Moving
 
 class MakeKFolds:
 ## ASSUMPTION: labels_path file contains *no dublicates* and *no NA* values
 
         def __init__(self,
                         labels_path = '/home/jovyan/Data/Specs/Labels.csv',
-                        output_file='/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top3_K_folds/Fold_{0}_{1}.csv', #  {0} used for insert number of k-fold, {1} for if test or train df
+                        output_folder = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top2_K_folds/',
+                        output_file = 'Fold_{0}_{1}.csv', #  {0} used for insert number of k-fold, {1} for if test or train df
                         # include_groups = [], #Empty for everything included,
                         # include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
-                        included_classes = ["negcon","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
+                        included_classes = ["negcon","DNA polymerase inhibitor", "topoisomerase inhibitor"],
                         class_header = "selected_mechanism",
                         exclude_images_path = "/home/jovyan/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
                         intact_group_header = 'compound_id',
@@ -24,7 +26,8 @@ class MakeKFolds:
                         validation_part = 0.20 
                         ):
                 self.labels_path = labels_path
-                self.output_file = output_file
+                self.output_folder = output_folder
+                self.output_file = output_folder + output_file
                 self.exclude_images_path = exclude_images_path
                 self.included_classes = included_classes
                 self.class_header = class_header
@@ -38,7 +41,8 @@ class MakeKFolds:
 
         def main(self):
                 print("Started KFolds.")
-              
+                General_Moving.make_non_existing_path(self.output_folder)
+                
                 all_data = np.genfromtxt(self.labels_path, delimiter=',', names = True, dtype = None, encoding = None)
                 self.intact_group_index = all_data.dtype.names.index(self.intact_group_header)
 
