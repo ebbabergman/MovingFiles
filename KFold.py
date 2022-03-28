@@ -98,13 +98,13 @@ class MakeKFolds:
                 for _ in range(0, folds_to_extend):
                         random_fold = np.random.choice(folds_numbered)
                         random_rows = np.random.choice(unsorted_rows, replace= False, size = unsorted_per_fold)
-                        folds[random_fold].append(random_rows)                
+                        folds[random_fold].extend(random_rows)                
                         unsorted_rows = np.setdiff1d(unsorted_rows, random_rows)
                         folds_numbered.remove(random_fold)
 
                 if unsorted_per_fold != 0:
                         final_fold = folds_numbered[0]
-                        folds[final_fold].append(unsorted_rows)                
+                        folds[final_fold].extend(unsorted_rows)                
                         unsorted_rows = np.setdiff1d(unsorted_rows, unsorted_rows)
 
                 return folds, unsorted_rows
