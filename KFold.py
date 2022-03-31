@@ -61,14 +61,14 @@ class MakeKFolds:
                         data_for_fold = all_data[mask]
                         # TODO Use this instead: https://www.geeksforgeeks.org/python-save-list-to-csv/ (Save to list, then to csv)
                         df_fold = pd.DataFrame(data_for_fold)
-                        df_fold.to_csv(self.output_file.format(fold_index, "Test"), index = False)
+                        df_fold.to_csv(self.output_file.format(str(fold_index+1), "Test"), index = False)
 
                         if self.only_test:  continue
 
                         # TODO make grouped version
                         data_for_train = all_data[~mask]
                         df_fold = pd.DataFrame(data_for_train)
-                        df_fold.to_csv(self.output_file.format(fold_index, "Train"), index = False)
+                        df_fold.to_csv(self.output_file.format(str(fold_index +1), "Train"), index = False)
 
 
                 print("K-folds are done")
