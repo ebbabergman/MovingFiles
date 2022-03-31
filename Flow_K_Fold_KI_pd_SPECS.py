@@ -63,7 +63,7 @@ class LeaveOneOut:
         self.save_labels_dir = save_labels_dir
        
     def update_settings(self,
-                labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
+                labels_path = '/home/jovyan/Data/Specs/Labels.csv',
                 output_dir = '/home/jovyan/Inputs/Test/',
                 include_groups = ["[dmso]","DNA polymerase inhibitor", "NFkB pathway inhibitor","mTOR inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
