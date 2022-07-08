@@ -13,19 +13,20 @@ class MakeKFolds:
     def __init__(self,
                 labels_path = '/home/jovyan/Data/Specs/Specs_Labels.csv',
                 output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_K_folds/',
-                include_groups = [], #Empty for everything included,
-                #include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
+                #include_groups = [], #Empty for everything included,
+                include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 #include_groups = ["negcon","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
                 class_column_header = "selected_mechanism",
                 exclude_groups = [],
                 exclude_header = "selected_mechanism",
+                # Exclude images isn't used. Change? There has to be a simpler way to do this.
                 exclude_images_path = "/home/jovyan/Data/Specs/Flaggs/images__outside_nuclei_cut_82_149.csv",
                 intact_group_header = 'compound_id',
                 intact_control_group_headers = ['plate', 'well'], # NOTE: hard coded for 2 headers to to troubles with dataframe
                 meta_data_header = ['plate', 'well', 'site'],
                 image_number_heading = "nr",   
-                has_controls = False,
+                has_controls = True,
                 frac_of_controls_to_use = 1,
                 k_folds = "3",
                 divide_on_header = 'compound_id',
@@ -140,10 +141,10 @@ class MakeKFolds:
             k_folds[k_fold] = df_fold
         k_folds[number_of_folds-1] = df_unused
 
-        if self.has_controls and df[df[self.class_column_header] == '[dmso]'].empty:
-            df_group = df[df[self.include_header].isin(['[dmso]'])]
-            df_sampled, df_used_wells, df = self.getControlSampel( df_group, df_used_wells, df, group_n['[dmso]'])
-            k_folds[number_of_folds-1] =  k_folds[number_of_folds-1].append(df_sampled)
+        # if self.has_controls and df[df[self.class_column_header] == '[dmso]'].empty:
+        #     df_group = df[df[self.include_header].isin(['[dmso]'])]
+        #     df_sampled, df_used_wells, df = self.getControlSampel( df_group, df_used_wells, df, group_n['[dmso]'])
+        #     k_folds[number_of_folds-1] =  k_folds[number_of_folds-1].append(df_sampled)
             
         return k_folds
 
