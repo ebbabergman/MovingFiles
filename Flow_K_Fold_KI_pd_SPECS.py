@@ -16,21 +16,21 @@ class LeaveOneOut:
                 k_fold = "1",
                 labels_path = '/home/jovyan/Data/Specs/Labels.csv',
                 output_dir="../Leave_One_Out/",
-                include_groups = ["heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
+                include_groups = ["negcon","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 #include_groups = [], #Empty for everything included,
                 #include_groups = ["negcon_PHB000001","negcon_PHB000012","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 #include_groups = ["negcon_PHB000001","negcon_PHB000012","DNA polymerase inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
                 class_column_header = "selected_mechanism",
-                exclude_images_path = "/home/jovyan/Data/Specs/Flaggs/images_outside_nuclei_cut_82_149.csv",
+                exclude_images_path = "/home/jovyan/Data/Specs/Flaggs/Cell_Profiler_Flagged_images_outside_nuclei_cut_82_149.csv",
                 save_labels_dir = "./Outputs/",
-                k_fold_dir = '/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_K_folds/',
+                k_fold_dir = '/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds/',
                 #k_fold_dir = "/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top2_K_folds/",
                 #k_fold_dir = '/home/jovyan/Inputs/SPECS_K_folds/',
                 #k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
-                k_fold_name = 'Fold_%s_Test.csv',#where /%s is the k_fold number
+                k_fold_name = 'k_fold_%s.csv',#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Specs/MiPhHo/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
@@ -64,18 +64,24 @@ class LeaveOneOut:
         self.save_labels_dir = save_labels_dir
        
     def update_settings(self,
+                k_fold = "1",
                 labels_path = '/home/jovyan/Data/Specs/Labels.csv',
-                output_dir = '/home/jovyan/Inputs/Test/',
-                include_groups = ["[dmso]","DNA polymerase inhibitor", "NFkB pathway inhibitor","mTOR inhibitor", "topoisomerase inhibitor"],
+                output_dir="../Leave_One_Out/",
+                include_groups = ["negcon","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
+                #include_groups = [], #Empty for everything included,
+                #include_groups = ["negcon_PHB000001","negcon_PHB000012","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
+                #include_groups = ["negcon_PHB000001","negcon_PHB000012","DNA polymerase inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
                 class_column_header = "selected_mechanism",
-                exclude_images_path = "~/Outputs/CellProfiler/QC_Specs/QC_Specs_OnlyFlaggedAut_AllPlates.csv",
+                exclude_images_path = "/home/jovyan/Data/Specs/Flaggs/Cell_Profiler_Flagged_images_outside_nuclei_cut_82_149.csv",
                 save_labels_dir = "./Outputs/",
+                k_fold_dir = '/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds/',
+                #k_fold_dir = "/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top2_K_folds/",
                 #k_fold_dir = '/home/jovyan/Inputs/SPECS_K_folds/',
-                k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
+                #k_fold_dir = '/home/jovyan/Inputs/SPECS_QC_Automatic_Jordi_Controll_top4_K_folds/',
                 exclude_groups = [], #Empty for everything included,
                 exclude_header = 'selected_mechanism',
-                k_fold_name = 'Fold_%s_Test.csv',#where /%s is the k_fold number
+                k_fold_name = 'k_fold_%s.csv',#where /%s is the k_fold number
                 image_dir= '/home/jovyan/scratch-shared/Specs/MiPhHo/',
                 image_name ='%s.png', #Where %s is the image number,
                 validation_set_size  = 0.20, #Percentage written as decimal,
@@ -84,8 +90,7 @@ class LeaveOneOut:
                 leave_out_header = "compound_id",
                 image_number_heading = "ImageNr",
                 name_to_leave_out = "" ,
-                k_fold = "1",
-                output_size = 1, # Percentage of original total size that should be used,            
+                output_size = 1, # Percentage of original total size that should be used,
                 ):
         self.labels_path = labels_path
         self.exclude_images_path = exclude_images_path
@@ -108,6 +113,7 @@ class LeaveOneOut:
         self.output_size = output_size
         self.k_fold = int(k_fold)
         self.save_labels_dir = save_labels_dir
+               
 
     def main(self):
         print("Starting leave one out")
@@ -198,7 +204,6 @@ class LeaveOneOut:
     def sort_into_test_folder(self, image_number, category): #where category is train, validation or test
         if(image_number == ''):
             return
-       
         current_path = self.image_dir + self.image_name  % str(image_number)
         dir_path = self.output_dir+"/"  + category + "/" +category #dataflow needs a subfolder, but test subfolder should not be class
         target_path = dir_path +"/" +str(image_number) + ".png"
