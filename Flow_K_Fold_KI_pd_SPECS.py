@@ -53,7 +53,7 @@ class LeaveOneOut:
         self.include_header = include_header
         self.exclude_groups = exclude_groups
         self.exclude_header = exclude_header
-        self.class_column_header =  class_column_header 
+        self.group_by_heading =  group_by_heading 
         self.meta_data_header = meta_data_header
         self.well_header =  well_header
         self.leave_out_header =  leave_out_header
@@ -104,7 +104,7 @@ class LeaveOneOut:
         self.include_header = include_header
         self.exclude_groups = exclude_groups
         self.exclude_header = exclude_header
-        self.class_column_header =  class_column_header 
+        self.group_by_heading =  class_column_header 
         self.meta_data_header = meta_data_header
         self.well_header =  well_header
         self.leave_out_header =  leave_out_header
@@ -119,7 +119,7 @@ class LeaveOneOut:
         print("Starting leave one out")
 
         df = pd.read_csv(self.labels_path , delimiter= ",")
-        df.dropna(subset = [self.class_column_header], inplace=True)
+        df.dropna(subset = [self.group_by_heading], inplace=True)
         
         if(len(self.included_groups) == 0):
             self.included_groups = df[self.include_header].unique()
@@ -136,7 +136,7 @@ class LeaveOneOut:
 
         df_used = pd.concat([df_used, df_test, df_test]).drop_duplicates(keep=False)
 
-        df_validation = df_used.groupby(self.class_column_header).sample(frac = self.validation_set_size)
+        df_validation = df_used.groupby(self.group_by_heading).sample(frac = self.validation_set_size)
         df_train = pd.concat([df_used, df_validation, df_validation]).drop_duplicates(keep=False)
 
         df["valid"] = df.index.isin(df_validation.index)
@@ -145,18 +145,18 @@ class LeaveOneOut:
 
         ##Make some statistics 
         df_statistics_base = df[df[self.include_header].isin(groups) & ~df[self.exclude_header].isin(self.exclude_groups)]
-        df_statistics_base = df_statistics_base[[self.class_column_header, "valid", "train", "test"]]
+        df_statistics_base = df_statistics_base[[self.group_by_heading, "valid", "train", "test"]]
         
         df_used = self.get_usable_images(df,groups)
     
-        df_statistics =pd.DataFrame(df_statistics_base.groupby(self.class_column_header).count()[["train"]].reset_index().values, columns=["group", "train"])
+        df_statistics =pd.DataFrame(df_statistics_base.groupby(self.group_by_heading).count()[["train"]].reset_index().values, columns=["group", "train"])
         df_statistics.rename(columns={"train": "total"}, inplace=True)
-        df_statistics["used"] = df_used.groupby(self.class_column_header).count().reset_index()[[self.image_number_heading]]
-        df_statistics["train"] = df_statistics_base[df_statistics_base["train"]==1].groupby(self.class_column_header).count().reset_index()[["train"]]
+        df_statistics["used"] = df_used.groupby(self.group_by_heading).count().reset_index()[[self.image_number_heading]]
+        df_statistics["train"] = df_statistics_base[df_statistics_base["train"]==1].groupby(self.group_by_heading).count().reset_index()[["train"]]
         df_statistics["percentage_train"] = df_statistics["train"] /df_statistics["used"] 
-        df_statistics["valid"] = df_statistics_base[df_statistics_base["valid"]==1].groupby(self.class_column_header).count().reset_index()[["valid"]]
+        df_statistics["valid"] = df_statistics_base[df_statistics_base["valid"]==1].groupby(self.group_by_heading).count().reset_index()[["valid"]]
         df_statistics["percentage_valid"] = df_statistics["valid"] /df_statistics["used"] 
-        df_statistics["test"] = df_statistics_base[df_statistics_base["test"]==1].groupby(self.class_column_header).count().reset_index()[["test"]]
+        df_statistics["test"] = df_statistics_base[df_statistics_base["test"]==1].groupby(self.group_by_heading).count().reset_index()[["test"]]
         df_statistics["percentage_test"] = df_statistics["test"] /df_statistics["used"] 
 
         ## Save information 
@@ -173,9 +173,9 @@ class LeaveOneOut:
         df_save.to_csv(self.save_labels_dir + "/Labels.csv", index = False)
         df_statistics.to_csv(self.save_labels_dir + "/LabelStatistics.csv", index = False)
 
-        train_rows = df_train[[self.image_number_heading,self.class_column_header]].to_numpy()
-        validation_rows = df_validation[[self.image_number_heading,self.class_column_header]].to_numpy()
-        test_rows = df_test[[self.image_number_heading,self.class_column_header]].to_numpy()
+        train_rows = df_train[[self.image_number_heading,self.group_by_heading]].to_numpy()
+        validation_rows = df_validation[[self.image_number_heading,self.group_by_heading]].to_numpy()
+        test_rows = df_test[[self.image_number_heading,self.group_by_heading]].to_numpy()
         for row in train_rows:
             self.sort_into_class_folders(row[0],row[1], "Train")
         for row in validation_rows:

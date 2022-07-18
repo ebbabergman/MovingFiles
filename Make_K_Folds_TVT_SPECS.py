@@ -65,7 +65,7 @@ class MakeKFolds:
         k_folds_test = self.get_k_folds_test(df)
 
         if self.make_train_valid:
-            k_fold_train, k_fold_validation=  self.get_k_folds_tv(df, k_fold_test, self.valid_fraction)
+            k_fold_train, k_fold_validation=  self.get_k_folds_tv(df, k_folds_test, self.valid_fraction)
 
         ##Make some statistics 
         s_statistics = df.groupby(self.class_column_header)[self.divide_on_header].nunique()
