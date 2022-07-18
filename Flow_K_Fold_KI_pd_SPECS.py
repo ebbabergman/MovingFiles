@@ -21,7 +21,7 @@ class LeaveOneOut:
                 #include_groups = ["negcon_PHB000001","negcon_PHB000012","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"], #Empty for everything included,
                 #include_groups = ["negcon_PHB000001","negcon_PHB000012","DNA polymerase inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
-                class_column_header = "selected_mechanism",
+                group_by_heading = "compound",
                 exclude_images_path = "/home/jovyan/Data/Specs/Flaggs/Cell_Profiler_Flagged_images_outside_nuclei_cut_82_149.csv",
                 save_labels_dir = "./Outputs/",
                 k_fold_dir = '/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds/',

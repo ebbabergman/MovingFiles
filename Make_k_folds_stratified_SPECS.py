@@ -57,10 +57,11 @@ class MakeKFolds:
         df_base.dropna(subset = [self.class_column_header], inplace=True)
         df_base.drop_duplicates(inplace=True)
 
-        self.included_groups = self.get_included_groups(df_base)
-        df = df_base[df_base[self.include_header].isin(self.included_groups) & ~df_base[self.exclude_header].isin(self.exclude_groups)]
-       
-        k_folds = self.get_k_folds(df)
+        all_groups_that_could_be_included = self.get_included_groups(df_base)
+        df = df_base[df_base[self.include_header].isin(all_groups_that_could_be_included) & ~df_base[self.exclude_header].isin(self.exclude_groups)]
+        self.included_groups = self.get_included_groups(df)
+
+        k_folds = self.get_k_folds_test(df)
 
         ##Make some statistics 
         s_statistics = df.groupby(self.class_column_header)[self.divide_on_header].nunique()
@@ -98,7 +99,7 @@ class MakeKFolds:
         included_groups = [group for group in included_groups if group not in self.exclude_groups]
         return included_groups
 
-    def get_k_folds(self, df):
+    def get_k_folds_test(self, df):
         number_of_folds = self.k_folds
         k_fold_frac = 1/number_of_folds
         k_folds = [None]*number_of_folds
@@ -130,7 +131,7 @@ class MakeKFolds:
                     df_fold = df_fold.append(df_sampled)
                 else:
                     unique_entries = df_group[self.intact_group_header].unique()
-                     group_choice = np.random.choice(unique_entries, size = group_n[group])
+                    group_choice = np.random.choice(unique_entries, size = group_n[group])
                     df_group_coice = df_group[df_group[self.divide_on_header].isin(group_choice)]
                     df_fold = df_fold.append(df_group_coice)
     #                 pd.merge(df1, df2, on=['A','B'], how='outer', indicator=True).query("_merge != 'both'")
