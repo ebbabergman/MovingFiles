@@ -135,9 +135,26 @@ class MakeKFolds:
                 df_group_coice = df_group[df_group[self.divide_on_header].isin(group_choice)]
                 df_fold = df_fold.append(df_group_coice)
             df_unused = pd.concat([df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
-            k_folds[k_fold] = df_fold
+            k_folds[k_fold-1] = df_fold
 
-       # TODO use  df_unused but put them into the other fold iterativel ( I feel like I already did this somewhere..)
+        group_index = 0 
+        for group in self.included_groups:
+            df_group = df_unused[df_unused[self.include_header].isin([group])]
+            
+            if df_group.empty:
+                continue
+            
+            k_fold_to_choose = [*range(1,number_of_folds +1)]
+            while not df_group.empty:
+                if len(k_fold_to_choose) == 0:
+                    k_fold_to_choose = [*range(1,number_of_folds +1)]
+                    print("Something is wrong with the way the number of groups are positioned, could put remainder into each fold") # TODO make this a warning
+                chosen_k_fold = np.random.choice(k_fold_to_choose, size = 1, replace = False)[0]
+                new_row = df_group[0] # How do I pop the first row from a dataframe? Should be easy?
+                k_folds[chosen_k_fold-1].append(new_row, ignore_index = True)
+                df_group.drop(index=df_group.index[0],  axis=0, inplace=True)
+            
+            group_index = group_index +1
 
         print("Made test sets for k-folds")    
         return k_folds
