@@ -65,7 +65,7 @@ class MakeKFolds:
         k_folds_test = self.get_k_folds_test(df)
 
         if self.make_train_valid:
-            k_fold_train, k_fold_validation=  self.get_k_folds_tv(df, k_folds_test, self.valid_fraction)
+            k_fold_train, k_fold_validation=  self.get_k_folds_tv(df, k_folds_test)
 
         ##Make some statistics 
         s_statistics = df.groupby(self.class_column_header)[self.divide_on_header].nunique()
@@ -130,9 +130,7 @@ class MakeKFolds:
                     df_group = df_unused[df_unused[self.include_header].isin([group])]
                     print("Every unit from group had been used, re-using values for group " + str(group) + ".")
 
-                unique_entries = df_group[self.intact_group_header].unique()
-                group_choice = np.random.choice(unique_entries, size = group_n[group])
-                df_group_coice = df_group[df_group[self.divide_on_header].isin(group_choice)]
+                df_group_coice = self.get_group_selection( df_group, group_n[group])
                 df_fold = df_fold.append(df_group_coice)
             df_unused = pd.concat([df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
             k_folds[k_fold-1] = df_fold
@@ -149,12 +147,19 @@ class MakeKFolds:
                 if len(k_fold_to_choose) == 0:
                     k_fold_to_choose = [*range(1,number_of_folds +1)]
                     print("Something is wrong with the way the number of groups are positioned, could put remainder into each fold") # TODO make this a warning
+                
                 chosen_k_fold = np.random.choice(k_fold_to_choose, size = 1, replace = False)[0]
-                new_row = df_group[0] # How do I pop the first row from a dataframe? Should be easy?
-                k_folds[chosen_k_fold-1].append(new_row, ignore_index = True)
-                df_group.drop(index=df_group.index[0],  axis=0, inplace=True)
-            
+                df_group_coice = self.get_group_selection( df_group, 1)
+
+                k_folds[chosen_k_fold-1].append(df_group_coice, ignore_index = True)
+                df_unused = pd.concat([df_unused, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
+                df_group = pd.concat([df_group, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
+                
             group_index = group_index +1
+
+        if not df_unused.empty:
+            print("WARNING: Didn't put all avialiable compound into test k-folds! Left over:")
+            print(df_unused)
 
         print("Made test sets for k-folds")    
         return k_folds
@@ -167,6 +172,12 @@ class MakeKFolds:
         # TODO implement the actual function
         return k_fold_train, k_fold_validation
 
+    def get_group_selection(self, df_group, number_of_unique_entries):
+        unique_entries = df_group[self.intact_group_header].unique()
+        group_choice = np.random.choice(unique_entries, size = number_of_unique_entries)
+        df_group_coice = df_group[df_group[self.divide_on_header].isin(group_choice)]
+        return df_group_coice
+                
 
 if __name__ == "__main__":
     MakeKFolds().main()
