@@ -187,8 +187,8 @@ class MakeKFolds:
                 df_group_coice_validation = self.get_group_selection(df_group, group_n[group])
                 df_group_coice_train = pd.concat([df_group, df_group_coice_validation, df_group_coice_validation]).drop_duplicates(keep=False)
 
-                df_fold_validation.extend(df_group_coice_validation)
-                df_fold_train.extend(df_group_coice_train)
+                df_fold_validation.append(df_group_coice_validation)
+                df_fold_train.append(df_group_coice_train)
 
             df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train]).drop_duplicates(keep=False)
             k_fold_validation[k_fold-1] = df_fold_validation
