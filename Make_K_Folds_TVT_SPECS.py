@@ -112,13 +112,10 @@ class MakeKFolds:
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
-            # TODO START HERE
-            ## Is there an error here?
             group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*k_fold_frac)
             if group_n[group] < 1: 
                 group_n[group] = 1
                 print("A group did not have enough unique groupings to have 1 unique entry per fold. Group:" + str(group) )
-
 
         for k_fold in range(1,number_of_folds +1):
             df_fold= pd.DataFrame()
@@ -166,10 +163,43 @@ class MakeKFolds:
 
     def get_k_folds_tv(self, df, k_fold_test):
         number_of_folds = self.k_folds
+        validation_fraction = (number_of_folds-1)/number_of_folds*self.valid_fraction
         k_fold_train = [None]*number_of_folds
         k_fold_validation = [None]*number_of_folds
+        group_n = {}
 
-        # TODO implement the actual function
+        for group in self.included_groups:
+            df_group = df[df[self.include_header].isin([group])]
+            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*validation_fraction)
+            if group_n[group] < 1: 
+                group_n[group] = 1
+                print("A group did not have enough unique groupings to have 1 unique entry per vakudation fold. Using 1 unique entry anyway. Group:" + str(group) )
+
+        for k_fold in range(1,number_of_folds +1):
+            df_unused = df.copy()
+            df_k_fold_test = k_fold_test[k_fold-1]
+            df_unused = pd.concat([df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
+
+            df_fold_validation= pd.DataFrame()
+            df_fold_train= pd.DataFrame()
+            for group in self.included_groups:
+                df_group = df_unused[df_unused[self.include_header].isin([group])]
+                df_group_coice_validation = self.get_group_selection(df_group, group_n[group])
+                df_group_coice_train = pd.concat([df_group, df_group_coice_validation, df_group_coice_validation]).drop_duplicates(keep=False)
+
+                df_fold_validation.extend(df_group_coice_validation)
+                df_fold_train.extend(df_group_coice_train)
+
+            df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train]).drop_duplicates(keep=False)
+            k_fold_validation[k_fold-1] = df_fold_validation
+            k_fold_train[k_fold-1] = df_fold_train
+
+        if not df_unused.empty:
+            print("WARNING: Didn't put all avialiable compound into train or valid k-folds! Left over:")
+            print(df_unused)
+
+        print("Made train and valid sets for k-folds")   
+
         return k_fold_train, k_fold_validation
 
     def get_group_selection(self, df_group, number_of_unique_entries):
