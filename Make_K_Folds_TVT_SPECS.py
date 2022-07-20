@@ -186,7 +186,7 @@ class MakeKFolds:
                 df_group = df_unused[df_unused[self.include_header].isin([group])]
                 
                 if k_fold == 1 : 
-                    df_group_coice_validation = self.get_group_selection(df_group_available_validation, group_n[group])
+                    df_group_coice_validation = self.get_group_selection(df_group, group_n[group])
                 else:
                     df_group_unavailable_validation =  pd.concat(k_fold_validation,ignore_index = True)[df_unused[self.include_header].isin([group])]
                     df_group_available_validation =  pd.concat(df_group,df_group_unavailable_validation,ignore_index = True).drop_duplicates(keep=False)
