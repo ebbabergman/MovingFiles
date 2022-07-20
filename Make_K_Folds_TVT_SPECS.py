@@ -52,6 +52,8 @@ class MakeKFolds:
     def main(self):
         print("Started make k-folds.")
 
+        self.make_path_available()
+
         df_base = pd.read_csv(self.labels_path , delimiter= ",")
         df_base.dropna(subset = [self.class_column_header], inplace=True)
         df_base.drop_duplicates(inplace=True)
@@ -63,36 +65,34 @@ class MakeKFolds:
         print("Included and exlcuded groups")
 
         k_folds_test = self.get_k_folds_test(df)
+        df_test_statistics  = self.get_statistics(k_folds_test,df)
+        df_test_statistics.to_csv(self.output_dir + "k_fold_test_statistics.csv", index = False)
+        print("Test Statistics")
+        print(df_test_statistics.to_latex())
 
         if self.make_train_valid:
-            k_fold_train, k_fold_validation=  self.get_k_folds_tv(df, k_folds_test)
+            k_folds_train, k_folds_validation=  self.get_k_folds_tv(df, k_folds_test)
+            df_validation_statistics  = self.get_statistics(k_folds_validation,df)
+            df_train_statistics  = self.get_statistics(k_folds_train,df)
+            
+            df_validation_statistics.to_csv(self.output_dir + "k_fold_validation_statistics.csv", index = False)
+            df_train_statistics.to_csv(self.output_dir + "k_fold_train_statistics.csv", index = False)
 
-        ##Make some statistics 
-        s_statistics = df.groupby(self.class_column_header)[self.divide_on_header].nunique()
-        df_statistics = pd.DataFrame(s_statistics.index)
-        df_statistics["Total"] = s_statistics.values
+            print("Validation Statistics ")
+            print(df_validation_statistics.to_latex())
+            print("Train Statistics ")
+            print(df_train_statistics.to_latex())
 
-        number_of_folds = self.k_folds
-        for k_fold in range(0,number_of_folds):
-            df_fold = k_folds_test[k_fold] 
-            df_grouped = df_fold.groupby(self.class_column_header)
-            statistic_column_header = self.divide_on_header+"s_in_fold_"+str(k_fold)
-            df_statistics[statistic_column_header] = df_grouped[self.divide_on_header].nunique().values
-   
-        print(df_statistics.to_latex())
-        ##Write out data 
-        if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
-            shutil.rmtree(self.output_dir)
-
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
-            print("made the output dir")   
-
-        df_statistics.to_csv(self.output_dir + "k_fold_statistics.csv", index = False)
-        for k_fold in range(0,number_of_folds):
-            df_fold = k_folds_test[k_fold] 
-            df_fold.to_csv(self.output_dir + "k_fold_"+ str(k_fold +1)+".csv", index = False)
-
+        for k_fold in range(0,self.k_fold):
+            df_test_fold = k_folds_test[k_fold] 
+            df_test_fold.to_csv(self.output_dir + "k_fold_test_"+ str(k_fold +1)+".csv", index = False)
+            
+            df_validation_fold = k_folds_validation[k_fold] 
+            df_validation_fold.to_csv(self.output_dir + "k_fold_validation_"+ str(k_fold +1)+".csv", index = False)
+            
+            df_train_fold = k_folds_train[k_fold] 
+            df_train_fold.to_csv(self.output_dir + "k_fold_validation_"+ str(k_fold +1)+".csv", index = False)
+           
         print("Finished. Find output in: " + self.output_dir)
 
     def get_included_groups(self, df):
@@ -132,6 +132,7 @@ class MakeKFolds:
             df_unused = pd.concat([df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
             k_folds[k_fold-1] = df_fold
 
+        # deal with the unused unique groups
         group_index = 0 
         for group in self.included_groups:
             df_group = df_unused[df_unused[self.include_header].isin([group])]
@@ -206,8 +207,31 @@ class MakeKFolds:
         unique_entries = df_group[self.intact_group_header].unique()
         group_choice = np.random.choice(unique_entries, size = number_of_unique_entries)
         df_group_coice = df_group[df_group[self.divide_on_header].isin(group_choice)]
-        return df_group_coice
-                
+        return df_group_coice   
+
+    def get_statistics (self, k_folds, df):
+         ##Make some statistics  # TODO make this a function and run for each type of data
+        s_statistics = df.groupby(self.class_column_header)[self.divide_on_header].nunique()
+        df_statistics = pd.DataFrame(s_statistics.index)
+        df_statistics["Total"] = s_statistics.values
+
+        number_of_folds = self.k_folds
+        for k_fold in range(0,number_of_folds):
+            df_fold = k_folds[k_fold] 
+            df_grouped = df_fold.groupby(self.class_column_header)
+            statistic_column_header = self.divide_on_header+"s_in_fold_"+str(k_fold)
+            df_statistics[statistic_column_header] = df_grouped[self.divide_on_header].nunique().values
+   
+        return df_statistics        
+
+    def make_path_available(self): 
+        if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
+            shutil.rmtree(self.output_dir)
+
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+            print("made the output dir") 
+
 
 if __name__ == "__main__":
     MakeKFolds().main()
