@@ -123,12 +123,11 @@ class MakeKFolds:
                 df_group = df_unused[df_unused[self.include_header].isin([group])]
                 if df_group.empty:
                     df_used = df[df[self.include_header].isin([group])]
-                    df_unused.append(df_used)
+                    df_unused = df_used.copy()
                     df_group = df_unused[df_unused[self.include_header].isin([group])]
                     print("Every unit from group had been used, re-using values for group " + str(group) + ".")
-
                 df_group_coice = self.get_group_selection( df_group, group_n[group])
-                df_fold = df_fold.append(df_group_coice)
+                df_fold = pd.concat([df_fold,df_group_coice],ignore_index = True)
             df_unused = pd.concat([df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
             k_folds[k_fold-1] = df_fold
 
@@ -149,7 +148,7 @@ class MakeKFolds:
                 chosen_k_fold = np.random.choice(k_fold_to_choose, size = 1, replace = False)[0]
                 df_group_coice = self.get_group_selection( df_group, 1)
 
-                k_folds[chosen_k_fold-1].append(df_group_coice, ignore_index = True)
+                k_folds[chosen_k_fold-1] = pd.concat([k_folds[chosen_k_fold-1],df_group_coice],ignore_index = True)
                 df_unused = pd.concat([df_unused, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
                 df_group = pd.concat([df_group, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
                 
@@ -188,8 +187,8 @@ class MakeKFolds:
                 df_group_coice_validation = self.get_group_selection(df_group, group_n[group])
                 df_group_coice_train = pd.concat([df_group, df_group_coice_validation, df_group_coice_validation]).drop_duplicates(keep=False)
 
-                df_fold_validation.append(df_group_coice_validation)
-                df_fold_train.append(df_group_coice_train)
+                df_fold_validation = pd.concat([df_fold_validation,df_group_coice_validation],ignore_index = True)
+                df_fold_train = pd.concat([df_fold_train,df_group_coice_train],ignore_index = True)
 
             df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train]).drop_duplicates(keep=False)
             k_fold_validation[k_fold-1] = df_fold_validation
