@@ -184,16 +184,20 @@ class MakeKFolds:
             df_fold_train= pd.DataFrame()
             for group in self.included_groups:
                 df_group = df_unused[df_unused[self.include_header].isin([group])]
-                df_group_unavailable_validation =  pd.concat(k_fold_validation,ignore_index = True)[df_unused[self.include_header].isin([group])]
-                df_group_available_validation =  pd.concat(df_group,df_group_unavailable_validation,ignore_index = True).drop_duplicates(keep=False)
-                unique_entries = df_group_available_validation[self.intact_group_header].unique()
                 
-                if unique_entries <  group_n[group]:
-                    number_of_added = group_n[group] - unique_entries
-                    add_to_validation = self.get_group_selection( df_group_unavailable_validation, number_of_added)
-                    df_group_coice_validation = pd.concat([df_group_available_validation, add_to_validation],ignore_index = True)
-                else:
+                if k_fold == 1 : 
                     df_group_coice_validation = self.get_group_selection(df_group_available_validation, group_n[group])
+                else:
+                    df_group_unavailable_validation =  pd.concat(k_fold_validation,ignore_index = True)[df_unused[self.include_header].isin([group])]
+                    df_group_available_validation =  pd.concat(df_group,df_group_unavailable_validation,ignore_index = True).drop_duplicates(keep=False)
+                    unique_entries = df_group_available_validation[self.intact_group_header].unique()
+                    
+                    if unique_entries <  group_n[group]:
+                        number_of_added = group_n[group] - unique_entries
+                        add_to_validation = self.get_group_selection( df_group_unavailable_validation, number_of_added)
+                        df_group_coice_validation = pd.concat([df_group_available_validation, add_to_validation],ignore_index = True)
+                    else:
+                        df_group_coice_validation = self.get_group_selection(df_group_available_validation, group_n[group])
                 
                 df_group_coice_train = pd.concat([df_group, df_group_coice_validation, df_group_coice_validation]).drop_duplicates(keep=False)
 
