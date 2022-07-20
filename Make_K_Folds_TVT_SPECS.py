@@ -105,14 +105,13 @@ class MakeKFolds:
 
     def get_k_folds_test(self, df):
         number_of_folds = self.k_folds
-        k_fold_frac = 1/number_of_folds
         k_folds = [None]*number_of_folds
         group_n = {}
         df_unused = df.copy()
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
-            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*k_fold_frac)
+            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()/number_of_folds)
             if group_n[group] < 1: 
                 group_n[group] = 1
                 print("A group did not have enough unique groupings to have 1 unique entry per fold. Group:" + str(group) )
@@ -163,14 +162,14 @@ class MakeKFolds:
 
     def get_k_folds_tv(self, df, k_fold_test):
         number_of_folds = self.k_folds
-        validation_fraction = (number_of_folds-1)/number_of_folds*self.valid_fraction
+        #validation_fraction = (number_of_folds-1)/number_of_folds*self.valid_fraction
         k_fold_train = [None]*number_of_folds
         k_fold_validation = [None]*number_of_folds
         group_n = {}
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
-            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*validation_fraction)
+            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*(number_of_folds-1)/number_of_folds*self.valid_fraction)
             if group_n[group] < 1: 
                 group_n[group] = 1
                 print("A group did not have enough unique groupings to have 1 unique entry per vakudation fold. Using 1 unique entry anyway. Group:" + str(group) )
