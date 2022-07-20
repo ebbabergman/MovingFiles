@@ -193,7 +193,7 @@ class MakeKFolds:
                     df_group_available_validation =  pd.concat([df_group,df_group_unavailable_validation],ignore_index = True).drop_duplicates(keep=False)
                     unique_entries = df_group_available_validation[self.intact_group_header].unique()
                     
-                    if len(unique_entrie) <  group_n[group]:
+                    if len(unique_entries) <  group_n[group]:
                         number_of_added = group_n[group] - unique_entries
                         add_to_validation = self.get_group_selection( df_group_unavailable_validation, number_of_added)
                         df_group_coice_validation = pd.concat([df_group_available_validation, add_to_validation],ignore_index = True)
