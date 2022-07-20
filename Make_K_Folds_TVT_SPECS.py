@@ -190,7 +190,7 @@ class MakeKFolds:
                 else:
                     df_unavailable_validation =  pd.concat(k_fold_validation,ignore_index = True)
                     df_group_unavailable_validation =  df_unavailable_validation[df_unavailable_validation[self.include_header].isin([group])]
-                    df_group_available_validation =  pd.concat(df_group,df_group_unavailable_validation,ignore_index = True).drop_duplicates(keep=False)
+                    df_group_available_validation =  pd.concat([df_group,df_group_unavailable_validation],ignore_index = True).drop_duplicates(keep=False)
                     unique_entries = df_group_available_validation[self.intact_group_header].unique()
                     
                     if unique_entries <  group_n[group]:
