@@ -13,7 +13,7 @@ import General_Moving
 class SortFiles:
 
     def __init__(self, 
-                input_dir = "/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds/",
+                input_dir = '/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds_top10/',
                 output_dir = "../Leave_One_Out/",
                 image_name_header = "ImageNr",
                 class_header = "selected_mechanism",
