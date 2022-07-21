@@ -17,11 +17,15 @@ class SortFiles:
                 output_dir = "../Leave_One_Out/",
                 image_name_header = "ImageNr",
                 class_header = "selected_mechanism",
+                image_name = "%s.png",
+                image_dir = "/home/jovyan/scratch-shared/Specs/20220314_MiPhHo/",
                 current_k_fold = 1):
         self.input_dir = input_dir
         self.output_dir = output_dir
         self.image_name_header = image_name_header
         self.class_header = class_header
+        self.image_name = image_name
+        self.image_dir = image_dir
         self.current_k_fold = str(current_k_fold)
   
     def main(self):
@@ -40,6 +44,7 @@ class SortFiles:
         validation_headers, validation_data = self.read_data(validation_file_path)
         test_headers, test_data = self.read_data(test_file_path)
 
+        print("Starting to move files")
         for row in train_data:
             image_nr_header = train_headers.index(self.image_name_header)
             class_header = train_headers.index(self.class_header)
@@ -53,6 +58,8 @@ class SortFiles:
             #Tensorflow's dataflow needs a subfolder, but test subfolder should be "Test" not the actual class
             self.sort_into_sub_folders(row[image_nr_header],"Test", "Test")
 
+        print("Finished sorting files")
+        
     def read_data (self, path):
         with open(path, 'r') as f:
             reader = csv.reader(f, delimiter=',')
