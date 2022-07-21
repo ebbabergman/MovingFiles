@@ -18,7 +18,7 @@ class MakeKFolds:
                 labels_path = '/home/jovyan/Data/Specs/Labels.csv',
                 output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds_top10/',
                # include_groups = [], #Empty for everything included,
-                include_groups = ["negcon","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"]                    #include_groups = ["negcon","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
+                include_groups = ["negcon","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"],                    #include_groups = ["negcon","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
                 class_column_header = "selected_mechanism",
                 exclude_groups = ["poscon","empty"],
