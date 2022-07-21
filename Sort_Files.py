@@ -29,7 +29,7 @@ class SortFiles:
         self.current_k_fold = str(current_k_fold)
   
     def update_settings(self, ## To keep up to date, simply change _init_ and then copy that full function here 
-                input_dir = "/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds/",
+                input_dir = '/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds_top10/',
                 output_dir = "../Leave_One_Out/",
                 image_name_header = "ImageNr",
                 class_header = "selected_mechanism",
