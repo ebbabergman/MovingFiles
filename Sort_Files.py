@@ -15,7 +15,7 @@ class SortFiles:
     def __init__(self, 
                 input_dir = "/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds/",
                 output_dir = "../Leave_One_Out/",
-                image_name_header = "nr",
+                image_name_header = "ImageNr",
                 class_header = "selected_mechanism",
                 current_k_fold = 1):
         self.input_dir = input_dir
@@ -28,13 +28,13 @@ class SortFiles:
         print("Starting Sort files")
         General_Moving.make_non_existing_path(self.output_dir)
 
-        all_csv_files = glob.glob(self.input_director+"*.csv")
+        all_csv_files = glob.glob(self.input_dir+"*.csv")
         #all_files = [f for f in listdir(self.input_directory) if isfile(join(self.input_directory, f))]
 
         right_k_fold_paths = [path for path in all_csv_files if self.current_k_fold in path]
-        train_file_path = [path for path in right_k_fold_paths if "train" in path]
-        validation_file_path = [path for path in right_k_fold_paths if "valid" in path]
-        test_file_path = [path for path in right_k_fold_paths if "test" in path]
+        train_file_path = [path for path in right_k_fold_paths if "train" in path][0]
+        validation_file_path = [path for path in right_k_fold_paths if "valid" in path][0]
+        test_file_path = [path for path in right_k_fold_paths if "test" in path][0]
 
         train_headers, train_data = self.read_data(train_file_path)
         validation_headers, validation_data = self.read_data(validation_file_path)
@@ -57,7 +57,7 @@ class SortFiles:
         with open(path, 'r') as f:
             reader = csv.reader(f, delimiter=',')
             headers = next(reader)
-            data = np.array(list(reader)).astype(float)
+            data = np.array(list(reader))
         return headers, data
 
     def sort_into_sub_folders(self, image_number, sub_folder, folder,): 
