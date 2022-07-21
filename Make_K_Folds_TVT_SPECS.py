@@ -91,7 +91,7 @@ class MakeKFolds:
             df_validation_fold.to_csv(self.output_dir + "k_fold_validation_"+ str(k_fold +1)+".csv", index = False)
             
             df_train_fold = k_folds_train[k_fold] 
-            df_train_fold.to_csv(self.output_dir + "k_fold_validation_"+ str(k_fold +1)+".csv", index = False)
+            df_train_fold.to_csv(self.output_dir + "k_fold_train_"+ str(k_fold +1)+".csv", index = False)
            
         print("Finished. Find output in: " + self.output_dir)
 
