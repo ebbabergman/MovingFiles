@@ -51,9 +51,9 @@ class SortFiles:
         all_csv_files = glob.glob(self.input_dir+"*.csv")
 
         right_k_fold_paths = [path for path in all_csv_files if self.current_k_fold in path]
-        train_file_path = [path for path in right_k_fold_paths if "train" in path][0]
-        validation_file_path = [path for path in right_k_fold_paths if "valid" in path][0]
-        test_file_path = [path for path in right_k_fold_paths if "test" in path][0]
+        train_file_path = [path for path in right_k_fold_paths if "train" and not "statistics" in path][0]
+        validation_file_path = [path for path in right_k_fold_paths if "valid" and not "statistics" in path][0]
+        test_file_path = [path for path in right_k_fold_paths if "test" and not "statistics" in path][0]
 
         train_headers, train_data = self.read_data(train_file_path)
         validation_headers, validation_data = self.read_data(validation_file_path)
