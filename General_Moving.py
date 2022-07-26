@@ -1,10 +1,17 @@
 import os
 import pandas as pd
+import shutil
 
 def make_non_existing_path(path):
     if not os.path.exists(path):
         os.makedirs(path)
         print(path)
+
+def make_new_empty_folder(path):
+    if  os.path.exists(path):
+        shutil.rmtree(path)
+    os.makedirs(path)
+    print(path)
 
 def use_only_good_images(exclude_images_path,image_number_heading, meta_data_header, df_used, total_flags_column = "total"):
     if(exclude_images_path == ""):

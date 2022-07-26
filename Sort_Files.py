@@ -46,7 +46,7 @@ class SortFiles:
 
     def main(self):
         print("Starting Sort files")
-        General_Moving.make_non_existing_path(self.output_dir)
+        General_Moving.make_new_empty_folder(self.output_dir)
 
         all_csv_files = glob.glob(self.input_dir+"*.csv")
 
