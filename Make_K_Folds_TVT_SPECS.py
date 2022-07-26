@@ -16,17 +16,19 @@ class MakeKFolds:
                    
     def __init__(self,
                 labels_path = '/home/jovyan/Data/Specs/Labels.csv',
-                output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds/',
-                include_groups = [], #Empty for everything included,
+                output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_top5_K_folds/',
+                #
+                # include_groups = [], #Empty for everything included,
+                include_groups = ["negcon", "heat shock response signalling agonist", "DILI", "estrogen receptor alpha modulator", "phosphodiesterase inhibitor",  "cyclooxygenase inhibitor"], #Empty for everything included,
                 #include_groups = ["negcon","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"],                    #include_groups = ["negcon","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
                 include_header = "selected_mechanism",
                 class_column_header = "selected_mechanism",
                 exclude_groups = ["poscon","empty"],
                 exclude_groups_header = "pert_type",
-                exclude_images_path = "/home/jovyan/Data/Specs/Flaggs/Cell_Profiler_Flagged_images_outside_nuclei_cut_82_149.csv",
+                exclude_images_path = "/home/jovyan/Data/Specs/Flaggs/images_outside_nuclei_cut_82_149.csv",
                 intact_group_header = 'compound_id',
                 unique_sample_headers = ['plate', 'well', 'site'],
-                image_number_heading = "nr",   
+                image_number_heading = "ImageNr",   
                 k_folds = "3",
                 divide_on_header = 'compound_id',
                 make_train_valid = True,
@@ -106,20 +108,23 @@ class MakeKFolds:
 
     def exclude_images(self, df):
         df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ",")
-        if 'Total' in df.columns:
-            bad_image_mask =  df_bad_images["Total"==1]
+        df_bad_images = df_bad_images.drop_duplicates(subset = self.unique_sample_headers)
+
+        if 'Total' in df_bad_images.columns:
+            bad_image_mask =  df_bad_images["Total"] == 1 
             df_bad_images = df_bad_images[bad_image_mask]
-        elif 'total' in df.columns:
-            bad_image_mask =  df_bad_images["total"==1]
+        elif 'total' in df_bad_images.columns:
+            bad_image_mask =  df_bad_images["total"] == 1
             df_bad_images = df_bad_images[bad_image_mask]
 
-        df_merged = pd.merge(df,df_bad_images, on = self.unique_sample_headers, how = "outer", indicator = True ) 
+        df_merged = pd.merge(df,df_bad_images[self.unique_sample_headers], on = self.unique_sample_headers, how = "outer", indicator = True ) 
 
         merge_both_mask = df_merged["_merge"] == "both" 
         merge_left_mask = df_merged["_merge"] == "left_only" 
         merge_right_mask = df_merged["_merge"] == "right_only" 
 
         print("Excluding images")
+        print(str(df.shape[0]) +  " included images to start with")
         print(str(df_merged[merge_right_mask].shape[0]) + " images were not in the input labels")
         print(str(df_merged[merge_both_mask].shape[0]) + " images will be dropped")
         print(str(df_merged[merge_left_mask].shape[0]) + " images will be kept")
