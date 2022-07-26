@@ -62,6 +62,8 @@ class MakeKFolds:
         self.included_groups = self.get_included_groups(df)
 
         print("Included and exlcuded groups")
+        df = self.exclude_images(df)
+        print("excluded images indicated")
 
         k_folds_test = self.get_k_folds_test(df)
         df_test_statistics  = self.get_statistics(k_folds_test,df)
@@ -101,6 +103,32 @@ class MakeKFolds:
             
         included_groups = [group for group in included_groups if group not in self.exclude_groups]
         return included_groups
+
+    def exclude_images(self, df):
+        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ",")
+        if 'Total' in df.columns:
+            bad_image_mask =  df_bad_images["Total"==1]
+            df_bad_images = df_bad_images[bad_image_mask]
+        elif 'total' in df.columns:
+            bad_image_mask =  df_bad_images["total"==1]
+            df_bad_images = df_bad_images[bad_image_mask]
+
+        df_merged = pd.merge(df,df_bad_images, on = self.unique_sample_headers, how = "outer", indicator = True ) 
+
+        merge_both_mask = df_merged["_merge"] == "both" 
+        merge_left_mask = df_merged["_merge"] == "left_only" 
+        merge_right_mask = df_merged["_merge"] == "right_only" 
+
+        print("Excluding images")
+        print(str(df_merged[merge_right_mask].shape[0]) + " images were not in the input labels")
+        print(str(df_merged[merge_both_mask].shape[0]) + " images will be dropped")
+        print(str(df_merged[merge_left_mask].shape[0]) + " images will be kept")
+
+        df_new = df[df[self.image_number_heading].isin(df_merged[merge_left_mask][self.image_number_heading])]
+        df = df_new.copy()
+
+        return df
+
 
     def get_k_folds_test(self, df):
         number_of_folds = self.k_folds
