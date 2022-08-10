@@ -15,8 +15,8 @@ import math
 class MakeKFolds:
                    
     def __init__(self,
-                labels_path = '/home/jovyan/Data/Specs/Labels.csv',
-                output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_small_images_top5_K_folds/',
+                labels_path = "/home/jovyan/Data/Specs/Specs_Labels_First_MiPhHo.csv",
+                output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_no_sorbitol_small_images_top5_K_folds/',
                 #
                 # include_groups = [], #Empty for everything included,
                 include_groups = ["negcon", "heat shock response signalling agonist", "DILI", "estrogen receptor alpha modulator", "phosphodiesterase inhibitor",  "cyclooxygenase inhibitor"], #Empty for everything included,
@@ -25,7 +25,7 @@ class MakeKFolds:
                 class_column_header = "selected_mechanism",
                 exclude_groups = ["poscon","empty"],
                 exclude_groups_header = "pert_type",
-                exclude_images_path = "/home/jovyan/Data/Specs/Flaggs/old_MiPhHo_Labels_images_outside_nuclei_cut_82_149.csv",
+                exclude_images_path = "/home/jovyan/Data/Specs/Flaggs/old_MiPhHo_Labels_images_outside_nuclei_cut_82_149_no_sorbitol.csv",
                 intact_group_header = 'compound_id',
                 unique_sample_headers = ['plate', 'well', 'site'],
                 image_number_heading = "ImageNr",   
