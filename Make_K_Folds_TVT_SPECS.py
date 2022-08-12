@@ -16,15 +16,16 @@ class MakeKFolds:
                    
     def __init__(self,
                 labels_path = "/home/jovyan/Data/Specs/Specs_Labels_First_MiPhHo.csv",
-                output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_no_sorbitol_small_images_top5_K_folds/',
+                output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_no_sorbitol_no_test_plate_small_images_top5_K_folds/',
                 #
-                # include_groups = [], #Empty for everything included,
+                #include_groups = [], #Empty for everything included,
                 include_groups = ["negcon", "heat shock response signalling agonist", "DILI", "estrogen receptor alpha modulator", "phosphodiesterase inhibitor",  "cyclooxygenase inhibitor"], #Empty for everything included,
                 #include_groups = ["negcon","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"],                    #include_groups = ["negcon","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
+                #include_groups = ['pregnane x receptor agonist', 'DILI', 'estrogen receptor alpha modulator', 'tubulin polymerization inhibitor', 'topoisomerase inhibitor', 'heat shock response signalling agonist', 'methyltransferase inhibitor', 'aryl hydrocarbon receptor agonist', 'estrogen receptor alpha agonist', 'mitochondrial toxicity  agonist', 'retinoid receptor agonist', 'protein synthesis inhibitor', 'phosphodiesterase inhibitor', 'DNA polymerase inhibitor', 'mTOR inhibitor', 'PPAR receptor agonist', 'glucocorticoid receptor agonist', 'ATPase inhibitor', 'cyclooxygenase inhibitor', 'NFkB pathway inhibitor', 'angiotensin converting enzyme inhibitor', 'adenosine receptor antagonist', 'PARP inhibitor', 'JAK inhibitor', 'HSP inhibitor', 'HDAC inhibitor',  'CC chemokine receptor antagonist', 'Aurora kinase inhibitor','negcon'],
                 include_header = "selected_mechanism",
                 class_column_header = "selected_mechanism",
-                exclude_groups = ["poscon","empty"],
-                exclude_groups_header = "pert_type",
+                exclude_groups = [["poscon","empty"],["P015085"]],
+                exclude_groups_headers = ["pert_type", "plate"],
                 exclude_images_path = "/home/jovyan/Data/Specs/Flaggs/old_MiPhHo_Labels_images_outside_nuclei_cut_82_149_no_sorbitol.csv",
                 intact_group_header = 'compound_id',
                 unique_sample_headers = ['plate', 'well', 'site'],
@@ -40,7 +41,7 @@ class MakeKFolds:
         self.included_groups = include_groups
         self.include_header = include_header
         self.exclude_groups = exclude_groups
-        self.exclude_groups_header = exclude_groups_header
+        self.exclude_groups_headers = exclude_groups_headers
         self.unique_sample_headers = unique_sample_headers
         self.image_number_heading = image_number_heading
         self.class_column_header =  class_column_header 
@@ -60,7 +61,11 @@ class MakeKFolds:
         df_base.drop_duplicates(inplace=True)
 
         all_groups_that_could_be_included = self.get_included_groups(df_base)
-        df = df_base[df_base[self.include_header].isin(all_groups_that_could_be_included) & ~df_base[self.exclude_groups_header].isin(self.exclude_groups)]
+        df = df_base[df_base[self.include_header].isin(all_groups_that_could_be_included)]
+        for index  in range(0,len(self.exclude_groups_headers)):
+            exclude_groups_header = self.exclude_groups_headers[index]
+            df = df[~df[exclude_groups_header].isin(self.exclude_groups[index])]
+
         self.included_groups = self.get_included_groups(df)
 
         print("Included and exlcuded groups")
