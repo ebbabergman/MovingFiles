@@ -3,6 +3,7 @@ import os
 from pickle import FALSE
 import shutil
 from xxlimited import Str
+from matplotlib import use
 import numpy as np
 import random
 import pandas as pd
@@ -16,18 +17,18 @@ class MakeKFolds:
 
     def __init__(self,
                  labels_path="/home/jovyan/Data/Specs/Specs_Labels_First_MiPhHo.csv",
-                 output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_no_sorbitol_no_test_no_negcon_plate_small_images_top10_K_folds/',
+                 output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_no_sorbitol_no_test_no_negcon_plate_small_images_All_K_folds/',
                  #
-                 # include_groups = [], #Empty for everything included,
+                 include_groups = ['DNA synthesis inhibitor'], #Empty for everything included,
                  # top10 good images (nuclei cut off)
-                 include_groups=["heat shock response signalling agonist","phosphodiesterase inhibitor","DILI","methyltransferase inhibitor","estrogen receptor alpha modulator","cyclooxygenase inhibitor","pregnane x receptor agonist","PPAR receptor agonist","protein synthesis inhibitor","CC chemokine receptor antagonist"],
+                 #include_groups=["heat shock response signalling agonist","phosphodiesterase inhibitor","DILI","methyltransferase inhibitor","estrogen receptor alpha modulator","cyclooxygenase inhibitor","pregnane x receptor agonist","PPAR receptor agonist","protein synthesis inhibitor","CC chemokine receptor antagonist"],
                  # include_groups = ["negcon", "heat shock response signalling agonist", "DILI", "estrogen receptor alpha modulator", "phosphodiesterase inhibitor",  "cyclooxygenase inhibitor"], #Empty for everything included,
                  # include_groups = ["negcon","heat shock response signalling agonist", "phosphodiesterase inhibitor", "methyltransferase inhibitor","DILI","HDAC inhibitor","topoisomerase inhibitor", "mTOR inhibitor","NFkB pathway inhibitor","JAK inhibitor","pregnane x receptor agonist"],                    #include_groups = ["negcon","DNA polymerase inhibitor", "mTOR inhibitor", "topoisomerase inhibitor"],
                  #include_groups = ['pregnane x receptor agonist', 'DILI', 'estrogen receptor alpha modulator', 'tubulin polymerization inhibitor', 'topoisomerase inhibitor', 'heat shock response signalling agonist', 'methyltransferase inhibitor', 'aryl hydrocarbon receptor agonist', 'estrogen receptor alpha agonist', 'mitochondrial toxicity  agonist', 'retinoid receptor agonist', 'protein synthesis inhibitor', 'phosphodiesterase inhibitor', 'DNA polymerase inhibitor', 'mTOR inhibitor', 'PPAR receptor agonist', 'glucocorticoid receptor agonist', 'ATPase inhibitor', 'cyclooxygenase inhibitor', 'NFkB pathway inhibitor', 'angiotensin converting enzyme inhibitor', 'adenosine receptor antagonist', 'PARP inhibitor', 'JAK inhibitor', 'HSP inhibitor', 'HDAC inhibitor',  'CC chemokine receptor antagonist', 'Aurora kinase inhibitor','negcon'],
                  include_header="selected_mechanism",
                  class_column_header="selected_mechanism",
-                 exclude_groups=[["poscon", "empty"], ["P015085"]],
-                 exclude_groups_headers=["pert_type", "plate"],
+                 excluded_groups=[["negcon","poscon", "empty"], ["P015085"], ['DNA synthesis inhibitor']],
+                 excluded_groups_headers=["pert_type", "plate", "selected_mechanism"],
                  exclude_images_path="/home/jovyan/Data/Specs/Flaggs/old_MiPhHo_Labels_images_outside_nuclei_cut_82_149_no_sorbitol.csv",
                  intact_group_header='compound_id',
                  unique_sample_headers=['plate', 'well', 'site'],
@@ -43,8 +44,8 @@ class MakeKFolds:
         self.exclude_images_path = exclude_images_path
         self.included_groups = include_groups
         self.include_header = include_header
-        self.exclude_groups = exclude_groups
-        self.exclude_groups_headers = exclude_groups_headers
+        self.excluded_groups = excluded_groups
+        self.excluded_groups_headers = excluded_groups_headers
         self.unique_sample_headers = unique_sample_headers
         self.image_number_heading = image_number_heading
         self.class_column_header = class_column_header
@@ -63,19 +64,13 @@ class MakeKFolds:
         df_base.dropna(subset=[self.class_column_header], inplace=True)
         df_base.drop_duplicates(inplace=True)
 
-        all_groups_that_could_be_included = self.get_included_groups(df_base)
-        df = df_base[df_base[self.include_header].isin(
-            all_groups_that_could_be_included)]
-        for index in range(0, len(self.exclude_groups_headers)):
-            exclude_groups_header = self.exclude_groups_headers[index]
-            df = df[~df[exclude_groups_header].isin(
-                self.exclude_groups[index])]
-
-        self.included_groups = self.get_included_groups(df)
+        df = self.exclude_groups(df_base)
 
         print("Included and exlcuded groups")
         df = self.exclude_images(df)
         print("excluded images indicated")
+
+        df = self.include_groups(df)
 
         k_folds_test = self.get_k_folds_test(df)
         df_test_statistics = self.get_statistics(k_folds_test, df)
@@ -116,14 +111,12 @@ class MakeKFolds:
 
         print("Finished. Find output in: " + self.output_dir)
 
-    def get_included_groups(self, df):
-        included_groups = self.included_groups
-        if (len(included_groups) == 0):
-            included_groups = df[self.include_header].unique()
-
-        included_groups = [
-            group for group in included_groups if group not in self.exclude_groups]
-        return included_groups
+    def exclude_groups(self,df):
+        for index in range(0, len(self.excluded_groups_headers)):
+            exclude_groups_header = self.excluded_groups_headers[index]
+            df = df[~df[exclude_groups_header].isin(
+                self.excluded_groups[index])]
+        return df
 
     def exclude_images(self, df):
         df_bad_images = pd.read_csv(self.exclude_images_path, delimiter=",")
@@ -157,6 +150,25 @@ class MakeKFolds:
             df_merged[merge_left_mask][self.image_number_heading])]
         df = df_new.copy()
 
+        return df
+
+    def include_groups(self,df):
+        included_groups = self.included_groups
+        use_all_available_groups = len(included_groups) == 0
+        available_groups = df[self.include_header].unique()
+
+        if use_all_available_groups:
+            print("Using all available groups")
+            included_groups = available_groups
+            self.included_groups = available_groups
+        elif not all(elem in included_groups  for elem in available_groups):
+            not_available = set(included_groups) - set(available_groups)
+            raise GroupNotIncluded(not_available)
+
+        print("Available groups: " + available_groups)
+        df = df[df[self.include_header].isin(
+            included_groups)]
+        
         return df
 
     def get_k_folds_test(self, df):
@@ -335,5 +347,23 @@ class MakeKFolds:
             print("made the output dir")
 
 
+class GroupNotIncluded(Exception):
+    """Exception raised for errors in the group inclustion.
+
+    Attributes:
+        groups -- groups not available after exclusion
+        message -- explanation of the error
+    """
+
+    def __init__(self, groups, message="A group could not be including after exclusion criteria was met."):
+        self.groups = groups
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f'{self.groups} -> {self.message}'
+
 if __name__ == "__main__":
     MakeKFolds().main()
+
+
