@@ -19,7 +19,7 @@ class MakeKFolds:
                  labels_path="/home/jovyan/Data/Specs/Specs_Labels_First_MiPhHo.csv",
                  output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_no_sorbitol_no_test_no_negcon_plate_small_images_All_K_folds/',
                  #
-                 include_groups = ['DNA synthesis inhibitor'], #Empty for everything included,
+                 include_groups = [], #Empty for everything included,
                  # top10 good images (nuclei cut off)
                  #include_groups=["heat shock response signalling agonist","phosphodiesterase inhibitor","DILI","methyltransferase inhibitor","estrogen receptor alpha modulator","cyclooxygenase inhibitor","pregnane x receptor agonist","PPAR receptor agonist","protein synthesis inhibitor","CC chemokine receptor antagonist"],
                  # include_groups = ["negcon", "heat shock response signalling agonist", "DILI", "estrogen receptor alpha modulator", "phosphodiesterase inhibitor",  "cyclooxygenase inhibitor"], #Empty for everything included,
