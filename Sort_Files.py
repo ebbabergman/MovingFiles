@@ -13,6 +13,7 @@ import General_Moving
 class SortFiles:
 
     def __init__(self, 
+    
                 input_dir = '/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_CP_AUT_K_folds_top10/',
                 output_dir = "../Leave_One_Out/",
                 image_name_header = "ImageNr",
@@ -50,11 +51,11 @@ class SortFiles:
 
         all_csv_files = glob.glob(self.input_dir+"*.csv")
 
-        right_k_fold_paths = [path for path in all_csv_files if self.current_k_fold in path]
-        train_file_path = [path for path in right_k_fold_paths if "train" and not "statistics" in path][0]
-        validation_file_path = [path for path in right_k_fold_paths if "valid" and not "statistics" in path][0]
-        test_file_path = [path for path in right_k_fold_paths if "test" and not "statistics" in path][0]
+        right_k_fold_paths = [path for path in all_csv_files if self.current_k_fold+".csv" in path]
+        train_file_path = [path for path in right_k_fold_paths if (("train" in path) and (not "statistics" in path))][0]
+        validation_file_path = [path for path in right_k_fold_paths if (("valid" in path) and (not "statistics" in path))][0]
 
+        test_file_path = [path for path in right_k_fold_paths if (("test" in path) and (not "statistics" in path))][0]
         train_headers, train_data = self.read_data(train_file_path)
         validation_headers, validation_data = self.read_data(validation_file_path)
         test_headers, test_data = self.read_data(test_file_path)
