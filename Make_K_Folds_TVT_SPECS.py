@@ -17,7 +17,7 @@ class MakeKFolds:
 
     def __init__(self,
                  labels_path="/home/jovyan/Data/Specs/Specs_Labels_First_MiPhHo.csv",
-                 output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_no_sorbitol_no_test_no_negcon_plate_small_images_All_K_folds/',
+                 output_dir='/home/jovyan/Inputs/SPECS_Nuclei_Cutoff_no_sorbitol_no_test_negcon_plate_small_images_All_K_folds/',
                  #
                  include_groups = [], #Empty for everything included,
                  # top10 good images (nuclei cut off)
@@ -27,7 +27,7 @@ class MakeKFolds:
                  #include_groups = ['pregnane x receptor agonist', 'DILI', 'estrogen receptor alpha modulator', 'tubulin polymerization inhibitor', 'topoisomerase inhibitor', 'heat shock response signalling agonist', 'methyltransferase inhibitor', 'aryl hydrocarbon receptor agonist', 'estrogen receptor alpha agonist', 'mitochondrial toxicity  agonist', 'retinoid receptor agonist', 'protein synthesis inhibitor', 'phosphodiesterase inhibitor', 'DNA polymerase inhibitor', 'mTOR inhibitor', 'PPAR receptor agonist', 'glucocorticoid receptor agonist', 'ATPase inhibitor', 'cyclooxygenase inhibitor', 'NFkB pathway inhibitor', 'angiotensin converting enzyme inhibitor', 'adenosine receptor antagonist', 'PARP inhibitor', 'JAK inhibitor', 'HSP inhibitor', 'HDAC inhibitor',  'CC chemokine receptor antagonist', 'Aurora kinase inhibitor','negcon'],
                  include_header="selected_mechanism",
                  class_column_header="selected_mechanism",
-                 excluded_groups=[["negcon","poscon", "empty"], ["P015085"], ['DNA synthesis inhibitor']],
+                 excluded_groups=[["poscon", "empty"], ["P015085"], ['DNA synthesis inhibitor']],
                  excluded_groups_headers=["pert_type", "plate", "selected_mechanism"],
                  exclude_images_path="/home/jovyan/Data/Specs/Flaggs/old_MiPhHo_Labels_images_outside_nuclei_cut_82_149_no_sorbitol.csv",
                  intact_group_header='compound_id',

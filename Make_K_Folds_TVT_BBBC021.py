@@ -16,7 +16,7 @@ class MakeKFolds:
                    
     def __init__(self,
                 labels_path = "/home/jovyan/Data/BBBC021/BBBC021_Labels.csv",
-                output_dir='/home/jovyan/Inputs/BBBC021_All_noDMSO_K_folds/',
+                output_dir='/home/jovyan/Inputs/BBBC021_All_Leave_One_Out/',
                 #
                 include_groups = [], #Empty for everything included,
                 include_header = "moa",
@@ -30,7 +30,8 @@ class MakeKFolds:
                 k_folds = "3",
                 divide_on_header = 'compound',
                 make_train_valid = True,
-                valid_fraction = 0.25 # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
+                valid_fraction = 0.25, # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
+                leave_one_out = True,
                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
@@ -47,6 +48,7 @@ class MakeKFolds:
         self.divide_on_header = divide_on_header
         self.make_train_valid = make_train_valid
         self.valid_fraction = valid_fraction
+        self.leave_one_out = leave_one_out
 
     def main(self):
         print("Started make k-folds.")
@@ -69,11 +71,15 @@ class MakeKFolds:
         # df = self.exclude_images(df) ## Uncomment to exclude images based on file
         # print("excluded images indicated")
 
-        k_folds_test = self.get_k_folds_test(df)
-        df_test_statistics  = self.get_statistics(k_folds_test,df)
-        df_test_statistics.to_csv(self.output_dir + "k_fold_test_statistics.csv", index = False)
-        print("Test Statistics")
-        print(df_test_statistics.to_latex())
+        if self.leave_one_out:
+            k_folds_test = self.get_leave_one_out_test(df)
+            # TODO make statistics
+        else:
+            k_folds_test = self.get_k_folds_test(df)
+            df_test_statistics  = self.get_statistics(k_folds_test,df)
+            df_test_statistics.to_csv(self.output_dir + "k_fold_test_statistics.csv", index = False)
+            print("Test Statistics")
+            print(df_test_statistics.to_latex())
 
         if self.make_train_valid:
             k_folds_train, k_folds_validation=  self.get_k_folds_tv(df, k_folds_test)
@@ -195,16 +201,33 @@ class MakeKFolds:
         print("Made test sets for k-folds")    
         return k_folds
 
+    def get_leave_one_out_test(self, df):
+        number_of_folds = df[self.divide_on_header].nunique()
+        self.k_folds = number_of_folds
+        print("Leave one out will result in " + str(number_of_folds) + " folds.")
+        k_folds = [None]*number_of_folds
+
+        leave_out_list = df[self.divide_on_header].unique()
+
+        k_fold = 1
+        for entry in leave_out_list:
+            df_fold= df[df[self.divide_on_header] == entry]
+            k_folds[k_fold-1] = df_fold
+            k_fold = k_fold +1
+
+        print("Made test sets for leave one out. Made " + str(k_fold) + "folds")    
+        return k_folds
+
     def get_k_folds_tv(self, df, k_fold_test):
         number_of_folds = self.k_folds
-        #validation_fraction = (number_of_folds-1)/number_of_folds*self.valid_fraction
+        validation_fraction = self.valid_fraction *(number_of_folds-1)/number_of_folds
         k_fold_train = [None]*number_of_folds
         k_fold_validation = [None]*number_of_folds
         group_n = {}
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
-            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*(number_of_folds-1)/number_of_folds*self.valid_fraction)
+            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*validation_fraction)
             if group_n[group] < 1: 
                 group_n[group] = 1
                 print("A group did not have enough unique groupings to have 1 unique entry per validation fold. Using 1 unique entry anyway. Group:" + str(group) )
@@ -241,7 +264,7 @@ class MakeKFolds:
             k_fold_validation[k_fold-1] = df_fold_validation
             k_fold_train[k_fold-1] = df_fold_train
             if not df_unused.empty:
-                print("WARNING: Didn't put all avialiable compound into train or valid k-folds! Left over:")
+                print("WARNING: Didn't put all available compound into train or valid k-folds! Left over:")
                 print(df_unused)
 
         print("Made train and valid sets for k-folds")   
@@ -255,7 +278,6 @@ class MakeKFolds:
         return df_group_choice   
 
     def get_statistics (self, k_folds, df):
-         ##Make some statistics  # TODO make this a function and run for each type of data
         s_statistics = df.groupby(self.class_column_header)[self.divide_on_header].nunique()
         df_statistics = pd.DataFrame(s_statistics.index)
         df_statistics["Total"] = s_statistics.values
@@ -264,7 +286,7 @@ class MakeKFolds:
         for k_fold in range(0,number_of_folds):
             df_fold = k_folds[k_fold] 
             df_grouped = df_fold.groupby(self.class_column_header)
-            statistic_column_header = self.divide_on_header+"s_in_fold_"+str(k_fold)
+            statistic_column_header = self.divide_on_header+"s_in_fold_"+str(k_fold +1)
             df_statistics[statistic_column_header] = df_grouped[self.divide_on_header].nunique().values
    
         return df_statistics        
