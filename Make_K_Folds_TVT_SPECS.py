@@ -18,7 +18,7 @@ class MakeKFolds:
     def __init__(self,
                  #labels_path="/home/jovyan/Data/Specs/Specs_Labels_First_MiPhHo.csv", #"smaller images"
                  labels_path="/home/jovyan/Data/Specs/Labels.csv",#bigger images
-                 output_dir='/home/jovyan/Inputs/SPECS_16Bit_nuclei_cut_above149_no_negcon_K_folds/',
+                 output_dir='/home/jovyan/Inputs/SPECS_16Bit_all_no_negcon_K_folds/',
                  #
                  include_groups = [], #Empty for everything included,
                  # top10 good images (nuclei cut off)
@@ -30,8 +30,8 @@ class MakeKFolds:
                  class_column_header="selected_mechanism",
                  excluded_groups=[["negcon","poscon", "empty"], ["P015085"]],
                  excluded_groups_headers=["pert_type", "plate"],
-                 exclude_images_path="/home/jovyan/Data/Specs/Flaggs/16Bit_images_nuclei_cut_above149.csv",
-                 #exclude_images_path="",
+                 #exclude_images_path="/home/jovyan/Data/Specs/Flaggs/16Bit_images_nuclei_cut_above149.csv",
+                 exclude_images_path="",
                  intact_group_header='compound_id',
                  unique_sample_headers=['plate', 'well', 'site'],
                  image_number_heading="ImageNr",
