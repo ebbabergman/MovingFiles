@@ -18,9 +18,11 @@ class MakeKFolds:
     def __init__(self,
                  #labels_path="/home/jovyan/Data/Specs/Specs_Labels_First_MiPhHo.csv", #"smaller images"
                  labels_path="/home/jovyan/Data/Specs/Labels.csv",#bigger images
-                 output_dir='/home/jovyan/Inputs/SPECS_16Bit_all_no_negcon_K_folds/',
+                 output_dir='/home/jovyan/Inputs/SPECS_16Bit_JordisTop10_no_negcon_K_folds/',
                  #
-                 include_groups = [], #Empty for everything included,
+                 #include_groups = [], #Empty for everything included,
+                 #Jordis top 10
+                 include_groups = ["Aurora kinase inhibitor","tubulin polymerization inhibitor","JAK inhibitor","protein synthesis inhibitor","HDAC inhibitor","topoisomerase inhibitor","PARP inhibitor","ATPase inhibitor","retinoid receptor agonist","HSP inhibitor"],
                  # top10 good images (nuclei cut off)
                  #include_groups=["heat shock response signalling agonist","phosphodiesterase inhibitor","DILI","methyltransferase inhibitor","estrogen receptor alpha modulator","cyclooxygenase inhibitor","pregnane x receptor agonist","PPAR receptor agonist","protein synthesis inhibitor","CC chemokine receptor antagonist"],
                  # include_groups = ["negcon", "heat shock response signalling agonist", "DILI", "estrogen receptor alpha modulator", "phosphodiesterase inhibitor",  "cyclooxygenase inhibitor"], #Empty for everything included,
