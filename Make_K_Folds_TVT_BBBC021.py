@@ -21,7 +21,8 @@ class MakeKFolds:
                 include_groups = [], #Empty for everything included,
                 include_header = "moa",
                 class_column_header = "moa",
-                exclude_groups = [["DMSO","Cholesterol-lowering","Eg5 inhibitors"]],
+                #exclude_groups = [["DMSO","Cholesterol-lowering","Eg5 inhibitors"]],
+                exclude_groups = [["DMSO"]],
                 exclude_groups_headers = ["moa"],
                 exclude_images_path = "",
                 intact_group_header = 'compound',
@@ -65,15 +66,17 @@ class MakeKFolds:
             exclude_groups_header = self.exclude_groups_headers[index]
             df = df[~df[exclude_groups_header].isin(self.exclude_groups[index])]
 
+        if len(self.exclude_images_path) > 0:
+            df = self.exclude_images(df)
+            print("excluded images indicated with file")
+
         self.included_groups = self.get_included_groups(df)
 
         print("Included and exlcuded groups")
-        # df = self.exclude_images(df) ## Uncomment to exclude images based on file
-        # print("excluded images indicated")
-
+      
         if self.leave_one_out:
             k_folds_test = self.get_leave_one_out_test(df)
-            # TODO make statistics
+            print("Made " + str(len(k_folds_test)) + " test sets")
         else:
             k_folds_test = self.get_k_folds_test(df)
             df_test_statistics  = self.get_statistics(k_folds_test,df)
