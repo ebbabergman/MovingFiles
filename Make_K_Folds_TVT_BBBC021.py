@@ -236,6 +236,7 @@ class MakeKFolds:
                 print("A group did not have enough unique groupings to have 1 unique entry per validation fold. Using 1 unique entry anyway. Group:" + str(group) )
 
         for k_fold in range(1,number_of_folds +1):
+            print("Starting k-fold: " + str(k_fold))
             df_unused = df.copy()
             df_k_fold_test = k_fold_test[k_fold-1]
             df_unused = pd.concat([df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
@@ -269,7 +270,7 @@ class MakeKFolds:
             if not df_unused.empty:
                 print("WARNING: Didn't put all available compound into train or valid k-folds! Left over:")
                 print(df_unused)
-
+ 
         print("Made train and valid sets for k-folds")   
 
         return k_fold_train, k_fold_validation
