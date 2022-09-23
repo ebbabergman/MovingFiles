@@ -21,8 +21,8 @@ class MakeKFolds:
                 include_groups = [], #Empty for everything included,
                 include_header = "moa",
                 class_column_header = "moa",
-                #exclude_groups = [["DMSO","Cholesterol-lowering","Eg5 inhibitors"]],
-                exclude_groups = [["DMSO"]],
+                exclude_groups = [["DMSO","Cholesterol-lowering","Eg5 inhibitors"]],
+                #exclude_groups = [["DMSO"]],
                 exclude_groups_headers = ["moa"],
                 exclude_images_path = "",
                 intact_group_header = 'compound',
@@ -250,7 +250,7 @@ class MakeKFolds:
                 if k_fold == 1 : 
                     df_group_coice_validation = self.get_group_selection(df_group, group_n[group])
                 else:
-                    df_available_group_validation =  df_available_group_validation[df_available_group_validation[self.include_header].isin([group])]
+                    df_available_group_validation =  df_available_validation[df_available_validation[self.include_header].isin([group])]
                     unique_entries = df_available_group_validation[self.intact_group_header].unique()
                     
                     if len(unique_entries) <  group_n[group]:
@@ -265,7 +265,7 @@ class MakeKFolds:
                         df_group_coice_validation = pd.concat([df_group_coice_validation, add_to_validation],ignore_index = True)
                         print ("Reusing previous validation compounds for validation, for group: " + group)
                     else:
-                        df_group_coice_validation = self.get_group_selection(df_available_validation, group_n[group])
+                        df_group_coice_validation = self.get_group_selection(df_available_group_validation, group_n[group])
                 
                 df_fold_validation = pd.concat([df_fold_validation,df_group_coice_validation],ignore_index = True)
             
