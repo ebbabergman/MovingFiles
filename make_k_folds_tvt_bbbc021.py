@@ -8,7 +8,6 @@ class MakeKFoldsTVTBBBC021(MakeTVTSets):
     def __init__(self,
                 labels_path = "/home/jovyan/Data/BBBC021/BBBC021_Labels.csv",
                 output_dir='/home/jovyan/Inputs/BBBC021_leave_one_out_No_Validation/',
-                #
                 include_groups = [], #Empty for everything included,
                 include_header = "moa",
                 class_column_header = "moa",
