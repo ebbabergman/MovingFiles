@@ -32,7 +32,9 @@ class MakeKFoldsTVTSPECS(MakeKFoldsTVT):
                  divide_on_header='compound_id',
                  make_train_valid=True,
                  # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
-                 valid_fraction=0.25
+                 valid_fraction=0.25,
+                leave_one_out = False,
+                make_unique_validation = True,
                  ):
         super().__init__(labels_path,
                 output_dir,

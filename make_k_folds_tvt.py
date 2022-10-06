@@ -29,10 +29,8 @@ class MakeTVTSets:
                  image_number_heading="ImageNumber",
                  k_folds="3",
                  divide_on_header='compound',
-                 make_train_valid=True,
                  # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
                  valid_fraction=0.25,
-                 leave_one_out=True,
                  ):
         self.labels_path = labels_path
         self.output_dir = output_dir
@@ -48,7 +46,6 @@ class MakeTVTSets:
         self.k_folds = int(k_folds)
         self.divide_on_header = divide_on_header
         self.valid_fraction = valid_fraction
-        self.leave_one_out = leave_one_out
 
     def make_k_folds(self):
         print("Started make k-folds.")
