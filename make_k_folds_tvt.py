@@ -111,7 +111,7 @@ class MakeTVTSets:
         print("Included and exlcuded groups")
 
         k_folds_test = self.get_leave_one_out_test(df)
-        df_test_statistics = self.get_statistics(k_folds_test, df)
+        df_test_statistics = self.get_statistics_leave_one_out_test(k_folds_test, df)
         df_test_statistics.to_csv(
             self.output_dir + "k_fold_test_statistics.csv", index=False)
         print("Test Statistics")
@@ -137,7 +137,7 @@ class MakeTVTSets:
         print("Included and exlcuded groups")
 
         k_folds_test = self.get_leave_one_out_test(df)
-        df_test_statistics = self.get_statistics(k_folds_test, df)
+        df_test_statistics = self.get_statistics_leave_one_out_test(k_folds_test, df)
         df_test_statistics.to_csv(
             self.output_dir + "k_fold_test_statistics.csv", index=False)
         print("Test Statistics")
@@ -153,6 +153,12 @@ class MakeTVTSets:
 
     def get_base(self):
         df_base = pd.read_csv(self.labels_path, delimiter=",")
+        
+        # Drop any lingering index columns, i.e. columns containing the string "Unnamed"
+        columns_to_drop = [s for s in df_base.columns if "Unnamed" in s]
+        drop_filter = df_base.filter(columns_to_drop)
+        df_base.drop(drop_filter, inplace=True, axis=1)
+
         df_base.dropna(subset=[self.class_column_header], inplace=True)
         df_base.drop_duplicates(inplace=True)
         return df_base
@@ -465,6 +471,15 @@ class MakeTVTSets:
                 "s_in_fold_"+str(k_fold)
             df_statistics[statistic_column_header] = df_grouped[self.divide_on_header].nunique(
             ).values
+
+        return df_statistics
+    
+    def get_statistics_leave_one_out_test(self, k_folds, df):
+        number_of_folds = self.k_folds
+        for k_fold in range(0, number_of_folds):
+            k_folds[k_fold]["k-fold"] = k_fold +1
+
+        df_statistics = pd.concat(k_folds, ignore_index=True)
 
         return df_statistics
 
