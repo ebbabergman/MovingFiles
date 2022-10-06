@@ -73,8 +73,8 @@ class MakeTVTSets:
         self.save_k_folds()
         print("Finished. Find output in: " + self.output_dir)
     
-    def make_k_folds(self):
-        print("Started make k-folds.")
+    def make_k_folds_train_test(self):
+        print("Started make k-folds with only train and test sets, no validation.")
 
         self.make_path_available()
 
@@ -125,8 +125,8 @@ class MakeTVTSets:
         self.save_k_folds()
         print("Finished. Find output in: " + self.output_dir)
 
-    def make_leave_one_out_train_only(self):
-        print("Started make leave one out train only.")
+    def make_leave_one_out_train_test(self):
+        print("Started make leave one out train only, no validation.")
 
         self.make_path_available()
 
