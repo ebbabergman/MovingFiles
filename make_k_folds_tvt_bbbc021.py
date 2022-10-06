@@ -50,12 +50,12 @@ class MakeKFoldsTVTBBBC021(MakeKFoldsTVT):
             if self.make_unique_validation:
                 self.make_leave_one_out()
             else:
-                raise NotImplementedError
+                self.make_leave_one_out_train_test()
         else:
             if self.make_unique_validation:
                 self.make_k_folds()
             else:
-                raise NotImplementedError
+                self.make_k_folds_train_test()
 
         print("Finished. Find output in: " + self.output_dir)
 
