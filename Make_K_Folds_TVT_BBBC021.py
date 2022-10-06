@@ -12,7 +12,7 @@ import math
 # Make K-folds, including their train and validation parts, with csv files as outpus
 
 
-class MakeKFolds:
+class MakeKFoldsTVTBBBC021(MakeKFoldsTVT):
                    
     def __init__(self,
                 labels_path = "/home/jovyan/Data/BBBC021/BBBC021_Labels.csv",
@@ -68,7 +68,7 @@ class MakeKFolds:
 
         if len(self.exclude_images_path) > 0:
             df = self.exclude_images(df)
-            print("excluded images indicated with file")
+            print("Excluded images indicated with file")
 
         self.included_groups = self.get_included_groups(df)
 
@@ -312,4 +312,4 @@ class MakeKFolds:
 
 
 if __name__ == "__main__":
-    MakeKFolds().main()
+    MakeKFoldsTVTBBBC021().main()
