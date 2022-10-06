@@ -51,7 +51,7 @@ class MakeTVTSets:
         self.valid_fraction = valid_fraction
         self.leave_one_out = leave_one_out
 
-        def main(self):
+    def make_k_folds(self):
         print("Started make k-folds.")
 
         self.make_path_available()
