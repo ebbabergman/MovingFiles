@@ -49,100 +49,123 @@ class MakeKFoldsTVT:
         self.valid_fraction = valid_fraction
         self.leave_one_out = leave_one_out
 
-    def main(self):
+        def main(self):
         print("Started make k-folds.")
 
         self.make_path_available()
 
-        df_base = pd.read_csv(self.labels_path , delimiter= ",")
-        df_base.dropna(subset = [self.class_column_header], inplace=True)
+        df_base = pd.read_csv(self.labels_path, delimiter=",")
+        df_base.dropna(subset=[self.class_column_header], inplace=True)
         df_base.drop_duplicates(inplace=True)
 
-        all_groups_that_could_be_included = self.get_included_groups(df_base)
-        df = df_base[df_base[self.include_header].isin(all_groups_that_could_be_included)]
-        for index  in range(0,len(self.exclude_groups_headers)):
-            exclude_groups_header = self.exclude_groups_headers[index]
-            df = df[~df[exclude_groups_header].isin(self.exclude_groups[index])]
-
-        if len(self.exclude_images_path) > 0:
-            df = self.exclude_images(df)
-            print("excluded images indicated with file")
-
-        self.included_groups = self.get_included_groups(df)
+        df = self.exclude_groups(df_base)
 
         print("Included and exlcuded groups")
-      
-        if self.leave_one_out:
-            k_folds_test = self.get_leave_one_out_test(df)
-            print("Made " + str(len(k_folds_test)) + " test sets")
-        else:
-            k_folds_test = self.get_k_folds_test(df)
-            df_test_statistics  = self.get_statistics(k_folds_test,df)
-            df_test_statistics.to_csv(self.output_dir + "k_fold_test_statistics.csv", index = False)
-            print("Test Statistics")
-            print(df_test_statistics.to_latex())
+        df = self.exclude_images(df)
+        print("excluded images indicated")
+
+        df = self.include_groups(df)
+
+        k_folds_test = self.get_k_folds_test(df)
+        df_test_statistics = self.get_statistics(k_folds_test, df)
+        df_test_statistics.to_csv(
+            self.output_dir + "k_fold_test_statistics.csv", index=False)
+        print("Test Statistics")
+        print(df_test_statistics.to_latex())
 
         if self.make_train_valid:
-            k_folds_train, k_folds_validation=  self.get_k_folds_tv(df, k_folds_test)
-            df_validation_statistics  = self.get_statistics(k_folds_validation,df)
-            df_train_statistics  = self.get_statistics(k_folds_train,df)
-            
-            df_validation_statistics.to_csv(self.output_dir + "k_fold_validation_statistics.csv", index = False)
-            df_train_statistics.to_csv(self.output_dir + "k_fold_train_statistics.csv", index = False)
+            k_folds_train, k_folds_validation = self.get_k_folds_tv(
+                df, k_folds_test)
+            df_validation_statistics = self.get_statistics(
+                k_folds_validation, df)
+            df_train_statistics = self.get_statistics(k_folds_train, df)
+
+            df_validation_statistics.to_csv(
+                self.output_dir + "k_fold_validation_statistics.csv", index=False)
+            df_train_statistics.to_csv(
+                self.output_dir + "k_fold_train_statistics.csv", index=False)
 
             print("Validation Statistics ")
             print(df_validation_statistics.to_latex())
             print("Train Statistics ")
             print(df_train_statistics.to_latex())
 
-        for k_fold in range(0,self.k_folds):
-            df_test_fold = k_folds_test[k_fold] 
-            df_test_fold.to_csv(self.output_dir + "k_fold_test_"+ str(k_fold +1)+".csv", index = False)
-            
-            df_validation_fold = k_folds_validation[k_fold] 
-            df_validation_fold.to_csv(self.output_dir + "k_fold_validation_"+ str(k_fold +1)+".csv", index = False)
-            
-            df_train_fold = k_folds_train[k_fold] 
-            df_train_fold.to_csv(self.output_dir + "k_fold_train_"+ str(k_fold +1)+".csv", index = False)
-           
+        for k_fold in range(0, self.k_folds):
+            df_test_fold = k_folds_test[k_fold]
+            df_test_fold.to_csv(
+                self.output_dir + "k_fold_test_" + str(k_fold + 1)+".csv", index=False)
+
+            df_validation_fold = k_folds_validation[k_fold]
+            df_validation_fold.to_csv(
+                self.output_dir + "k_fold_validation_" + str(k_fold + 1)+".csv", index=False)
+
+            df_train_fold = k_folds_train[k_fold]
+            df_train_fold.to_csv(
+                self.output_dir + "k_fold_train_" + str(k_fold + 1)+".csv", index=False)
+
         print("Finished. Find output in: " + self.output_dir)
 
-    def get_included_groups(self, df):
-        included_groups = self.included_groups
-        if(len(included_groups) == 0):
-            included_groups = df[self.include_header].unique()
-            
-        included_groups = [group for group in included_groups if group not in self.exclude_groups]
-        return included_groups
+    def exclude_groups(self,df):
+        for index in range(0, len(self.excluded_groups_headers)):
+            exclude_groups_header = self.excluded_groups_headers[index]
+            df = df[~df[exclude_groups_header].isin(
+                self.excluded_groups[index])]
+        return df
 
     def exclude_images(self, df):
-        df_bad_images = pd.read_csv(self.exclude_images_path , delimiter= ",")
-        df_bad_images = df_bad_images.drop_duplicates(subset = self.unique_sample_headers)
+        if self.exclude_images_path == "":
+            return df
+        df_bad_images = pd.read_csv(self.exclude_images_path, delimiter=",")
+        df_bad_images = df_bad_images.drop_duplicates(
+            subset=self.unique_sample_headers)
 
         if 'Total' in df_bad_images.columns:
-            bad_image_mask =  df_bad_images["Total"] == 1 
+            bad_image_mask = df_bad_images["Total"] == 1
             df_bad_images = df_bad_images[bad_image_mask]
         elif 'total' in df_bad_images.columns:
-            bad_image_mask =  df_bad_images["total"] == 1
+            bad_image_mask = df_bad_images["total"] == 1
             df_bad_images = df_bad_images[bad_image_mask]
 
-        df_merged = pd.merge(df,df_bad_images[self.unique_sample_headers], on = self.unique_sample_headers, how = "outer", indicator = True ) 
+        df_merged = pd.merge(df, df_bad_images[self.unique_sample_headers],
+                             on=self.unique_sample_headers, how="outer", indicator=True)
 
-        merge_both_mask = df_merged["_merge"] == "both" 
-        merge_left_mask = df_merged["_merge"] == "left_only" 
-        merge_right_mask = df_merged["_merge"] == "right_only" 
+        merge_both_mask = df_merged["_merge"] == "both"
+        merge_left_mask = df_merged["_merge"] == "left_only"
+        merge_right_mask = df_merged["_merge"] == "right_only"
 
         print("Excluding images")
-        print(str(df.shape[0]) +  " included images to start with")
-        print(str(df_merged[merge_right_mask].shape[0]) + " images were not in the input labels")
-        print(str(df_merged[merge_both_mask].shape[0]) + " images will be dropped")
-        print(str(df_merged[merge_left_mask].shape[0]) + " images will be kept")
+        print(str(df.shape[0]) + " included images to start with")
+        print(str(df_merged[merge_right_mask].shape[0]) +
+              " images were not in the input labels")
+        print(str(df_merged[merge_both_mask].shape[0]) +
+              " images will be dropped")
+        print(str(df_merged[merge_left_mask].shape[0]) +
+              " images will be kept")
 
-        df_new = df[df[self.image_number_heading].isin(df_merged[merge_left_mask][self.image_number_heading])]
+        df_new = df[df[self.image_number_heading].isin(
+            df_merged[merge_left_mask][self.image_number_heading])]
         df = df_new.copy()
 
         return df
 
+    def include_groups(self,df):
+        included_groups = self.included_groups
+        use_all_available_groups = len(included_groups) == 0
+        available_groups = df[self.include_header].unique()
+
+        if use_all_available_groups:
+            print("Using all available groups")
+            included_groups = available_groups
+            self.included_groups = available_groups
+        elif not set(included_groups).issubset(available_groups):
+            not_available = set(included_groups) - set(available_groups)
+            raise GroupNotIncluded(not_available)
+
+        print("Available groups: " + available_groups)
+        df = df[df[self.include_header].isin(
+            included_groups)]
+        
+        return df
 
     def get_k_folds_test(self, df):
         number_of_folds = self.k_folds
@@ -152,162 +175,186 @@ class MakeKFoldsTVT:
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
-            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()/number_of_folds)
-            if group_n[group] < 1: 
+            group_n[group] = math.floor(
+                df_group[self.divide_on_header].nunique()/number_of_folds)
+            if group_n[group] < 1:
                 group_n[group] = 1
-                print("A group did not have enough unique groupings to have 1 unique entry per fold. Group:" + str(group) )
+                print(
+                    "A group did not have enough unique groupings to have 1 unique entry per fold. Group:" + str(group))
 
-        for k_fold in range(1,number_of_folds +1):
-            df_fold= pd.DataFrame()
+        for k_fold in range(1, number_of_folds + 1):
+            df_fold = pd.DataFrame()
             for group in self.included_groups:
-                df_group = df_unused[df_unused[self.include_header].isin([group])]
+                df_group = df_unused[df_unused[self.include_header].isin([
+                                                                         group])]
                 if df_group.empty:
                     df_used = df[df[self.include_header].isin([group])]
                     df_unused = df_used.copy()
-                    df_group = df_unused[df_unused[self.include_header].isin([group])]
-                    print("Every unit from group had been used, re-using values for group " + str(group) + ".")
-                df_group_coice = self.get_group_selection( df_group, group_n[group])
-                df_fold = pd.concat([df_fold,df_group_coice],ignore_index = True)
-            df_unused = pd.concat([df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
+                    df_group = df_unused[df_unused[self.include_header].isin([
+                                                                             group])]
+                    print(
+                        "Every unit from group had been used, re-using values for group " + str(group) + ".")
+                df_group_coice = self.get_group_selection(
+                    df_group, group_n[group])
+                df_fold = pd.concat(
+                    [df_fold, df_group_coice], ignore_index=True)
+            df_unused = pd.concat(
+                [df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
             k_folds[k_fold-1] = df_fold
 
         # deal with the unused unique groups
-        group_index = 0 
+        group_index = 0
         for group in self.included_groups:
             df_group = df_unused[df_unused[self.include_header].isin([group])]
-            
+
             if df_group.empty:
                 continue
-            
-            k_fold_to_choose = [*range(1,number_of_folds +1)]
+
+            k_fold_to_choose = [*range(1, number_of_folds + 1)]
             while not df_group.empty:
                 if len(k_fold_to_choose) == 0:
-                    k_fold_to_choose = [*range(1,number_of_folds +1)]
-                    print("Something is wrong with the way the number of groups are positioned, could put remainder into each fold") # TODO make this a warning
-                
-                chosen_k_fold = np.random.choice(k_fold_to_choose, size = 1, replace = False)[0]
+                    k_fold_to_choose = [*range(1, number_of_folds + 1)]
+                    # TODO make this a warning
+                    print(
+                        "Something is wrong with the way the number of groups are positioned, could put remainder into each fold")
+
+                chosen_k_fold = np.random.choice(
+                    k_fold_to_choose, size=1, replace=False)[0]
                 k_fold_to_choose.remove(chosen_k_fold)
                 df_group_coice = self.get_group_selection(df_group, 1)
 
-                k_folds[chosen_k_fold-1] = pd.concat([k_folds[chosen_k_fold-1],df_group_coice],ignore_index = True)
-                df_unused = pd.concat([df_unused, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
-                df_group = pd.concat([df_group, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
-                
-            group_index = group_index +1
+                k_folds[chosen_k_fold-1] = pd.concat(
+                    [k_folds[chosen_k_fold-1], df_group_coice], ignore_index=True)
+                df_unused = pd.concat(
+                    [df_unused, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
+                df_group = pd.concat(
+                    [df_group, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
+
+            group_index = group_index + 1
 
         if not df_unused.empty:
-            print("WARNING: Didn't put all avialiable compound into test k-folds! Left over:")
+            print(
+                "WARNING: Didn't put all avialiable compound into test k-folds! Left over:")
             print(df_unused)
 
-        print("Made test sets for k-folds")    
-        return k_folds
-
-    def get_leave_one_out_test(self, df):
-        number_of_folds = df[self.divide_on_header].nunique()
-        self.k_folds = number_of_folds
-        print("Leave one out will result in " + str(number_of_folds) + " folds.")
-        k_folds = [None]*number_of_folds
-
-        leave_out_list = df[self.divide_on_header].unique()
-
-        k_fold = 1
-        for entry in leave_out_list:
-            df_fold= df[df[self.divide_on_header] == entry]
-            k_folds[k_fold-1] = df_fold
-            k_fold = k_fold +1
-
-        print("Made test sets for leave one out. Made " + str(k_fold) + "folds")    
+        print("Made test sets for k-folds")
         return k_folds
 
     def get_k_folds_tv(self, df, k_fold_test):
         number_of_folds = self.k_folds
-        validation_fraction = self.valid_fraction *(number_of_folds-1)/number_of_folds
+        #validation_fraction = (number_of_folds-1)/number_of_folds*self.valid_fraction
         k_fold_train = [None]*number_of_folds
         k_fold_validation = [None]*number_of_folds
         group_n = {}
-        df_available_validation = df.copy()
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
-            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*validation_fraction)
-            if group_n[group] < 1: 
+            group_n[group] = math.floor(df_group[self.divide_on_header].nunique(
+            )*(number_of_folds-1)/number_of_folds*self.valid_fraction)
+            if group_n[group] < 1:
                 group_n[group] = 1
-                print("A group did not have enough unique groupings to have 1 unique entry per validation fold. Using 1 unique entry anyway. Group:" + str(group) )
+                print("A group did not have enough unique groupings to have 1 unique entry per vakudation fold. Using 1 unique entry anyway. Group:" + str(group))
 
-        for k_fold in range(1,number_of_folds +1):
-            print("Starting k-fold: " + str(k_fold))
+        for k_fold in range(1, number_of_folds + 1):
             df_unused = df.copy()
             df_k_fold_test = k_fold_test[k_fold-1]
-            df_unused = pd.concat([df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
+            df_unused = pd.concat(
+                [df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
 
-            df_fold_validation= pd.DataFrame()
-            df_fold_train= pd.DataFrame()
+            df_fold_validation = pd.DataFrame()
+            df_fold_train = pd.DataFrame()
             for group in self.included_groups:
-                df_group = df_unused[df_unused[self.include_header].isin([group])]
-                
-                if k_fold == 1 : 
-                    df_group_coice_validation = self.get_group_selection(df_group, group_n[group])
+                df_group = df_unused[df_unused[self.include_header].isin([
+                                                                         group])]
+
+                if k_fold == 1:
+                    df_group_coice_validation = self.get_group_selection(
+                        df_group, group_n[group])
                 else:
-                    df_available_group_validation =  df_available_validation[df_available_validation[self.include_header].isin([group])]
-                    unique_entries = df_available_group_validation[self.intact_group_header].unique()
-                    
-                    if len(unique_entries) <  group_n[group]:
-                        df_group_coice_validation = df_available_group_validation.copy()
-                       
-                        df_new_group_validation_copy = df[df[self.include_header].isin([group])].copy()
-                        df_available_validation = pd.concat([df_available_validation,df_new_group_validation_copy],ignore_index = True).drop_duplicates(keep=False)
-                        df_available_group_validation = pd.concat([df_new_group_validation_copy,df_group_coice_validation,df_group_coice_validation],ignore_index = True).drop_duplicates(keep=False)
-                        
+                    df_unavailable_validation = pd.concat(
+                        k_fold_validation, ignore_index=True)
+                    df_group_unavailable_validation = df_unavailable_validation[df_unavailable_validation[self.include_header].isin([
+                                                                                                                                    group])]
+                    df_group_available_validation = pd.concat(
+                        [df_group, df_group_unavailable_validation, df_group_unavailable_validation], ignore_index=True).drop_duplicates(keep=False)
+                    unique_entries = df_group_available_validation[self.intact_group_header].unique(
+                    )
+
+                    if len(unique_entries) < group_n[group]:
                         number_of_added = group_n[group] - len(unique_entries)
-                        add_to_validation = self.get_group_selection(df_available_group_validation, number_of_added)
-                        df_group_coice_validation = pd.concat([df_group_coice_validation, add_to_validation],ignore_index = True)
-                        print ("Reusing previous validation compounds for validation, for group: " + group)
+                        add_to_validation = self.get_group_selection(
+                            df_group_unavailable_validation, number_of_added)
+                        df_group_coice_validation = pd.concat(
+                            [df_group_available_validation, add_to_validation], ignore_index=True)
+                        print("Reusing previous validation compounds for validation")
                     else:
-                        df_group_coice_validation = self.get_group_selection(df_available_group_validation, group_n[group])
-                
-                df_fold_validation = pd.concat([df_fold_validation,df_group_coice_validation],ignore_index = True)
-            
-            df_available_validation = pd.concat([df_available_validation,df_fold_validation,df_fold_validation],ignore_index = True).drop_duplicates(keep=False)
-            df_fold_train = pd.concat([df_unused,df_fold_validation,df_fold_validation],ignore_index = True).drop_duplicates(keep=False)
-            df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train],ignore_index = True).drop_duplicates(keep=False)
+                        df_group_coice_validation = self.get_group_selection(
+                            df_group_available_validation, group_n[group])
+
+                df_fold_validation = pd.concat(
+                    [df_fold_validation, df_group_coice_validation], ignore_index=True)
+            df_fold_train = pd.concat(
+                [df_unused, df_fold_validation, df_fold_validation], ignore_index=True).drop_duplicates(keep=False)
+            df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train],
+                                  ignore_index=True).drop_duplicates(keep=False)
             k_fold_validation[k_fold-1] = df_fold_validation
             k_fold_train[k_fold-1] = df_fold_train
             if not df_unused.empty:
-                print("WARNING: Didn't put all available compound into train or valid k-folds! Left over:")
+                print(
+                    "WARNING: Didn't put all avialiable compound into train or valid k-folds! Left over:")
                 print(df_unused)
- 
-        print("Made train and valid sets for k-folds")   
+
+        print("Made train and valid sets for k-folds")
 
         return k_fold_train, k_fold_validation
 
     def get_group_selection(self, df_group, number_of_unique_entries):
         unique_entries = df_group[self.intact_group_header].unique()
-        group_choice = np.random.choice(unique_entries, size = number_of_unique_entries, replace = False)
-        df_group_choice = df_group[df_group[self.divide_on_header].isin(group_choice)]
-        return df_group_choice   
+        group_choice = np.random.choice(
+            unique_entries, size=number_of_unique_entries, replace=False)
+        df_group_choice = df_group[df_group[self.divide_on_header].isin(
+            group_choice)]
+        return df_group_choice
 
-    def get_statistics (self, k_folds, df):
-        s_statistics = df.groupby(self.class_column_header)[self.divide_on_header].nunique()
+    def get_statistics(self, k_folds, df):
+        # Make some statistics  # TODO make this a function and run for each type of data
+        s_statistics = df.groupby(self.class_column_header)[
+            self.divide_on_header].nunique()
         df_statistics = pd.DataFrame(s_statistics.index)
         df_statistics["Total"] = s_statistics.values
 
         number_of_folds = self.k_folds
-        for k_fold in range(0,number_of_folds):
-            df_fold = k_folds[k_fold] 
+        for k_fold in range(0, number_of_folds):
+            df_fold = k_folds[k_fold]
             df_grouped = df_fold.groupby(self.class_column_header)
-            statistic_column_header = self.divide_on_header+"s_in_fold_"+str(k_fold +1)
-            df_statistics[statistic_column_header] = df_grouped[self.divide_on_header].nunique().values
-   
-        return df_statistics        
+            statistic_column_header = self.divide_on_header + \
+                "s_in_fold_"+str(k_fold)
+            df_statistics[statistic_column_header] = df_grouped[self.divide_on_header].nunique(
+            ).values
 
-    def make_path_available(self): 
+        return df_statistics
+
+    def make_path_available(self):
         if os.path.exists(self.output_dir) and os.path.isdir(self.output_dir):
             shutil.rmtree(self.output_dir)
 
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
-            print("made the output dir") 
+            print("made the output dir")
 
 
-if __name__ == "__main__":
-    MakeKFoldsTVT().main()
+class GroupNotIncluded(Exception):
+    """Exception raised for errors in the group inclustion.
+
+    Attributes:
+        groups -- groups not available after exclusion
+        message -- explanation of the error
+    """
+
+    def __init__(self, groups, message="A group could not be including after exclusion criteria was met."):
+        self.groups = groups
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f'{self.groups} -> {self.message}'
