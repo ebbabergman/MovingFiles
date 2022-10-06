@@ -12,26 +12,28 @@ import math
 # Make K-folds, including their train and validation parts, with csv files as outpus
 
 
-class MakeKFoldsTVT:
-                   
+class MakeTVTSets:
+
     def __init__(self,
-                labels_path = "/home/jovyan/Data/BBBC021/BBBC021_Labels.csv",
-                output_dir='/home/jovyan/Inputs/BBBC021_All_Leave_One_Out/',
-                include_groups = [], #Empty for everything included,
-                include_header = "moa",
-                class_column_header = "moa",
-                exclude_groups = [["DMSO","Cholesterol-lowering","Eg5 inhibitors"]],
-                exclude_groups_headers = ["moa"],
-                exclude_images_path = "",
-                intact_group_header = 'compound',
-                unique_sample_headers = ["ImageNumber"],
-                image_number_heading = "ImageNumber",   
-                k_folds = "3",
-                divide_on_header = 'compound',
-                make_train_valid = True,
-                valid_fraction = 0.25, # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
-                leave_one_out = True,
-                ):
+                 labels_path="/home/jovyan/Data/BBBC021/BBBC021_Labels.csv",
+                 output_dir='/home/jovyan/Inputs/BBBC021_All_Leave_One_Out/',
+                 include_groups=[],  # Empty for everything included,
+                 include_header="moa",
+                 class_column_header="moa",
+                 exclude_groups=[
+                     ["DMSO", "Cholesterol-lowering", "Eg5 inhibitors"]],
+                 exclude_groups_headers=["moa"],
+                 exclude_images_path="",
+                 intact_group_header='compound',
+                 unique_sample_headers=["ImageNumber"],
+                 image_number_heading="ImageNumber",
+                 k_folds="3",
+                 divide_on_header='compound',
+                 make_train_valid=True,
+                 # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
+                 valid_fraction=0.25,
+                 leave_one_out=True,
+                 ):
         self.labels_path = labels_path
         self.output_dir = output_dir
         self.exclude_images_path = exclude_images_path
@@ -41,7 +43,7 @@ class MakeKFoldsTVT:
         self.exclude_groups_headers = exclude_groups_headers
         self.unique_sample_headers = unique_sample_headers
         self.image_number_heading = image_number_heading
-        self.class_column_header =  class_column_header 
+        self.class_column_header = class_column_header
         self.intact_group_header = intact_group_header
         self.k_folds = int(k_folds)
         self.divide_on_header = divide_on_header
@@ -105,7 +107,7 @@ class MakeKFoldsTVT:
 
         print("Finished. Find output in: " + self.output_dir)
 
-    def exclude_groups(self,df):
+    def exclude_groups(self, df):
         for index in range(0, len(self.excluded_groups_headers)):
             exclude_groups_header = self.excluded_groups_headers[index]
             df = df[~df[exclude_groups_header].isin(
@@ -148,7 +150,7 @@ class MakeKFoldsTVT:
 
         return df
 
-    def include_groups(self,df):
+    def include_groups(self, df):
         included_groups = self.included_groups
         use_all_available_groups = len(included_groups) == 0
         available_groups = df[self.include_header].unique()
@@ -164,7 +166,7 @@ class MakeKFoldsTVT:
         print("Available groups: " + available_groups)
         df = df[df[self.include_header].isin(
             included_groups)]
-        
+
         return df
 
     def get_k_folds_test(self, df):
