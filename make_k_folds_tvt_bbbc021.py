@@ -38,10 +38,9 @@ class MakeKFoldsTVTBBBC021(MakeTVTSets):
                 image_number_heading,   
                 k_folds,
                 divide_on_header,
-                make_train_valid,
                 valid_fraction)
-        leave_one_out = leave_one_out
-        make_unique_validation = make_unique_validation
+        self.leave_one_out = leave_one_out
+        self.make_unique_validation = make_unique_validation
 
     def main(self):
         print("Started making divisions for runs for BBBC021.")
