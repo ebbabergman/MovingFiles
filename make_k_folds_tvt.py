@@ -20,9 +20,9 @@ class MakeTVTSets:
                  include_groups=[],  # Empty for everything included,
                  include_header="moa",
                  class_column_header="moa",
-                 exclude_groups=[
+                 excluded_groups=[
                      ["DMSO", "Cholesterol-lowering", "Eg5 inhibitors"]],
-                 exclude_groups_headers=["moa"],
+                 excluded_groups_headers=["moa"],
                  exclude_images_path="",
                  intact_group_header='compound',
                  unique_sample_headers=["ImageNumber"],
@@ -37,8 +37,8 @@ class MakeTVTSets:
         self.exclude_images_path = exclude_images_path
         self.included_groups = include_groups
         self.include_header = include_header
-        self.exclude_groups = exclude_groups
-        self.exclude_groups_headers = exclude_groups_headers
+        self.excluded_groups = excluded_groups
+        self.excluded_groups_headers = excluded_groups_headers
         self.unique_sample_headers = unique_sample_headers
         self.image_number_heading = image_number_heading
         self.class_column_header = class_column_header
@@ -174,13 +174,13 @@ class MakeTVTSets:
             included_groups = df[self.include_header].unique()
 
         included_groups = [
-            group for group in included_groups if group not in self.exclude_groups]
+            group for group in included_groups if group not in self.excluded_groups]
         return included_groups
 
     def exclude_groups(self, df):
         for index in range(0, len(self.excluded_groups_headers)):
-            exclude_groups_header = self.excluded_groups_headers[index]
-            df = df[~df[exclude_groups_header].isin(
+            excluded_groups_header = self.excluded_groups_headers[index]
+            df = df[~df[excluded_groups_header].isin(
                 self.excluded_groups[index])]
         return df
 
