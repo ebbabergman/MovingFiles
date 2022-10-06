@@ -56,22 +56,10 @@ class MakeTVTSets:
         self.make_path_available()
 
         df_base = self.get_base()
-        df = self.exclude_groups(df_base)
-
-        all_groups_that_could_be_included = self.get_included_groups(df_base)
-        df = df_base[df_base[self.include_header].isin(all_groups_that_could_be_included)]
-        for index  in range(0,len(self.exclude_groups_headers)):
-            exclude_groups_header = self.exclude_groups_headers[index]
-            df = df[~df[exclude_groups_header].isin(self.exclude_groups[index])]
-
-        if len(self.exclude_images_path) > 0:
-            df = self.exclude_images(df)
-            print("Excluded images indicated with file")
-
-        self.included_groups = self.get_included_groups(df)
-
+        print("Read in base for dataframe, starting inclusion and exclusion of rows")
+        
+        df = self.include_exclude_rows(df_base)
         print("Included and exlcuded groups")
-
 
         k_folds_test = self.get_k_folds_test(df)
         df_test_statistics = self.get_statistics(k_folds_test, df)
@@ -82,33 +70,36 @@ class MakeTVTSets:
 
         k_folds_train, k_folds_validation = self.get_k_folds_tv(
             df, k_folds_test)
-        df_validation_statistics = self.get_statistics(
-            k_folds_validation, df)
-        df_train_statistics = self.get_statistics(k_folds_train, df)
 
-        df_validation_statistics.to_csv(
-            self.output_dir + "k_fold_validation_statistics.csv", index=False)
-        df_train_statistics.to_csv(
-            self.output_dir + "k_fold_train_statistics.csv", index=False)
+        self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
 
-        print("Validation Statistics ")
-        print(df_validation_statistics.to_latex())
-        print("Train Statistics ")
-        print(df_train_statistics.to_latex())
+        self.save_k_folds()
+        print("Finished. Find output in: " + self.output_dir)
 
-        for k_fold in range(0, self.k_folds):
-            df_test_fold = k_folds_test[k_fold]
-            df_test_fold.to_csv(
-                self.output_dir + "k_fold_test_" + str(k_fold + 1)+".csv", index=False)
+    def make_leave_one_out(self):
+        print("Started make leave one out.")
 
-            df_validation_fold = k_folds_validation[k_fold]
-            df_validation_fold.to_csv(
-                self.output_dir + "k_fold_validation_" + str(k_fold + 1)+".csv", index=False)
+        self.make_path_available()
 
-            df_train_fold = k_folds_train[k_fold]
-            df_train_fold.to_csv(
-                self.output_dir + "k_fold_train_" + str(k_fold + 1)+".csv", index=False)
+        df_base = self.get_base()
+        print("Read in base for dataframe, starting inclusion and exclusion of rows")
+        
+        df = self.include_exclude_rows(df_base)
+        print("Included and exlcuded groups")
 
+        k_folds_test = self.get_leave_one_out_test(df)
+        df_test_statistics = self.get_statistics(k_folds_test, df)
+        df_test_statistics.to_csv(
+            self.output_dir + "k_fold_test_statistics.csv", index=False)
+        print("Test Statistics")
+        print(df_test_statistics.to_latex())
+
+        k_folds_train, k_folds_validation = self.get_k_folds_tv(
+            df, k_folds_test)
+
+        self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
+
+        self.save_k_folds()
         print("Finished. Find output in: " + self.output_dir)
 
     def get_base(self):
@@ -116,6 +107,26 @@ class MakeTVTSets:
         df_base.dropna(subset=[self.class_column_header], inplace=True)
         df_base.drop_duplicates(inplace=True)
         return df_base
+
+    def include_exclude_rows(self, df):
+        all_groups_that_could_be_included = self.get_included_groups(df)
+        df = df[df[self.include_header].isin(
+            all_groups_that_could_be_included)]
+        df = self.exclude_groups(df)
+        if len(self.exclude_images_path) > 0:
+            df = self.exclude_images(df)
+            print("Excluded images indicated with file")
+        self.included_groups = self.get_included_groups(df)
+        return df
+
+    def get_included_groups(self, df):
+        included_groups = self.included_groups
+        if (len(included_groups) == 0):
+            included_groups = df[self.include_header].unique()
+
+        included_groups = [
+            group for group in included_groups if group not in self.exclude_groups]
+        return included_groups
 
     def exclude_groups(self, df):
         for index in range(0, len(self.excluded_groups_headers)):
@@ -254,24 +265,25 @@ class MakeTVTSets:
     def get_leave_one_out_test(self, df):
         number_of_folds = df[self.divide_on_header].nunique()
         self.k_folds = number_of_folds
-        print("Leave one out will result in " + str(number_of_folds) + " folds.")
+        print("Leave one out will result in " +
+              str(number_of_folds) + " folds.")
         k_folds = [None]*number_of_folds
 
         leave_out_list = df[self.divide_on_header].unique()
 
         k_fold = 1
         for entry in leave_out_list:
-            df_fold= df[df[self.divide_on_header] == entry]
+            df_fold = df[df[self.divide_on_header] == entry]
             k_folds[k_fold-1] = df_fold
-            k_fold = k_fold +1
+            k_fold = k_fold + 1
 
-        print("Made test sets for leave one out. Made " + str(k_fold) + "folds")    
+        print("Made test sets for leave one out. Made " + str(number_of_folds) + "folds")
         return k_folds
 
-    
     def get_k_folds_tv(self, df, k_fold_test):
         number_of_folds = self.k_folds
-        validation_fraction = self.valid_fraction *(number_of_folds-1)/number_of_folds
+        validation_fraction = self.valid_fraction * \
+            (number_of_folds-1)/number_of_folds
         k_fold_train = [None]*number_of_folds
         k_fold_validation = [None]*number_of_folds
         group_n = {}
@@ -279,56 +291,75 @@ class MakeTVTSets:
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
-            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*validation_fraction)
-            if group_n[group] < 1: 
+            group_n[group] = math.floor(
+                df_group[self.divide_on_header].nunique()*validation_fraction)
+            if group_n[group] < 1:
                 group_n[group] = 1
-                print("A group did not have enough unique groupings to have 1 unique entry per validation fold. Using 1 unique entry anyway. Group:" + str(group) )
+                print("A group did not have enough unique groupings to have 1 unique entry per validation fold. Using 1 unique entry anyway. Group:" + str(group))
 
-        for k_fold in range(1,number_of_folds +1):
+        for k_fold in range(1, number_of_folds + 1):
             print("Starting k-fold: " + str(k_fold))
             df_unused = df.copy()
             df_k_fold_test = k_fold_test[k_fold-1]
-            df_unused = pd.concat([df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
+            df_unused = pd.concat(
+                [df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
 
-            df_fold_validation= pd.DataFrame()
-            df_fold_train= pd.DataFrame()
+            df_fold_validation = pd.DataFrame()
+            df_fold_train = pd.DataFrame()
             for group in self.included_groups:
-                df_group = df_unused[df_unused[self.include_header].isin([group])]
-                
-                if k_fold == 1 : 
-                    df_group_coice_validation = self.get_group_selection(df_group, group_n[group])
+                df_group = df_unused[df_unused[self.include_header].isin([
+                                                                         group])]
+
+                if k_fold == 1:
+                    df_group_coice_validation = self.get_group_selection(
+                        df_group, group_n[group])
                 else:
-                    df_available_group_validation =  df_available_validation[df_available_validation[self.include_header].isin([group])]
-                    unique_entries = df_available_group_validation[self.intact_group_header].unique()
-                    
-                    if len(unique_entries) <  group_n[group]:
+                    df_available_group_validation = df_available_validation[df_available_validation[self.include_header].isin([
+                                                                                                                              group])]
+                    unique_entries = df_available_group_validation[self.intact_group_header].unique(
+                    )
+
+                    if len(unique_entries) < group_n[group]:
                         df_group_coice_validation = df_available_group_validation.copy()
-                       
-                        df_new_group_validation_copy = df[df[self.include_header].isin([group])].copy()
-                        df_available_validation = pd.concat([df_available_validation,df_new_group_validation_copy],ignore_index = True).drop_duplicates(keep=False)
-                        df_available_group_validation = pd.concat([df_new_group_validation_copy,df_group_coice_validation,df_group_coice_validation],ignore_index = True).drop_duplicates(keep=False)
-                        
+
+                        df_new_group_validation_copy = df[df[self.include_header].isin([
+                                                                                       group])].copy()
+                        df_available_validation = pd.concat(
+                            [df_available_validation, df_new_group_validation_copy], ignore_index=True).drop_duplicates(keep=False)
+                        df_available_group_validation = pd.concat(
+                            [df_new_group_validation_copy, df_group_coice_validation, df_group_coice_validation], ignore_index=True).drop_duplicates(keep=False)
+
                         number_of_added = group_n[group] - len(unique_entries)
-                        add_to_validation = self.get_group_selection(df_available_group_validation, number_of_added)
-                        df_group_coice_validation = pd.concat([df_group_coice_validation, add_to_validation],ignore_index = True)
-                        print ("Reusing previous validation compounds for validation, for group: " + group)
+                        add_to_validation = self.get_group_selection(
+                            df_available_group_validation, number_of_added)
+                        df_group_coice_validation = pd.concat(
+                            [df_group_coice_validation, add_to_validation], ignore_index=True)
+                        print(
+                            "Reusing previous validation compounds for validation, for group: " + group)
                     else:
-                        df_group_coice_validation = self.get_group_selection(df_available_group_validation, group_n[group])
-                
-                df_fold_validation = pd.concat([df_fold_validation,df_group_coice_validation],ignore_index = True)
-            
-            df_available_validation = pd.concat([df_available_validation,df_fold_validation,df_fold_validation],ignore_index = True).drop_duplicates(keep=False)
-            df_fold_train = pd.concat([df_unused,df_fold_validation,df_fold_validation],ignore_index = True).drop_duplicates(keep=False)
-            df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train],ignore_index = True).drop_duplicates(keep=False)
+                        df_group_coice_validation = self.get_group_selection(
+                            df_available_group_validation, group_n[group])
+
+                df_fold_validation = pd.concat(
+                    [df_fold_validation, df_group_coice_validation], ignore_index=True)
+
+            df_available_validation = pd.concat(
+                [df_available_validation, df_fold_validation, df_fold_validation], ignore_index=True).drop_duplicates(keep=False)
+            df_fold_train = pd.concat(
+                [df_unused, df_fold_validation, df_fold_validation], ignore_index=True).drop_duplicates(keep=False)
+            df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train],
+                                  ignore_index=True).drop_duplicates(keep=False)
             k_fold_validation[k_fold-1] = df_fold_validation
             k_fold_train[k_fold-1] = df_fold_train
             if not df_unused.empty:
-                print("WARNING: Didn't put all available compound into train or valid k-folds! Left over:")
+                print(
+                    "WARNING: Didn't put all available compound into train or valid k-folds! Left over:")
                 print(df_unused)
- 
-        print("Made train and valid sets for k-folds")   
+
+        print("Made train and valid sets for k-folds")
 
         return k_fold_train, k_fold_validation
+
     def get_group_selection(self, df_group, number_of_unique_entries):
         unique_entries = df_group[self.intact_group_header].unique()
         group_choice = np.random.choice(
@@ -338,7 +369,6 @@ class MakeTVTSets:
         return df_group_choice
 
     def get_statistics(self, k_folds, df):
-        # Make some statistics  # TODO make this a function and run for each type of data
         s_statistics = df.groupby(self.class_column_header)[
             self.divide_on_header].nunique()
         df_statistics = pd.DataFrame(s_statistics.index)
@@ -362,6 +392,35 @@ class MakeTVTSets:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
             print("made the output dir")
+
+    def make_train_valid_statistics(self, k_folds_train, k_folds_validation, df):
+        df_validation_statistics = self.get_statistics(
+            k_folds_validation, df)
+        df_train_statistics = self.get_statistics(k_folds_train, df)
+
+        df_validation_statistics.to_csv(
+            self.output_dir + "k_fold_validation_statistics.csv", index=False)
+        df_train_statistics.to_csv(
+            self.output_dir + "k_fold_train_statistics.csv", index=False)
+
+        print("Validation Statistics ")
+        print(df_validation_statistics.to_latex())
+        print("Train Statistics ")
+        print(df_train_statistics.to_latex())
+
+    def save_k_folds(self, k_folds_test, k_folds_validation, k_folds_train):
+        for k_fold in range(0, self.k_folds):
+            df_test_fold = k_folds_test[k_fold]
+            df_test_fold.to_csv(
+                self.output_dir + "k_fold_test_" + str(k_fold + 1)+".csv", index=False)
+
+            df_validation_fold = k_folds_validation[k_fold]
+            df_validation_fold.to_csv(
+                self.output_dir + "k_fold_validation_" + str(k_fold + 1)+".csv", index=False)
+
+            df_train_fold = k_folds_train[k_fold]
+            df_train_fold.to_csv(
+                self.output_dir + "k_fold_train_" + str(k_fold + 1)+".csv", index=False)
 
 
 class GroupNotIncluded(Exception):
