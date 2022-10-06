@@ -54,7 +54,7 @@ class MakeTVTSets:
 
         df_base = self.get_base()
         print("Read in base for dataframe, starting inclusion and exclusion of rows")
-        
+
         df = self.include_exclude_rows(df_base)
         print("Included and exlcuded groups")
 
@@ -72,6 +72,32 @@ class MakeTVTSets:
 
         self.save_k_folds()
         print("Finished. Find output in: " + self.output_dir)
+    
+    def make_k_folds(self):
+        print("Started make k-folds.")
+
+        self.make_path_available()
+
+        df_base = self.get_base()
+        print("Read in base for dataframe, starting inclusion and exclusion of rows")
+
+        df = self.include_exclude_rows(df_base)
+        print("Included and exlcuded groups")
+
+        k_folds_test = self.get_k_folds_test(df)
+        df_test_statistics = self.get_statistics(k_folds_test, df)
+        df_test_statistics.to_csv(
+            self.output_dir + "k_fold_test_statistics.csv", index=False)
+        print("Test Statistics")
+        print(df_test_statistics.to_latex())
+
+        k_folds_train, k_folds_validation = self.get_k_folds_train_only(
+            df, k_folds_test)
+
+        self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
+
+        self.save_k_folds()
+        print("Finished. Find output in: " + self.output_dir)
 
     def make_leave_one_out(self):
         print("Started make leave one out.")
@@ -80,7 +106,7 @@ class MakeTVTSets:
 
         df_base = self.get_base()
         print("Read in base for dataframe, starting inclusion and exclusion of rows")
-        
+
         df = self.include_exclude_rows(df_base)
         print("Included and exlcuded groups")
 
@@ -92,6 +118,32 @@ class MakeTVTSets:
         print(df_test_statistics.to_latex())
 
         k_folds_train, k_folds_validation = self.get_k_folds_tv(
+            df, k_folds_test)
+
+        self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
+
+        self.save_k_folds()
+        print("Finished. Find output in: " + self.output_dir)
+
+    def make_leave_one_out_train_only(self):
+        print("Started make leave one out train only.")
+
+        self.make_path_available()
+
+        df_base = self.get_base()
+        print("Read in base for dataframe, starting inclusion and exclusion of rows")
+
+        df = self.include_exclude_rows(df_base)
+        print("Included and exlcuded groups")
+
+        k_folds_test = self.get_leave_one_out_test(df)
+        df_test_statistics = self.get_statistics(k_folds_test, df)
+        df_test_statistics.to_csv(
+            self.output_dir + "k_fold_test_statistics.csv", index=False)
+        print("Test Statistics")
+        print(df_test_statistics.to_latex())
+
+        k_folds_train, k_folds_validation = self.get_k_folds_train_only(
             df, k_folds_test)
 
         self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
@@ -274,7 +326,8 @@ class MakeTVTSets:
             k_folds[k_fold-1] = df_fold
             k_fold = k_fold + 1
 
-        print("Made test sets for leave one out. Made " + str(number_of_folds) + "folds")
+        print("Made test sets for leave one out. Made " +
+              str(number_of_folds) + "folds")
         return k_folds
 
     def get_k_folds_tv(self, df, k_fold_test):
@@ -353,6 +406,39 @@ class MakeTVTSets:
                     "WARNING: Didn't put all available compound into train or valid k-folds! Left over:")
                 print(df_unused)
 
+        print("Made train and valid sets for k-folds")
+
+        return k_fold_train, k_fold_validation
+
+    def get_k_folds_train_only(self, df, k_fold_test):
+        """Get whatever's not in test into a df
+
+        This function is meant to be used as an alternative for when we want to only have a train and a test set, but may need a nominal validation set to fit with programs.
+        The train set for a fold will be whatever is not in the test set, and the validation set will be a copy of the train set.
+
+        Keyword arguments:
+        df -- the full dataset as a pandas dataframe
+        k_fold_test -- a list of dataframe where each dataframe is the test set for a fold
+
+        Returns:
+        k_fold_train -- same structure as the k_fold_test but every row in df that is not in k_fold_test for that k_fold
+        k_fold_valid -- a copy of k_fold_train
+        """
+        number_of_folds = self.k_folds
+        k_fold_train = [None]*number_of_folds
+        k_fold_validation = [None]*number_of_folds
+        group_n = {}
+        
+        for k_fold in range(1, number_of_folds + 1):
+            print("Starting k-fold: " + str(k_fold))
+            df_unused = df.copy()
+            df_k_fold_test = k_fold_test[k_fold-1]
+            df_unused = pd.concat(
+                [df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
+
+            k_fold_validation[k_fold-1] = df_unused
+            k_fold_train[k_fold-1] = df_unused
+ 
         print("Made train and valid sets for k-folds")
 
         return k_fold_train, k_fold_validation
