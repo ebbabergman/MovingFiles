@@ -205,22 +205,7 @@ class MakeKFoldsTVTBBBC021(MakeKFoldsTVT):
         print("Made test sets for k-folds")    
         return k_folds
 
-    def get_leave_one_out_test(self, df):
-        number_of_folds = df[self.divide_on_header].nunique()
-        self.k_folds = number_of_folds
-        print("Leave one out will result in " + str(number_of_folds) + " folds.")
-        k_folds = [None]*number_of_folds
-
-        leave_out_list = df[self.divide_on_header].unique()
-
-        k_fold = 1
-        for entry in leave_out_list:
-            df_fold= df[df[self.divide_on_header] == entry]
-            k_folds[k_fold-1] = df_fold
-            k_fold = k_fold +1
-
-        print("Made test sets for leave one out. Made " + str(k_fold) + "folds")    
-        return k_folds
+    
 
     def get_k_folds_tv(self, df, k_fold_test):
         number_of_folds = self.k_folds
