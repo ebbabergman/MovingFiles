@@ -47,7 +47,6 @@ class MakeTVTSets:
         self.intact_group_header = intact_group_header
         self.k_folds = int(k_folds)
         self.divide_on_header = divide_on_header
-        self.make_train_valid = make_train_valid
         self.valid_fraction = valid_fraction
         self.leave_one_out = leave_one_out
 
@@ -56,17 +55,23 @@ class MakeTVTSets:
 
         self.make_path_available()
 
-        df_base = pd.read_csv(self.labels_path, delimiter=",")
-        df_base.dropna(subset=[self.class_column_header], inplace=True)
-        df_base.drop_duplicates(inplace=True)
-
+        df_base = self.get_base()
         df = self.exclude_groups(df_base)
 
-        print("Included and exlcuded groups")
-        df = self.exclude_images(df)
-        print("excluded images indicated")
+        all_groups_that_could_be_included = self.get_included_groups(df_base)
+        df = df_base[df_base[self.include_header].isin(all_groups_that_could_be_included)]
+        for index  in range(0,len(self.exclude_groups_headers)):
+            exclude_groups_header = self.exclude_groups_headers[index]
+            df = df[~df[exclude_groups_header].isin(self.exclude_groups[index])]
 
-        df = self.include_groups(df)
+        if len(self.exclude_images_path) > 0:
+            df = self.exclude_images(df)
+            print("Excluded images indicated with file")
+
+        self.included_groups = self.get_included_groups(df)
+
+        print("Included and exlcuded groups")
+
 
         k_folds_test = self.get_k_folds_test(df)
         df_test_statistics = self.get_statistics(k_folds_test, df)
@@ -75,22 +80,21 @@ class MakeTVTSets:
         print("Test Statistics")
         print(df_test_statistics.to_latex())
 
-        if self.make_train_valid:
-            k_folds_train, k_folds_validation = self.get_k_folds_tv(
-                df, k_folds_test)
-            df_validation_statistics = self.get_statistics(
-                k_folds_validation, df)
-            df_train_statistics = self.get_statistics(k_folds_train, df)
+        k_folds_train, k_folds_validation = self.get_k_folds_tv(
+            df, k_folds_test)
+        df_validation_statistics = self.get_statistics(
+            k_folds_validation, df)
+        df_train_statistics = self.get_statistics(k_folds_train, df)
 
-            df_validation_statistics.to_csv(
-                self.output_dir + "k_fold_validation_statistics.csv", index=False)
-            df_train_statistics.to_csv(
-                self.output_dir + "k_fold_train_statistics.csv", index=False)
+        df_validation_statistics.to_csv(
+            self.output_dir + "k_fold_validation_statistics.csv", index=False)
+        df_train_statistics.to_csv(
+            self.output_dir + "k_fold_train_statistics.csv", index=False)
 
-            print("Validation Statistics ")
-            print(df_validation_statistics.to_latex())
-            print("Train Statistics ")
-            print(df_train_statistics.to_latex())
+        print("Validation Statistics ")
+        print(df_validation_statistics.to_latex())
+        print("Train Statistics ")
+        print(df_train_statistics.to_latex())
 
         for k_fold in range(0, self.k_folds):
             df_test_fold = k_folds_test[k_fold]
@@ -106,6 +110,12 @@ class MakeTVTSets:
                 self.output_dir + "k_fold_train_" + str(k_fold + 1)+".csv", index=False)
 
         print("Finished. Find output in: " + self.output_dir)
+
+    def get_base(self):
+        df_base = pd.read_csv(self.labels_path, delimiter=",")
+        df_base.dropna(subset=[self.class_column_header], inplace=True)
+        df_base.drop_duplicates(inplace=True)
+        return df_base
 
     def exclude_groups(self, df):
         for index in range(0, len(self.excluded_groups_headers)):
@@ -231,7 +241,6 @@ class MakeTVTSets:
                     [df_unused, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
                 df_group = pd.concat(
                     [df_group, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
-
             group_index = group_index + 1
 
         if not df_unused.empty:
@@ -240,6 +249,23 @@ class MakeTVTSets:
             print(df_unused)
 
         print("Made test sets for k-folds")
+        return k_folds
+
+    def get_leave_one_out_test(self, df):
+        number_of_folds = df[self.divide_on_header].nunique()
+        self.k_folds = number_of_folds
+        print("Leave one out will result in " + str(number_of_folds) + " folds.")
+        k_folds = [None]*number_of_folds
+
+        leave_out_list = df[self.divide_on_header].unique()
+
+        k_fold = 1
+        for entry in leave_out_list:
+            df_fold= df[df[self.divide_on_header] == entry]
+            k_folds[k_fold-1] = df_fold
+            k_fold = k_fold +1
+
+        print("Made test sets for leave one out. Made " + str(k_fold) + "folds")    
         return k_folds
 
     def get_k_folds_tv(self, df, k_fold_test):
