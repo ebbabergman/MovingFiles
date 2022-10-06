@@ -9,6 +9,7 @@ import pandas as pd
 from pandas.core import indexing
 import math
 
+from make_k_folds_tvt import MakeKFoldsTVT
 # Make K-folds, including their train and validation parts, with csv files as outpus
 
 
@@ -16,7 +17,7 @@ class MakeKFoldsTVTBBBC021(MakeKFoldsTVT):
                    
     def __init__(self,
                 labels_path = "/home/jovyan/Data/BBBC021/BBBC021_Labels.csv",
-                output_dir='/home/jovyan/Inputs/BBBC021_All_Leave_One_Out/',
+                output_dir='/home/jovyan/Inputs/test/',
                 #
                 include_groups = [], #Empty for everything included,
                 include_header = "moa",
@@ -34,22 +35,22 @@ class MakeKFoldsTVTBBBC021(MakeKFoldsTVT):
                 valid_fraction = 0.25, # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
                 leave_one_out = True,
                 ):
-        self.labels_path = labels_path
-        self.output_dir = output_dir
-        self.exclude_images_path = exclude_images_path
-        self.included_groups = include_groups
-        self.include_header = include_header
-        self.exclude_groups = exclude_groups
-        self.exclude_groups_headers = exclude_groups_headers
-        self.unique_sample_headers = unique_sample_headers
-        self.image_number_heading = image_number_heading
-        self.class_column_header =  class_column_header 
-        self.intact_group_header = intact_group_header
-        self.k_folds = int(k_folds)
-        self.divide_on_header = divide_on_header
-        self.make_train_valid = make_train_valid
-        self.valid_fraction = valid_fraction
-        self.leave_one_out = leave_one_out
+       super().__init__(labels_path,
+                output_dir,
+                include_groups,
+                include_header,
+                class_column_header,
+                exclude_groups,
+                exclude_groups_headers,
+                exclude_images_path,
+                intact_group_header,
+                unique_sample_headers,
+                image_number_heading,   
+                k_folds,
+                divide_on_header,
+                make_train_valid,
+                valid_fraction,
+                leave_one_out)
 
     def main(self):
         print("Started make k-folds.")
