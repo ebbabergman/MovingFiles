@@ -268,74 +268,67 @@ class MakeTVTSets:
         print("Made test sets for leave one out. Made " + str(k_fold) + "folds")    
         return k_folds
 
+    
     def get_k_folds_tv(self, df, k_fold_test):
         number_of_folds = self.k_folds
-        #validation_fraction = (number_of_folds-1)/number_of_folds*self.valid_fraction
+        validation_fraction = self.valid_fraction *(number_of_folds-1)/number_of_folds
         k_fold_train = [None]*number_of_folds
         k_fold_validation = [None]*number_of_folds
         group_n = {}
+        df_available_validation = df.copy()
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
-            group_n[group] = math.floor(df_group[self.divide_on_header].nunique(
-            )*(number_of_folds-1)/number_of_folds*self.valid_fraction)
-            if group_n[group] < 1:
+            group_n[group] = math.floor(df_group[self.divide_on_header].nunique()*validation_fraction)
+            if group_n[group] < 1: 
                 group_n[group] = 1
-                print("A group did not have enough unique groupings to have 1 unique entry per vakudation fold. Using 1 unique entry anyway. Group:" + str(group))
+                print("A group did not have enough unique groupings to have 1 unique entry per validation fold. Using 1 unique entry anyway. Group:" + str(group) )
 
-        for k_fold in range(1, number_of_folds + 1):
+        for k_fold in range(1,number_of_folds +1):
+            print("Starting k-fold: " + str(k_fold))
             df_unused = df.copy()
             df_k_fold_test = k_fold_test[k_fold-1]
-            df_unused = pd.concat(
-                [df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
+            df_unused = pd.concat([df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
 
-            df_fold_validation = pd.DataFrame()
-            df_fold_train = pd.DataFrame()
+            df_fold_validation= pd.DataFrame()
+            df_fold_train= pd.DataFrame()
             for group in self.included_groups:
-                df_group = df_unused[df_unused[self.include_header].isin([
-                                                                         group])]
-
-                if k_fold == 1:
-                    df_group_coice_validation = self.get_group_selection(
-                        df_group, group_n[group])
+                df_group = df_unused[df_unused[self.include_header].isin([group])]
+                
+                if k_fold == 1 : 
+                    df_group_coice_validation = self.get_group_selection(df_group, group_n[group])
                 else:
-                    df_unavailable_validation = pd.concat(
-                        k_fold_validation, ignore_index=True)
-                    df_group_unavailable_validation = df_unavailable_validation[df_unavailable_validation[self.include_header].isin([
-                                                                                                                                    group])]
-                    df_group_available_validation = pd.concat(
-                        [df_group, df_group_unavailable_validation, df_group_unavailable_validation], ignore_index=True).drop_duplicates(keep=False)
-                    unique_entries = df_group_available_validation[self.intact_group_header].unique(
-                    )
-
-                    if len(unique_entries) < group_n[group]:
+                    df_available_group_validation =  df_available_validation[df_available_validation[self.include_header].isin([group])]
+                    unique_entries = df_available_group_validation[self.intact_group_header].unique()
+                    
+                    if len(unique_entries) <  group_n[group]:
+                        df_group_coice_validation = df_available_group_validation.copy()
+                       
+                        df_new_group_validation_copy = df[df[self.include_header].isin([group])].copy()
+                        df_available_validation = pd.concat([df_available_validation,df_new_group_validation_copy],ignore_index = True).drop_duplicates(keep=False)
+                        df_available_group_validation = pd.concat([df_new_group_validation_copy,df_group_coice_validation,df_group_coice_validation],ignore_index = True).drop_duplicates(keep=False)
+                        
                         number_of_added = group_n[group] - len(unique_entries)
-                        add_to_validation = self.get_group_selection(
-                            df_group_unavailable_validation, number_of_added)
-                        df_group_coice_validation = pd.concat(
-                            [df_group_available_validation, add_to_validation], ignore_index=True)
-                        print("Reusing previous validation compounds for validation")
+                        add_to_validation = self.get_group_selection(df_available_group_validation, number_of_added)
+                        df_group_coice_validation = pd.concat([df_group_coice_validation, add_to_validation],ignore_index = True)
+                        print ("Reusing previous validation compounds for validation, for group: " + group)
                     else:
-                        df_group_coice_validation = self.get_group_selection(
-                            df_group_available_validation, group_n[group])
-
-                df_fold_validation = pd.concat(
-                    [df_fold_validation, df_group_coice_validation], ignore_index=True)
-            df_fold_train = pd.concat(
-                [df_unused, df_fold_validation, df_fold_validation], ignore_index=True).drop_duplicates(keep=False)
-            df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train],
-                                  ignore_index=True).drop_duplicates(keep=False)
+                        df_group_coice_validation = self.get_group_selection(df_available_group_validation, group_n[group])
+                
+                df_fold_validation = pd.concat([df_fold_validation,df_group_coice_validation],ignore_index = True)
+            
+            df_available_validation = pd.concat([df_available_validation,df_fold_validation,df_fold_validation],ignore_index = True).drop_duplicates(keep=False)
+            df_fold_train = pd.concat([df_unused,df_fold_validation,df_fold_validation],ignore_index = True).drop_duplicates(keep=False)
+            df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train],ignore_index = True).drop_duplicates(keep=False)
             k_fold_validation[k_fold-1] = df_fold_validation
             k_fold_train[k_fold-1] = df_fold_train
             if not df_unused.empty:
-                print(
-                    "WARNING: Didn't put all avialiable compound into train or valid k-folds! Left over:")
+                print("WARNING: Didn't put all available compound into train or valid k-folds! Left over:")
                 print(df_unused)
-
-        print("Made train and valid sets for k-folds")
+ 
+        print("Made train and valid sets for k-folds")   
 
         return k_fold_train, k_fold_validation
-
     def get_group_selection(self, df_group, number_of_unique_entries):
         unique_entries = df_group[self.intact_group_header].unique()
         group_choice = np.random.choice(
