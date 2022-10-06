@@ -1,9 +1,9 @@
 
-from make_k_folds_tvt import MakeKFoldsTVT
+from make_k_folds_tvt import MakeTVTSets
 # Make K-folds, including their train and validation parts, with csv files as outpus
 
 
-class MakeKFoldsTVTBBBC021(MakeKFoldsTVT):
+class MakeKFoldsTVTBBBC021(MakeTVTSets):
                    
     def __init__(self,
                 labels_path = "/home/jovyan/Data/BBBC021/BBBC021_Labels.csv",

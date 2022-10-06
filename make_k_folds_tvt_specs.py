@@ -1,8 +1,8 @@
 
-from make_k_folds_tvt import MakeKFoldsTVT
+from make_k_folds_tvt import MakeTVTSets
 # Make K-folds, including their train and validation parts, with csv files as outpus
 
-class MakeKFoldsTVTSPECS(MakeKFoldsTVT):
+class MakeKFoldsTVTSPECS(MakeTVTSets):
 
     def __init__(self,
                  #labels_path="/home/jovyan/Data/Specs/Specs_Labels_First_MiPhHo.csv", #"smaller images"
