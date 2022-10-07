@@ -25,6 +25,7 @@ class MakeKFoldsTVTBBBC021(MakeTVTSets):
                 valid_fraction = 0.25, # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
                 leave_one_out = True,
                 make_unique_validation = False,
+                non_unique_divider = ['concentration', 'moa', 'compound', 'Replicate']
                 ):
         super().__init__(labels_path = labels_path,
                 output_dir =output_dir,
@@ -39,7 +40,8 @@ class MakeKFoldsTVTBBBC021(MakeTVTSets):
                 image_number_heading = image_number_heading,   
                 k_folds = k_folds,
                 divide_on_header = divide_on_header,
-                valid_fraction = valid_fraction)
+                valid_fraction = valid_fraction,
+                non_unique_divider = non_unique_divider)
         self.leave_one_out = leave_one_out
         self.make_unique_validation = make_unique_validation
 
