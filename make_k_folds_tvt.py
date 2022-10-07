@@ -16,7 +16,7 @@ class MakeTVTSets:
 
     def __init__(self,
                  labels_path="/home/jovyan/Data/BBBC021/BBBC021_Labels.csv",
-                 output_dir='/home/jovyan/Inputs/BBBC021_All_Leave_One_Out/',
+                 output_dir='/home/jovyan/Inputs/test/',
                  include_groups=[],  # Empty for everything included,
                  include_header="moa",
                  class_column_header="moa",
