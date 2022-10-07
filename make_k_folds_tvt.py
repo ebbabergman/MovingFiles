@@ -31,6 +31,7 @@ class MakeTVTSets:
                  divide_on_header='compound',
                  # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
                  valid_fraction=0.25,
+                 non_unique_divider = ['concentration', 'moa', 'compound', 'Replicate']
                  ):
         self.labels_path = labels_path
         self.output_dir = output_dir
@@ -46,6 +47,8 @@ class MakeTVTSets:
         self.k_folds = int(k_folds)
         self.divide_on_header = divide_on_header
         self.valid_fraction = valid_fraction
+        self.non_unique_divider = non_unique_divider
+
 
     def make_k_folds(self):
         print("Started make k-folds.")
@@ -85,6 +88,7 @@ class MakeTVTSets:
         print("Included and exlcuded groups")
 
         k_folds_test = self.get_k_folds_test(df)
+     
         df_test_statistics = self.get_statistics(k_folds_test, df)
         df_test_statistics.to_csv(
             self.output_dir + "k_fold_test_statistics.csv", index=False)
@@ -148,7 +152,7 @@ class MakeTVTSets:
 
         self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
 
-        self.save_k_folds()
+        self.save_k_folds(k_folds_test, k_folds_validation,k_folds_train)
         print("Finished. Find output in: " + self.output_dir)
 
     def get_base(self):
@@ -479,8 +483,10 @@ class MakeTVTSets:
         for k_fold in range(0, number_of_folds):
             k_folds[k_fold]["k-fold"] = k_fold +1
 
+        non_unique_divider_test=  self.non_unique_divider.copy()
+        non_unique_divider_test.append("k-fold")
         df_statistics = pd.concat(k_folds, ignore_index=True)
-
+        df_statistics = df_statistics.groupby(by = non_unique_divider_test).size().reset_index().rename(columns={0:'records'})
         return df_statistics
 
     def make_path_available(self):
