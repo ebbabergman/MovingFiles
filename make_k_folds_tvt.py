@@ -73,7 +73,7 @@ class MakeTVTSets:
 
         self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
 
-        self.save_k_folds()
+        self.save_k_folds(k_folds_test, k_folds_validation,k_folds_train)
         print("Finished. Find output in: " + self.output_dir)
     
     def make_k_folds_train_test(self):
@@ -100,7 +100,7 @@ class MakeTVTSets:
 
         self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
 
-        self.save_k_folds()
+        self.save_k_folds(k_folds_test, k_folds_validation,k_folds_train)
         print("Finished. Find output in: " + self.output_dir)
 
     def make_leave_one_out(self):
@@ -126,7 +126,7 @@ class MakeTVTSets:
 
         self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
 
-        self.save_k_folds()
+        self.save_k_folds(k_folds_test, k_folds_validation,k_folds_train)
         print("Finished. Find output in: " + self.output_dir)
 
     def make_leave_one_out_train_test(self):
