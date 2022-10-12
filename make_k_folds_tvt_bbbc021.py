@@ -8,7 +8,7 @@ class MakeKFoldsTVTBBBC021(MakeTVTSets):
                    
     def __init__(self,
                 labels_path = "/home/jovyan/Data/BBBC021/BBBC021_Labels.csv",
-                output_dir='/home/jovyan/Inputs/BBBC021_leave_one_out_No_Validation/',
+                output_dir='/home/jovyan/Inputs/BBBC021_leave_one_out/',
                 include_groups = [], #Empty for everything included,
                 include_header = "moa",
                 class_column_header = "moa",
@@ -24,7 +24,7 @@ class MakeKFoldsTVTBBBC021(MakeTVTSets):
                 make_train_valid = True,
                 valid_fraction = 0.25, # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
                 leave_one_out = True,
-                make_unique_validation = False,
+                make_unique_validation = True,
                 non_unique_divider = ['concentration', 'moa', 'compound', 'Replicate']
                 ):
         super().__init__(labels_path = labels_path,
