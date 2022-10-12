@@ -63,6 +63,7 @@ class MakeKFoldsTVT_Tox21:
 
         for predicted_group in self.include_groups:
             print("Making labels for " + str(predicted_group))
+            group_name = predicted_group.replace(" ", "_")
             group_mask = df_original[self.include_header] == predicted_group
             df_group = df_original[group_mask]
             size_of_true_group = len(df_group[self.intact_group_header].unique()) # number of rows
@@ -74,24 +75,25 @@ class MakeKFoldsTVT_Tox21:
 
             conditions  = [group_mask, negative_mask]
             choices     = [ True, False]
-            df_new_group[predicted_group] = np.select(conditions, choices, default=np.nan)
+            df_new_group[group_name] = np.select(conditions, choices, default=np.nan)
 
-            df_new_group = df_new_group[df_new_group[predicted_group].notnull()]
+            df_new_group = df_new_group[df_new_group[group_name].notnull()]
 
-            group_labels_path =  self.output_dir + predicted_group  + "_Labels.csv"
+            group_labels_path =  self.output_dir + group_name  + "_Labels.csv"
             df_new_group.to_csv(group_labels_path,  index=False)
 
             print("Finished making labels for " + str(predicted_group))
 
         for predicted_group in self.include_groups:
             print("Making K-folds for " + str(predicted_group))
-            group_output_path = self.output_dir +"/"+ predicted_group +"/"
-            group_labels_path =  self.output_dir + predicted_group  + "_Labels.csv"
+            group_name = predicted_group.replace(" ", "_")
+            group_output_path = self.output_dir +"/"+ group_name +"/"
+            group_labels_path =  self.output_dir + group_name  + "_Labels.csv"
 
             makeKFoldsTVTSPECS = MakeKFoldsTVTSPECS(labels_path = group_labels_path,
                                                     output_dir = group_output_path,
                                                     include_groups = [],
-                                                    include_header = predicted_group,
+                                                    include_header = group_name,
                                                     class_column_header = self.class_column_header,
                                                     excluded_groups = [],
                                                     excluded_groups_headers = [],
