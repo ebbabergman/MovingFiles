@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import random
 from make_k_folds_tvt import MakeTVTSets
 from make_k_folds_tvt_specs import MakeKFoldsTVTSPECS
@@ -70,38 +71,41 @@ class MakeKFoldsTVT_Tox21:
             negative_mask = df_original[self.intact_group_header].isin(negative_intact_group)
 
             df_new_group = df_original[self.meta_data_headers].copy()
-            df_new_group.loc[group_mask,df_new_group[predicted_group]] = True
-            df_new_group.loc[negative_mask,df_new_group[predicted_group]] = False
+
+            conditions  = [group_mask, negative_mask]
+            choices     = [ True, False]
+            df_new_group[predicted_group] = np.select(conditions, choices, default=np.nan)
+
             df_new_group = df_new_group[df_new_group[predicted_group].notnull()]
 
-            group_output_path = self.output_dir + predicted_group + "/"
-            General_Moving.make_non_existing_path(group_output_path)
-            df_new_group.to_csv(group_output_path + "Labels.csv")
+            group_labels_path =  self.output_dir + predicted_group  + "_Labels.csv"
+            df_new_group.to_csv(group_labels_path,  index=False)
 
             print("Finished making labels for " + str(predicted_group))
 
         for predicted_group in self.include_groups:
             print("Making K-folds for " + str(predicted_group))
-            group_output_path = self.output_dir + predicted_group + "/"
-            group_labels_path = group_output_path + "Labels.csv"
+            group_output_path = self.output_dir +"/"+ predicted_group +"/"
+            group_labels_path =  self.output_dir + predicted_group  + "_Labels.csv"
 
-            MakeKFoldsTVTSPECS(labels_path = group_labels_path,
-        output_dir = group_output_path,
-        include_groups = [],
-        include_header = predicted_group,
-        class_column_header = self.class_column_header,
-        excluded_groups = [],
-        excluded_groups_headers = [],
-        exclude_images_path = "",
-        intact_group_header = self.intact_group_header,
-        unique_sample_headers = self.unique_sample_headers,
-        image_number_heading = self.image_number_heading,   
-        k_folds = self.k_folds,
-        divide_on_header = self.divide_on_header,
-        valid_fraction = self.valid_fraction,
-        leave_one_out = self.leave_one_out,
-        make_unique_validation = self.make_unique_validation)
+            makeKFoldsTVTSPECS = MakeKFoldsTVTSPECS(labels_path = group_labels_path,
+                                                    output_dir = group_output_path,
+                                                    include_groups = [],
+                                                    include_header = predicted_group,
+                                                    class_column_header = self.class_column_header,
+                                                    excluded_groups = [],
+                                                    excluded_groups_headers = [],
+                                                    exclude_images_path = "",
+                                                    intact_group_header = self.intact_group_header,
+                                                    unique_sample_headers = self.unique_sample_headers,
+                                                    image_number_heading = self.image_number_heading,   
+                                                    k_folds = self.k_folds,
+                                                    divide_on_header = self.divide_on_header,
+                                                    valid_fraction = self.valid_fraction,
+                                                    leave_one_out = self.leave_one_out,
+                                                    make_unique_validation = self.make_unique_validation)
 
+            makeKFoldsTVTSPECS.main()
         print("Finished making tox21 dataset. Find output in: " + self.output_dir)
 
 if __name__ == "__main__":
