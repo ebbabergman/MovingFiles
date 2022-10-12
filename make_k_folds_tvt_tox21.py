@@ -55,7 +55,7 @@ class MakeKFoldsTVT_Tox21:
         print("Started making divisions for runs for tox21. Each included group will get their own k-fold.")
     
         
-        df_original = pd.read_csv(self.labels_path)
+        df_original = pd.read_csv(self.labels_path, sep = ";")
         all_included_mask = df_original[self.include_header].isin(self.include_groups)
         df_available_neg = df_original[~all_included_mask]
         available_neg_intact_group = list(df_available_neg[self.intact_group_header].unique())
