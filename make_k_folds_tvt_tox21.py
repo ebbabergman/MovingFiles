@@ -30,7 +30,7 @@ class MakeKFoldsTVT_Tox21:
                 proportion_persumed_negative = 4, # How many times more persumed negatives should we have?
                 leave_one_out = False,
                 make_unique_validation = True,
-                meta_data_headers = ['ImageID', 'PlateID', 'Well', 'Site', 'Plate', 'Plate_Well', 'batch_id', 'pertType', 'cmpd_conc', 'Flag', 'Count_nuclei', 'Batch nr', 'Compound_ID', 'selected_mechanism']
+                meta_data_headers = ['ImageID', 'PlateID', 'Well', 'Site', 'Plate', 'Plate_Well', 'batch_id', 'pertType', 'cmpd_conc', 'Flag', 'Count_nuclei', 'Batch nr', 'Compound ID', 'selected_mechanism']
                  ):
         self.labels_path = labels_path
         self.output_dir =output_dir
@@ -53,7 +53,7 @@ class MakeKFoldsTVT_Tox21:
 
     def main(self):
         print("Started making divisions for runs for tox21. Each included group will get their own k-fold.")
-    
+        General_Moving.make_non_existing_path(self.output_dir)
         
         df_original = pd.read_csv(self.labels_path, sep = ";")
         all_included_mask = df_original[self.include_header].isin(self.include_groups)
