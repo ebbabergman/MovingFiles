@@ -55,14 +55,8 @@ class MakeKFoldsTVT_Tox21:
     def main(self):
         print("Started making divisions for runs for tox21. Each included group will get their own k-fold.")
         General_Moving.make_non_existing_path(self.output_dir)
-        
-        df_original = pd.read_csv(self.labels_path, sep = ";")
-        all_included_mask = df_original[self.include_header].isin(self.include_groups)
-        df_available_neg = df_original[~all_included_mask]
-        available_neg_intact_group = list(df_available_neg[self.intact_group_header].unique())
-
-        # for predicted_group in self.include_groups:
-        #    self.make_labels(predicted_group, df_original,available_neg_intact_group)
+       
+        #self.make_labels()
 
         for predicted_group in self.include_groups:
             print("Making K-folds for " + str(predicted_group))
@@ -90,7 +84,16 @@ class MakeKFoldsTVT_Tox21:
             makeKFoldsTVTSPECS.main()
         print("Finished making tox21 dataset. Find output in: " + self.output_dir)
 
-def make_labels(self, predicted_group, df_original,available_neg_intact_group):
+def make_lables(self):
+    df_original = pd.read_csv(self.labels_path, sep = ";")
+    all_included_mask = df_original[self.include_header].isin(self.include_groups)
+    df_available_neg = df_original[~all_included_mask]
+    available_neg_intact_group = list(df_available_neg[self.intact_group_header].unique())
+
+    for predicted_group in self.include_groups:
+        self.make_labels(predicted_group, df_original,available_neg_intact_group)
+
+def make_group_labels(self, predicted_group, df_original,available_neg_intact_group):
     print("Making labels for " + str(predicted_group))
     group_name = predicted_group.replace(" ", "_")
     group_mask = df_original[self.include_header] == predicted_group
