@@ -20,11 +20,11 @@ class MakeKFoldsTVT_Tox21:
                 excluded_groups_headers=[],
                 #exclude_images_path="/home/jovyan/Data/Specs/Flaggs/16Bit_images_nuclei_cut_above149.csv",
                 exclude_images_path="",
-                intact_group_header='Compound_id',
+                intact_group_header='Compound ID',
                 unique_sample_headers=['Plate', 'Well', 'Site'],
                 image_number_heading="ImageID",
                 k_folds="5",
-                divide_on_header='Compound_id',
+                divide_on_header='Compound ID',
                 # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
                 valid_fraction=0.25,
                 proportion_persumed_negative = 4, # How many times more persumed negatives should we have?
