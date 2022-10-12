@@ -61,28 +61,8 @@ class MakeKFoldsTVT_Tox21:
         df_available_neg = df_original[~all_included_mask]
         available_neg_intact_group = list(df_available_neg[self.intact_group_header].unique())
 
-        for predicted_group in self.include_groups:
-            print("Making labels for " + str(predicted_group))
-            group_name = predicted_group.replace(" ", "_")
-            group_mask = df_original[self.include_header] == predicted_group
-            df_group = df_original[group_mask]
-            size_of_true_group = len(df_group[self.intact_group_header].unique()) # number of rows
-            
-            negative_intact_group = random.sample( available_neg_intact_group, size_of_true_group * self.proportion_persumed_negative)
-            negative_mask = df_original[self.intact_group_header].isin(negative_intact_group)
-
-            df_new_group = df_original[self.meta_data_headers].copy()
-
-            conditions  = [group_mask, negative_mask]
-            choices     = [ True, False]
-            df_new_group[group_name] = np.select(conditions, choices, default=np.nan)
-
-            df_new_group = df_new_group[df_new_group[group_name].notnull()]
-
-            group_labels_path =  self.output_dir + group_name  + "_Labels.csv"
-            df_new_group.to_csv(group_labels_path,  index=False)
-
-            print("Finished making labels for " + str(predicted_group))
+        # for predicted_group in self.include_groups:
+        #    self.make_labels(predicted_group, df_original,available_neg_intact_group)
 
         for predicted_group in self.include_groups:
             print("Making K-folds for " + str(predicted_group))
@@ -109,6 +89,29 @@ class MakeKFoldsTVT_Tox21:
 
             makeKFoldsTVTSPECS.main()
         print("Finished making tox21 dataset. Find output in: " + self.output_dir)
+
+def make_labels(self, predicted_group, df_original,available_neg_intact_group):
+    print("Making labels for " + str(predicted_group))
+    group_name = predicted_group.replace(" ", "_")
+    group_mask = df_original[self.include_header] == predicted_group
+    df_group = df_original[group_mask]
+    size_of_true_group = len(df_group[self.intact_group_header].unique()) # number of rows
+    
+    negative_intact_group = random.sample( available_neg_intact_group, size_of_true_group * self.proportion_persumed_negative)
+    negative_mask = df_original[self.intact_group_header].isin(negative_intact_group)
+
+    df_new_group = df_original[self.meta_data_headers].copy()
+
+    conditions  = [group_mask, negative_mask]
+    choices     = [ True, False]
+    df_new_group[group_name] = np.select(conditions, choices, default=np.nan)
+
+    df_new_group = df_new_group[df_new_group[group_name].notnull()]
+
+    group_labels_path =  self.output_dir + group_name  + "_Labels.csv"
+    df_new_group.to_csv(group_labels_path,  index=False)
+
+    print("Finished making labels for " + str(predicted_group))
 
 if __name__ == "__main__":
     MakeKFoldsTVT_Tox21().main()
