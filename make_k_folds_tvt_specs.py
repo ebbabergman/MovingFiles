@@ -7,7 +7,7 @@ class MakeKFoldsTVTSPECS(MakeTVTSets):
     def __init__(self,
                 #labels_path="/home/jovyan/Data/Specs/Specs_Labels_First_MiPhHo.csv", #"smaller images"
                 labels_path="/home/jovyan/Data/Specs/Labels.csv",#bigger images
-                output_dir='/home/jovyan/Inputs/SPECS_16Bit_Top10_MoA_no_negcon_5_folds/',
+                output_dir='/home/jovyan/Inputs/test/',
                 #
                 #include_groups = [], #Empty for everything included,
                 #Jordis top 10
@@ -53,7 +53,7 @@ class MakeKFoldsTVTSPECS(MakeTVTSets):
         self.make_unique_validation = make_unique_validation
 
     def main(self):
-        print("Started making divisions for runs for BBBC021.")
+        print("Started making divisions for runs for SPECS.")
         if self.leave_one_out :
             if self.make_unique_validation:
                 self.make_leave_one_out()
