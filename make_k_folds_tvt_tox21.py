@@ -64,7 +64,7 @@ class MakeKFoldsTVT_Tox21:
             print("Making labels for " + str(predicted_group))
             group_mask = df_original[self.include_header] == predicted_group
             df_group = df_original[group_mask]
-            size_of_true_group = df_group.shape[0] # number of rows
+            size_of_true_group = len(df_group[self.intact_group_header].unique()) # number of rows
             
             negative_intact_group = random.sample( available_neg_intact_group, size_of_true_group * self.proportion_persumed_negative)
             negative_mask = df_original[self.intact_group_header].isin(negative_intact_group)
