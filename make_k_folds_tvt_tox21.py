@@ -59,7 +59,7 @@ class MakeKFoldsTVT_Tox21:
         print("Started making divisions for runs for tox21. Each included group will get their own k-fold.")
         General_Moving.make_non_existing_path(self.output_dir)
 
-        self.make_lables()
+        #self.make_lables()
 
         for predicted_group in self.include_groups:
             print("Making K-folds for " + str(predicted_group))
@@ -96,7 +96,7 @@ class MakeKFoldsTVT_Tox21:
             df_available_neg[self.intact_group_header].unique())
 
         for predicted_group in self.include_groups:
-            self.make_labels(predicted_group, df_original,
+            self.make_group_labels(predicted_group, df_original,
                              available_neg_intact_group)
 
     def make_group_labels(self, predicted_group, df_original, available_neg_intact_group):
@@ -120,7 +120,7 @@ class MakeKFoldsTVT_Tox21:
             conditions, choices, default=np.nan)
 
         df_new_group = df_new_group[df_new_group[group_name].notnull()]
-        df_new_group.drop_duplicates(keep=False, inplace=True)
+        df_new_group.drop_duplicates(subset = self.unique_sample_headers, keep=False, inplace=True)
 
         group_labels_path = self.output_dir + group_name + "_Labels.csv"
         df_new_group.to_csv(group_labels_path,  index=False)

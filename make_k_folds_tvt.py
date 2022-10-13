@@ -164,7 +164,7 @@ class MakeTVTSets:
         df_base.drop(drop_filter, inplace=True, axis=1)
 
         df_base.dropna(subset=[self.class_column_header], inplace=True)
-        df_base.drop_duplicates(inplace=True)
+        df_base.drop_duplicates(subset = self.unique_sample_headers, inplace=True, ignore_index=True)
         return df_base
 
     def include_exclude_rows(self, df):
@@ -199,7 +199,7 @@ class MakeTVTSets:
             return df
         df_bad_images = pd.read_csv(self.exclude_images_path, delimiter=",")
         df_bad_images = df_bad_images.drop_duplicates(
-            subset=self.unique_sample_headers)
+            subset=self.unique_sample_headers, ignore_index=True)
 
         if 'Total' in df_bad_images.columns:
             bad_image_mask = df_bad_images["Total"] == 1
@@ -281,7 +281,7 @@ class MakeTVTSets:
                 df_fold = pd.concat(
                     [df_fold, df_group_coice], ignore_index=True)
             df_unused = pd.concat(
-                [df_unused, df_fold, df_fold]).drop_duplicates(keep=False)
+                [df_unused, df_fold, df_fold]).drop_duplicates(subset = self.unique_sample_headers, keep=False, ignore_index=True)
             k_folds[k_fold-1] = df_fold
 
         # deal with the unused unique groups
@@ -308,9 +308,9 @@ class MakeTVTSets:
                 k_folds[chosen_k_fold-1] = pd.concat(
                     [k_folds[chosen_k_fold-1], df_group_coice], ignore_index=True)
                 df_unused = pd.concat(
-                    [df_unused, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
+                    [df_unused, df_group_coice, df_group_coice]).drop_duplicates(subset = self.intact_group_header, keep=False, ignore_index=True)
                 df_group = pd.concat(
-                    [df_group, df_group_coice, df_group_coice]).drop_duplicates(keep=False)
+                    [df_group, df_group_coice, df_group_coice]).drop_duplicates(subset = self.intact_group_header, keep=False, ignore_index=True)
             group_index = group_index + 1
 
         if not df_unused.empty:
@@ -360,9 +360,9 @@ class MakeTVTSets:
         for k_fold in range(1, number_of_folds + 1):
             print("Starting k-fold: " + str(k_fold))
             df_unused = df.copy()
-            df_k_fold_test = k_fold_test[k_fold-1]
+            df_fold_test = k_fold_test[k_fold-1]
             df_unused = pd.concat(
-                [df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
+                [df_unused, df_fold_test, df_fold_test]).drop_duplicates(subset = self.unique_sample_headers, keep=False , ignore_index=True)
 
             df_fold_validation = pd.DataFrame()
             df_fold_train = pd.DataFrame()
@@ -385,9 +385,9 @@ class MakeTVTSets:
                         df_new_group_validation_copy = df[df[self.include_header].isin([
                                                                                        group])].copy()
                         df_available_validation = pd.concat(
-                            [df_available_validation, df_new_group_validation_copy], ignore_index=True).drop_duplicates(keep=False)
+                            [df_available_validation, df_new_group_validation_copy], ignore_index=True).drop_duplicates(subset = self.unique_sample_headers, keep=False, ignore_index=True)
                         df_available_group_validation = pd.concat(
-                            [df_new_group_validation_copy, df_group_coice_validation, df_group_coice_validation], ignore_index=True).drop_duplicates(keep=False)
+                            [df_new_group_validation_copy, df_group_coice_validation, df_group_coice_validation], ignore_index=True).drop_duplicates(subset = self.intact_group_header, keep=False, ignore_index=True)
 
                         number_of_added = group_n[group] - len(unique_entries)
                         add_to_validation = self.get_group_selection(
@@ -404,11 +404,11 @@ class MakeTVTSets:
                     [df_fold_validation, df_group_coice_validation], ignore_index=True)
 
             df_available_validation = pd.concat(
-                [df_available_validation, df_fold_validation, df_fold_validation], ignore_index=True).drop_duplicates(keep=False)
+                [df_available_validation, df_fold_validation, df_fold_validation], ignore_index=True).drop_duplicates(keep=False, ignore_index=True)
             df_fold_train = pd.concat(
-                [df_unused, df_fold_validation, df_fold_validation], ignore_index=True).drop_duplicates(keep=False)
+                [df_unused, df_fold_validation, df_fold_validation], ignore_index=True).drop_duplicates(keep=False, ignore_index=True)
             df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train],
-                                  ignore_index=True).drop_duplicates(keep=False)
+                                  ignore_index=True).drop_duplicates(keep=False, ignore_index=True)
             k_fold_validation[k_fold-1] = df_fold_validation
             k_fold_train[k_fold-1] = df_fold_train
             if not df_unused.empty:
@@ -444,7 +444,7 @@ class MakeTVTSets:
             df_unused = df.copy()
             df_k_fold_test = k_fold_test[k_fold-1]
             df_unused = pd.concat(
-                [df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False)
+                [df_unused, df_k_fold_test, df_k_fold_test]).drop_duplicates(keep=False, ignore_index=True)
 
             k_fold_validation[k_fold-1] = df_unused
             k_fold_train[k_fold-1] = df_unused
