@@ -56,7 +56,7 @@ class MakeKFoldsTVT_Tox21:
         print("Started making divisions for runs for tox21. Each included group will get their own k-fold.")
         General_Moving.make_non_existing_path(self.output_dir)
        
-        #self.make_labels()
+        self.make_lables()
 
         for predicted_group in self.include_groups:
             print("Making K-folds for " + str(predicted_group))
@@ -68,7 +68,7 @@ class MakeKFoldsTVT_Tox21:
                                                     output_dir = group_output_path,
                                                     include_groups = [],
                                                     include_header = group_name,
-                                                    class_column_header = self.class_column_header,
+                                                    class_column_header = group_name,
                                                     excluded_groups = [],
                                                     excluded_groups_headers = [],
                                                     exclude_images_path = "",
@@ -84,37 +84,38 @@ class MakeKFoldsTVT_Tox21:
             makeKFoldsTVTSPECS.main()
         print("Finished making tox21 dataset. Find output in: " + self.output_dir)
 
-def make_lables(self):
-    df_original = pd.read_csv(self.labels_path, sep = ";")
-    all_included_mask = df_original[self.include_header].isin(self.include_groups)
-    df_available_neg = df_original[~all_included_mask]
-    available_neg_intact_group = list(df_available_neg[self.intact_group_header].unique())
+    def make_lables(self):
+        df_original = pd.read_csv(self.labels_path, sep = ";")
+        all_included_mask = df_original[self.include_header].isin(self.include_groups)
+        df_available_neg = df_original[~all_included_mask]
+        available_neg_intact_group = list(df_available_neg[self.intact_group_header].unique())
 
-    for predicted_group in self.include_groups:
-        self.make_labels(predicted_group, df_original,available_neg_intact_group)
+        for predicted_group in self.include_groups:
+            self.make_labels(predicted_group, df_original,available_neg_intact_group)
 
-def make_group_labels(self, predicted_group, df_original,available_neg_intact_group):
-    print("Making labels for " + str(predicted_group))
-    group_name = predicted_group.replace(" ", "_")
-    group_mask = df_original[self.include_header] == predicted_group
-    df_group = df_original[group_mask]
-    size_of_true_group = len(df_group[self.intact_group_header].unique()) # number of rows
-    
-    negative_intact_group = random.sample( available_neg_intact_group, size_of_true_group * self.proportion_persumed_negative)
-    negative_mask = df_original[self.intact_group_header].isin(negative_intact_group)
+    def make_group_labels(self, predicted_group, df_original,available_neg_intact_group):
+        print("Making labels for " + str(predicted_group))
+        group_name = predicted_group.replace(" ", "_")
+        group_mask = df_original[self.include_header] == predicted_group
+        df_group = df_original[group_mask]
+        size_of_true_group = len(df_group[self.intact_group_header].unique()) # number of rows
+        
+        negative_intact_group = random.sample( available_neg_intact_group, size_of_true_group * self.proportion_persumed_negative)
+        negative_mask = df_original[self.intact_group_header].isin(negative_intact_group)
 
-    df_new_group = df_original[self.meta_data_headers].copy()
+        df_new_group = df_original[self.meta_data_headers].copy()
 
-    conditions  = [group_mask, negative_mask]
-    choices     = [ True, False]
-    df_new_group[group_name] = np.select(conditions, choices, default=np.nan)
+        conditions  = [group_mask, negative_mask]
+        choices     = [ True, False]
+        df_new_group[group_name] = np.select(conditions, choices, default=np.nan)
 
-    df_new_group = df_new_group[df_new_group[group_name].notnull()]
+        df_new_group = df_new_group[df_new_group[group_name].notnull()]
+        df_new_group.drop_duplicates(keep=False, inplace = True)
 
-    group_labels_path =  self.output_dir + group_name  + "_Labels.csv"
-    df_new_group.to_csv(group_labels_path,  index=False)
+        group_labels_path =  self.output_dir + group_name  + "_Labels.csv"
+        df_new_group.to_csv(group_labels_path,  index=False)
 
-    print("Finished making labels for " + str(predicted_group))
+        print("Finished making labels for " + str(predicted_group))
 
 if __name__ == "__main__":
     MakeKFoldsTVT_Tox21().main()
