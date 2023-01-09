@@ -11,7 +11,6 @@ import math
 
 # Make K-folds, including their train and validation parts, with csv files as outpus
 
-
 class MakeTVTSets:
 
     def __init__(self,
