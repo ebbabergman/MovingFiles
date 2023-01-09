@@ -114,7 +114,12 @@ class MakeTVTSets:
         df = self.include_exclude_rows(df_base)
         print("Included and exlcuded groups")
 
+        self.check_leave_one_out_validity(self, df_base)
+
         k_folds_test = self.get_leave_one_out_test(df)
+
+        self.check_leave_one_out_validity(self, df)
+
         df_test_statistics = self.get_statistics_leave_one_out_test(k_folds_test, df)
         df_test_statistics.to_csv(
             self.output_dir + "k_fold_test_statistics.csv", index=False)
@@ -124,10 +129,16 @@ class MakeTVTSets:
         k_folds_train, k_folds_validation = self.get_k_folds_tv(
             df, k_folds_test)
 
+        self.check_no_overlap_between_tvt(self, k_folds_test, k_folds_validation,k_folds_train)
+
         self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
 
         self.save_k_folds(k_folds_test, k_folds_validation,k_folds_train)
         print("Finished. Find output in: " + self.output_dir)
+
+    def check_leave_one_out_validity(self, df):
+        #check that there are enough of each group to do a tvt leave one out 
+
 
     def make_leave_one_out_train_test(self):
         print("Started make leave one out train only, no validation.")
