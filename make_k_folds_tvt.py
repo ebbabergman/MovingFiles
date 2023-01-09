@@ -31,7 +31,8 @@ class MakeTVTSets:
                  divide_on_header='compound',
                  # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
                  valid_fraction=0.25,
-                 non_unique_divider = ['concentration', 'moa', 'compound', 'Replicate']
+                 non_unique_divider = ['concentration', 'moa', 'compound', 'Replicate'],
+                 make_unique_validation = True,
                  ):
         self.labels_path = labels_path
         self.output_dir = output_dir
@@ -48,6 +49,7 @@ class MakeTVTSets:
         self.divide_on_header = divide_on_header
         self.valid_fraction = valid_fraction
         self.non_unique_divider = non_unique_divider
+        self.make_unique_validation = make_unique_validation
 
 
     def make_k_folds(self):
@@ -139,6 +141,20 @@ class MakeTVTSets:
     def check_leave_one_out_validity(self, df):
         #check that there are enough of each group to do a tvt leave one out 
 
+        unique_combinations_needed = 3 # train, validation, test
+        if not self.make_unique_validation: 
+            unique_combinations_needed = 2 # train, test
+
+
+
+    def check_no_overlap_between_tvt(self, k_folds_test, k_folds_validation,k_folds_train): 
+        # Check that there's no overlap between the test, validation and train set for each fold
+        # Add exception for validation set if only doing train and test
+        
+        #check test against train 
+
+        if self.make_unique_validation: 
+            # CHeck validation set against train and test
 
     def make_leave_one_out_train_test(self):
         print("Started make leave one out train only, no validation.")
