@@ -139,15 +139,20 @@ class MakeTVTSets:
         print("Finished. Find output in: " + self.output_dir)
 
     def check_leave_one_out_validity(self, df):
-        #check that there are enough of each group to do a tvt leave one out 
-
+        df_sorted = df.sort_values(self.class_column_header, ascending=True)
+        unique_combinations_per_group = df_sorted.groupby(self.class_column_header)[self.divide_on_header].nunique()
+        
         unique_combinations_needed = 3 # train, validation, test
         if not self.make_unique_validation: 
             unique_combinations_needed = 2 # train, test
 
+        too_few_combinations_per_group = unique_combinations_per_group < unique_combinations_needed
 
+        if too_few_combinations_per_group.any():
+            raise Exception("At least one grouping does not have enough unique combinations to proceed. Unique combinations per group:  str(df_bbbc021.groupby(class_heading)[compound_header].nunique())")
 
     def check_no_overlap_between_tvt(self, k_folds_test, k_folds_validation,k_folds_train): 
+        # TODO Ebba start here
         # Check that there's no overlap between the test, validation and train set for each fold
         # Add exception for validation set if only doing train and test
         
@@ -510,7 +515,7 @@ class MakeTVTSets:
         for k_fold in range(0, number_of_folds):
             k_folds[k_fold]["k-fold"] = k_fold +1
 
-        non_unique_divider_test=  self.non_unique_divider.copy()
+        non_unique_divider_test = self.non_unique_divider.copy()
         non_unique_divider_test.append("k-fold")
         df_statistics = pd.concat(k_folds, ignore_index=True)
         df_statistics = df_statistics.groupby(by = non_unique_divider_test).size().reset_index().rename(columns={0:'records'})
