@@ -31,8 +31,9 @@ class MakeTVTSets:
                  divide_on_header='compound',
                  # 1 = 100%,  Percentage of images remaining afte the test set has been excluded
                  valid_fraction=0.25,
-                 non_unique_divider = ['concentration', 'moa', 'compound', 'Replicate'],
-                 make_unique_validation = True,
+                 non_unique_divider=['concentration',
+                                     'moa', 'compound', 'Replicate'],
+                 make_unique_validation=True,
                  ):
         self.labels_path = labels_path
         self.output_dir = output_dir
@@ -50,7 +51,6 @@ class MakeTVTSets:
         self.valid_fraction = valid_fraction
         self.non_unique_divider = non_unique_divider
         self.make_unique_validation = make_unique_validation
-
 
     def make_k_folds(self):
         print("Started make k-folds.")
@@ -75,9 +75,9 @@ class MakeTVTSets:
 
         self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
 
-        self.save_k_folds(k_folds_test, k_folds_validation,k_folds_train)
+        self.save_k_folds(k_folds_test, k_folds_validation, k_folds_train)
         print("Finished. Find output in: " + self.output_dir)
-    
+
     def make_k_folds_train_test(self):
         print("Started make k-folds with only train and test sets, no validation.")
 
@@ -90,7 +90,7 @@ class MakeTVTSets:
         print("Included and exlcuded groups")
 
         k_folds_test = self.get_k_folds_test(df)
-     
+
         df_test_statistics = self.get_statistics(k_folds_test, df)
         df_test_statistics.to_csv(
             self.output_dir + "k_fold_test_statistics.csv", index=False)
@@ -102,7 +102,7 @@ class MakeTVTSets:
 
         self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
 
-        self.save_k_folds(k_folds_test, k_folds_validation,k_folds_train)
+        self.save_k_folds(k_folds_test, k_folds_validation, k_folds_train)
         print("Finished. Find output in: " + self.output_dir)
 
     def make_leave_one_out(self):
@@ -122,7 +122,8 @@ class MakeTVTSets:
 
         self.check_leave_one_out_validity(self, df)
 
-        df_test_statistics = self.get_statistics_leave_one_out_test(k_folds_test, df)
+        df_test_statistics = self.get_statistics_leave_one_out_test(
+            k_folds_test, df)
         df_test_statistics.to_csv(
             self.output_dir + "k_fold_test_statistics.csv", index=False)
         print("Test Statistics")
@@ -131,34 +132,37 @@ class MakeTVTSets:
         k_folds_train, k_folds_validation = self.get_k_folds_tv(
             df, k_folds_test)
 
-        self.check_no_overlap_between_tvt(self, k_folds_test, k_folds_validation,k_folds_train)
+        self.check_no_overlap_between_tvt(
+            self, k_folds_test, k_folds_validation, k_folds_train)
 
         self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
 
-        self.save_k_folds(k_folds_test, k_folds_validation,k_folds_train)
+        self.save_k_folds(k_folds_test, k_folds_validation, k_folds_train)
         print("Finished. Find output in: " + self.output_dir)
 
     def check_leave_one_out_validity(self, df):
         df_sorted = df.sort_values(self.class_column_header, ascending=True)
-        unique_combinations_per_group = df_sorted.groupby(self.class_column_header)[self.divide_on_header].nunique()
-        
-        unique_combinations_needed = 3 # train, validation, test
-        if not self.make_unique_validation: 
-            unique_combinations_needed = 2 # train, test
+        unique_combinations_per_group = df_sorted.groupby(self.class_column_header)[
+            self.divide_on_header].nunique()
+
+        unique_combinations_needed = 3  # train, validation, test
+        if not self.make_unique_validation:
+            unique_combinations_needed = 2  # train, test
 
         too_few_combinations_per_group = unique_combinations_per_group < unique_combinations_needed
 
         if too_few_combinations_per_group.any():
-            raise Exception("At least one grouping does not have enough unique combinations to proceed. Unique combinations per group:  str(df_bbbc021.groupby(class_heading)[compound_header].nunique())")
+            raise Exception(
+                "At least one grouping does not have enough unique combinations to proceed. Unique combinations per group:  str(df_bbbc021.groupby(class_heading)[compound_header].nunique())")
 
-    def check_no_overlap_between_tvt(self, k_folds_test, k_folds_validation,k_folds_train): 
+    def check_no_overlap_between_tvt(self, k_folds_test, k_folds_validation, k_folds_train):
         # TODO Ebba start here
         # Check that there's no overlap between the test, validation and train set for each fold
         # Add exception for validation set if only doing train and test
-        
-        #check test against train 
 
-        if self.make_unique_validation: 
+        #check test against train
+
+        if self.make_unique_validation:
             # CHeck validation set against train and test
 
     def make_leave_one_out_train_test(self):
@@ -173,7 +177,8 @@ class MakeTVTSets:
         print("Included and exlcuded groups")
 
         k_folds_test = self.get_leave_one_out_test(df)
-        df_test_statistics = self.get_statistics_leave_one_out_test(k_folds_test, df)
+        df_test_statistics = self.get_statistics_leave_one_out_test(
+            k_folds_test, df)
         df_test_statistics.to_csv(
             self.output_dir + "k_fold_test_statistics.csv", index=False)
         print("Test Statistics")
@@ -184,19 +189,20 @@ class MakeTVTSets:
 
         self.make_train_valid_statistics(k_folds_train, k_folds_validation, df)
 
-        self.save_k_folds(k_folds_test, k_folds_validation,k_folds_train)
+        self.save_k_folds(k_folds_test, k_folds_validation, k_folds_train)
         print("Finished. Find output in: " + self.output_dir)
 
     def get_base(self):
         df_base = pd.read_csv(self.labels_path, delimiter=",")
-        
+
         # Drop any lingering index columns, i.e. columns containing the string "Unnamed"
         columns_to_drop = [s for s in df_base.columns if "Unnamed" in s]
         drop_filter = df_base.filter(columns_to_drop)
         df_base.drop(drop_filter, inplace=True, axis=1)
 
         df_base.dropna(subset=[self.class_column_header], inplace=True)
-        df_base.drop_duplicates(subset = self.unique_sample_headers, inplace=True, ignore_index=True)
+        df_base.drop_duplicates(
+            subset=self.unique_sample_headers, inplace=True, ignore_index=True)
         return df_base
 
     def include_exclude_rows(self, df):
@@ -313,7 +319,7 @@ class MakeTVTSets:
                 df_fold = pd.concat(
                     [df_fold, df_group_coice], ignore_index=True)
             df_unused = pd.concat(
-                [df_unused, df_fold, df_fold]).drop_duplicates(subset = self.unique_sample_headers, keep=False, ignore_index=True)
+                [df_unused, df_fold, df_fold]).drop_duplicates(subset=self.unique_sample_headers, keep=False, ignore_index=True)
             k_folds[k_fold-1] = df_fold
 
         # deal with the unused unique groups
@@ -340,9 +346,9 @@ class MakeTVTSets:
                 k_folds[chosen_k_fold-1] = pd.concat(
                     [k_folds[chosen_k_fold-1], df_group_coice], ignore_index=True)
                 df_unused = pd.concat(
-                    [df_unused, df_group_coice, df_group_coice]).drop_duplicates(subset = self.intact_group_header, keep=False, ignore_index=True)
+                    [df_unused, df_group_coice, df_group_coice]).drop_duplicates(subset=self.intact_group_header, keep=False, ignore_index=True)
                 df_group = pd.concat(
-                    [df_group, df_group_coice, df_group_coice]).drop_duplicates(subset = self.intact_group_header, keep=False, ignore_index=True)
+                    [df_group, df_group_coice, df_group_coice]).drop_duplicates(subset=self.intact_group_header, keep=False, ignore_index=True)
             group_index = group_index + 1
 
         if not df_unused.empty:
@@ -394,7 +400,7 @@ class MakeTVTSets:
             df_unused = df.copy()
             df_fold_test = k_fold_test[k_fold-1]
             df_unused = pd.concat(
-                [df_unused, df_fold_test, df_fold_test]).drop_duplicates(subset = self.unique_sample_headers, keep=False , ignore_index=True)
+                [df_unused, df_fold_test, df_fold_test]).drop_duplicates(subset=self.unique_sample_headers, keep=False, ignore_index=True)
 
             df_fold_validation = pd.DataFrame()
             df_fold_train = pd.DataFrame()
@@ -417,9 +423,9 @@ class MakeTVTSets:
                         df_new_group_validation_copy = df[df[self.include_header].isin([
                                                                                        group])].copy()
                         df_available_validation = pd.concat(
-                            [df_available_validation, df_new_group_validation_copy], ignore_index=True).drop_duplicates(subset = self.unique_sample_headers, keep=False, ignore_index=True)
+                            [df_available_validation, df_new_group_validation_copy], ignore_index=True).drop_duplicates(subset=self.unique_sample_headers, keep=False, ignore_index=True)
                         df_available_group_validation = pd.concat(
-                            [df_new_group_validation_copy, df_group_coice_validation, df_group_coice_validation], ignore_index=True).drop_duplicates(subset = self.intact_group_header, keep=False, ignore_index=True)
+                            [df_new_group_validation_copy, df_group_coice_validation, df_group_coice_validation], ignore_index=True).drop_duplicates(subset=self.intact_group_header, keep=False, ignore_index=True)
 
                         number_of_added = group_n[group] - len(unique_entries)
                         add_to_validation = self.get_group_selection(
@@ -470,7 +476,7 @@ class MakeTVTSets:
         k_fold_train = [None]*number_of_folds
         k_fold_validation = [None]*number_of_folds
         group_n = {}
-        
+
         for k_fold in range(1, number_of_folds + 1):
             print("Starting k-fold: " + str(k_fold))
             df_unused = df.copy()
@@ -480,7 +486,7 @@ class MakeTVTSets:
 
             k_fold_validation[k_fold-1] = df_unused
             k_fold_train[k_fold-1] = df_unused
- 
+
         print("Made train and valid sets for k-folds")
 
         return k_fold_train, k_fold_validation
@@ -509,16 +515,17 @@ class MakeTVTSets:
             ).values
 
         return df_statistics
-    
+
     def get_statistics_leave_one_out_test(self, k_folds, df):
         number_of_folds = self.k_folds
         for k_fold in range(0, number_of_folds):
-            k_folds[k_fold]["k-fold"] = k_fold +1
+            k_folds[k_fold]["k-fold"] = k_fold + 1
 
         non_unique_divider_test = self.non_unique_divider.copy()
         non_unique_divider_test.append("k-fold")
         df_statistics = pd.concat(k_folds, ignore_index=True)
-        df_statistics = df_statistics.groupby(by = non_unique_divider_test).size().reset_index().rename(columns={0:'records'})
+        df_statistics = df_statistics.groupby(
+            by=non_unique_divider_test).size().reset_index().rename(columns={0: 'records'})
         return df_statistics
 
     def make_path_available(self):
