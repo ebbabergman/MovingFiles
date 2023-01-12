@@ -1,4 +1,5 @@
 import csv
+from heapq import merge
 import os
 from pickle import FALSE
 import shutil
@@ -155,14 +156,42 @@ class MakeTVTSets:
                 "At least one grouping does not have enough unique combinations to proceed. Unique combinations per group:  str(df_bbbc021.groupby(class_heading)[compound_header].nunique())")
 
     def check_no_overlap_between_tvt(self, k_folds_test, k_folds_validation, k_folds_train):
-        # TODO Ebba start here
-        # Check that there's no overlap between the test, validation and train set for each fold
-        # Add exception for validation set if only doing train and test
+        for fold in range(0, self.k_folds):
+            df_train = k_folds_train[fold]
+            df_test = k_folds_test [fold]
 
-        #check test against train
-
+            overlaps, df_overlap =  self.get_merge_overlap(df_train, df_test)
+            if overlaps:
+                raise Exception(
+                "Overlap between Test and Train set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
+      
         if self.make_unique_validation:
-            # CHeck validation set against train and test
+            df_validation = k_folds_validation[fold]
+            overlaps, df_overlap =  self.get_merge_overlap(df_validation, df_test)
+            if overlaps:
+                raise Exception(
+                "Overlap between Test and Validation set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
+      
+            overlaps, df_overlap =  self.get_merge_overlap(df_validation, df_train)
+            if overlaps:
+                raise Exception(
+                "Overlap between Train and Validation set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
+      
+        
+    def get_merge_overlap(self, df1, df2, merge_on = []):
+        if len(merge_on) == 0:
+            merge_on = self.divide_on_header
+
+        df3 = df2.merge(df1, on=merge_on, how='outer',indicator='present_in_both')
+        
+        df3['present_in_both'] = df3['present_in_both'].eq('both')
+        if df3['present_in_both'].any():
+            duplicates_unique_samples = df3[df3['present_in_both'] == True][self.unique_sample_headers]
+            df1_duplicate_mask = df1[self.unique_sample_headers].is_in(duplicates_unique_samples)
+            return True, df1[df1_duplicate_mask]
+        
+        return False, []
+     
 
     def make_leave_one_out_train_test(self):
         print("Started make leave one out train only, no validation.")
