@@ -116,11 +116,9 @@ class MakeTVTSets:
         df = self.include_exclude_rows(df_base)
         print("Included and exlcuded groups")
 
-        self.check_leave_one_out_validity(df_base)
+        self.check_leave_one_out_validity(df)
 
         k_folds_test = self.get_leave_one_out_test(df)
-
-        self.check_leave_one_out_validity(df)
 
         df_test_statistics = self.get_statistics_leave_one_out_test(
             k_folds_test, df)
@@ -445,15 +443,16 @@ class MakeTVTSets:
                     unique_entries = df_available_group_validation[self.intact_group_header].unique(
                     )
 
-                    if len(unique_entries) < group_n[group]:
+                    if  len(unique_entries) >= group_n[group]:
+                        df_group_coice_validation = self.get_group_selection(
+                        df_available_group_validation, group_n[group])
+                    else:          
+                        ## TODO if time it would probably be easier to have a column with "this has been sampled" rather than doing all this merging and dropping of dataframes 
+
                         df_group_coice_validation = df_available_group_validation.copy()
 
-                        df_new_group_validation_copy = df[df[self.include_header].isin([
-                                                                                       group])].copy()
-                        df_available_validation = pd.concat(
-                            [df_available_validation, df_new_group_validation_copy], ignore_index=True).drop_duplicates(subset=self.unique_sample_headers, keep=False, ignore_index=True)
-                        df_available_group_validation = pd.concat(
-                            [df_new_group_validation_copy, df_group_coice_validation, df_group_coice_validation], ignore_index=True).drop_duplicates(subset=self.intact_group_header, keep=False, ignore_index=True)
+                        df_available_group_validation = self.reset_group_validation(df, df_available_group_validation, group)
+                        df_available_validation = pd.concat(df_available_validation,df_available_group_validation )
 
                         number_of_added = group_n[group] - len(unique_entries)
                         add_to_validation = self.get_group_selection(
@@ -462,10 +461,7 @@ class MakeTVTSets:
                             [df_group_coice_validation, add_to_validation], ignore_index=True)
                         print(
                             "Reusing previous validation compounds for validation, for group: " + group)
-                    else:
-                        df_group_coice_validation = self.get_group_selection(
-                            df_available_group_validation, group_n[group])
-
+                      
                 df_fold_validation = pd.concat(
                     [df_fold_validation, df_group_coice_validation], ignore_index=True)
 
@@ -518,6 +514,14 @@ class MakeTVTSets:
         print("Made train and valid sets for k-folds")
 
         return k_fold_train, k_fold_validation
+
+    def reset_sample_space_df(self, df, df_already_sampled, group):
+        df_new_sample_space = df[df[self.include_header].isin([group])].copy()       
+        df_new_sample_space = pd.concat(
+            [df_new_sample_space, df_already_sampled, df_already_sampled], ignore_index=True).drop_duplicates(subset=self.intact_group_header, keep=False, ignore_index=True)
+
+        df_new_sample_space.drop_duplicates(subset=self.unique_sample_headers, keep=False, ignore_index=True)
+        return df_new_sample_space
 
     def get_group_selection(self, df_group, number_of_unique_entries):
         unique_entries = df_group[self.intact_group_header].unique()
