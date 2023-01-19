@@ -12,6 +12,7 @@ import math
 
 # Make K-folds, including their train and validation parts, with csv files as outpus
 
+
 class MakeTVTSets:
 
     def __init__(self,
@@ -151,45 +152,49 @@ class MakeTVTSets:
 
         if too_few_combinations_per_group.any():
             raise Exception(
-                "At least one grouping does not have enough unique combinations to proceed. The following do not hav enough unique combinations per group: " +  str(too_few_combinations_per_group
-))
+                "At least one grouping does not have enough unique combinations to proceed. The following do not hav enough unique combinations per group: " + str(too_few_combinations_per_group
+                                                                                                                                                                   ))
 
     def check_no_overlap_between_tvt(self, k_folds_test, k_folds_validation, k_folds_train):
         for fold in range(0, self.k_folds):
             df_train = k_folds_train[fold]
-            df_test = k_folds_test [fold]
+            df_test = k_folds_test[fold]
 
-            overlaps, df_overlap =  self.get_merge_overlap(df_train, df_test)
+            overlaps, df_overlap = self.get_merge_overlap(df_train, df_test)
             if overlaps:
                 raise Exception(
-                "Overlap between Test and Train set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
-      
+                    "Overlap between Test and Train set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
+
             if self.make_unique_validation:
                 df_validation = k_folds_validation[fold]
-                overlaps, df_overlap =  self.get_merge_overlap(df_validation, df_test)
+                overlaps, df_overlap = self.get_merge_overlap(
+                    df_validation, df_test)
                 if overlaps:
                     raise Exception(
-                    "Overlap between Test and Validation set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
-        
-                overlaps, df_overlap =  self.get_merge_overlap(df_validation, df_train)
+                        "Overlap between Test and Validation set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
+
+                overlaps, df_overlap = self.get_merge_overlap(
+                    df_validation, df_train)
                 if overlaps:
                     raise Exception(
-                    "Overlap between Train and Validation set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
-        
-    def get_merge_overlap(self, df1, df2, merge_on = []):
+                        "Overlap between Train and Validation set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
+
+    def get_merge_overlap(self, df1, df2, merge_on=[]):
         if len(merge_on) == 0:
             merge_on = self.divide_on_header
 
-        df3 = df2.merge(df1, on=merge_on, how='outer',indicator='present_in_both')
-        
+        df3 = df2.merge(df1, on=merge_on, how='outer',
+                        indicator='present_in_both')
+
         df3['present_in_both'] = df3['present_in_both'].eq('both')
         if df3['present_in_both'].any():
-            duplicates_unique_samples = df3[df3['present_in_both'] == True][self.unique_sample_headers]
-            df1_duplicate_mask = df1[self.unique_sample_headers].is_in(duplicates_unique_samples)
+            duplicates_unique_samples = df3[df3['present_in_both']
+                                            == True][self.unique_sample_headers]
+            df1_duplicate_mask = df1[self.unique_sample_headers].is_in(
+                duplicates_unique_samples)
             return True, df1[df1_duplicate_mask]
-        
+
         return False, []
-     
 
     def make_leave_one_out_train_test(self):
         print("Started make leave one out train only, no validation.")
@@ -443,16 +448,18 @@ class MakeTVTSets:
                     unique_entries = df_available_group_validation[self.intact_group_header].unique(
                     )
 
-                    if  len(unique_entries) >= group_n[group]:
+                    if len(unique_entries) >= group_n[group]:
                         df_group_coice_validation = self.get_group_selection(
-                        df_available_group_validation, group_n[group])
-                    else:          
-                        ## TODO if time it would probably be easier to have a column with "this has been sampled" rather than doing all this merging and dropping of dataframes 
+                            df_available_group_validation, group_n[group])
+                    else:
+                        ## TODO if time it would probably be easier to have a column with "this has been sampled" rather than doing all this merging and dropping of dataframes. Also do if we get errors here again
 
                         df_group_coice_validation = df_available_group_validation.copy()
 
-                        df_available_group_validation = self.reset_group_validation(df, df_available_group_validation, group)
-                        df_available_validation = pd.concat(df_available_validation,df_available_group_validation )
+                        df_available_group_validation = self.reset_group_validation(
+                            df, df_available_group_validation, group)
+                        df_available_validation = pd.concat(
+                            df_available_validation, df_available_group_validation)
 
                         number_of_added = group_n[group] - len(unique_entries)
                         add_to_validation = self.get_group_selection(
@@ -461,7 +468,7 @@ class MakeTVTSets:
                             [df_group_coice_validation, add_to_validation], ignore_index=True)
                         print(
                             "Reusing previous validation compounds for validation, for group: " + group)
-                      
+
                 df_fold_validation = pd.concat(
                     [df_fold_validation, df_group_coice_validation], ignore_index=True)
 
@@ -516,11 +523,12 @@ class MakeTVTSets:
         return k_fold_train, k_fold_validation
 
     def reset_sample_space_df(self, df, df_already_sampled, group):
-        df_new_sample_space = df[df[self.include_header].isin([group])].copy()       
+        df_new_sample_space = df[df[self.include_header].isin([group])].copy()
         df_new_sample_space = pd.concat(
             [df_new_sample_space, df_already_sampled, df_already_sampled], ignore_index=True).drop_duplicates(subset=self.intact_group_header, keep=False, ignore_index=True)
 
-        df_new_sample_space.drop_duplicates(subset=self.unique_sample_headers, keep=False, ignore_index=True)
+        df_new_sample_space.drop_duplicates(
+            subset=self.unique_sample_headers, keep=False, ignore_index=True)
         return df_new_sample_space
 
     def get_group_selection(self, df_group, number_of_unique_entries):
