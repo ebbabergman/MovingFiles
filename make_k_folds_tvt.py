@@ -116,11 +116,11 @@ class MakeTVTSets:
         df = self.include_exclude_rows(df_base)
         print("Included and exlcuded groups")
 
-        self.check_leave_one_out_validity(self, df_base)
+        self.check_leave_one_out_validity(df_base)
 
         k_folds_test = self.get_leave_one_out_test(df)
 
-        self.check_leave_one_out_validity(self, df)
+        self.check_leave_one_out_validity(df)
 
         df_test_statistics = self.get_statistics_leave_one_out_test(
             k_folds_test, df)
@@ -153,7 +153,8 @@ class MakeTVTSets:
 
         if too_few_combinations_per_group.any():
             raise Exception(
-                "At least one grouping does not have enough unique combinations to proceed. Unique combinations per group:  str(df_bbbc021.groupby(class_heading)[compound_header].nunique())")
+                "At least one grouping does not have enough unique combinations to proceed. The following do not hav enough unique combinations per group: " +  str(too_few_combinations_per_group
+))
 
     def check_no_overlap_between_tvt(self, k_folds_test, k_folds_validation, k_folds_train):
         for fold in range(0, self.k_folds):
@@ -165,18 +166,17 @@ class MakeTVTSets:
                 raise Exception(
                 "Overlap between Test and Train set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
       
-        if self.make_unique_validation:
-            df_validation = k_folds_validation[fold]
-            overlaps, df_overlap =  self.get_merge_overlap(df_validation, df_test)
-            if overlaps:
-                raise Exception(
-                "Overlap between Test and Validation set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
-      
-            overlaps, df_overlap =  self.get_merge_overlap(df_validation, df_train)
-            if overlaps:
-                raise Exception(
-                "Overlap between Train and Validation set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
-      
+            if self.make_unique_validation:
+                df_validation = k_folds_validation[fold]
+                overlaps, df_overlap =  self.get_merge_overlap(df_validation, df_test)
+                if overlaps:
+                    raise Exception(
+                    "Overlap between Test and Validation set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
+        
+                overlaps, df_overlap =  self.get_merge_overlap(df_validation, df_train)
+                if overlaps:
+                    raise Exception(
+                    "Overlap between Train and Validation set in fold:" + str(fold)+". Overlapping rows: " + print(df_overlap))
         
     def get_merge_overlap(self, df1, df2, merge_on = []):
         if len(merge_on) == 0:
