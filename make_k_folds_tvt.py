@@ -459,7 +459,7 @@ class MakeTVTSets:
                         df_available_group_validation = self.reset_sample_space_df(
                             df, df_available_group_validation, group)
                         df_available_validation = pd.concat(
-                            df_available_validation, df_available_group_validation)
+                            [df_available_validation, df_available_group_validation])
 
                         number_of_added = group_n[group] - len(unique_entries)
                         add_to_validation = self.get_group_selection(
@@ -524,6 +524,7 @@ class MakeTVTSets:
 
     def reset_sample_space_df(self, df, df_already_sampled, group):
         df_new_sample_space = df[df[self.include_header].isin([group])].copy()
+        # TODO Fix: If df_already_samplesd == [] then the below line makes the new sample space empty
         df_new_sample_space = pd.concat(
             [df_new_sample_space, df_already_sampled, df_already_sampled], ignore_index=True).drop_duplicates(subset=self.intact_group_header, keep=False, ignore_index=True)
 
