@@ -456,7 +456,7 @@ class MakeTVTSets:
 
                         df_group_coice_validation = df_available_group_validation.copy()
 
-                        df_available_group_validation = self.reset_group_validation(
+                        df_available_group_validation = self.reset_sample_space_df(
                             df, df_available_group_validation, group)
                         df_available_validation = pd.concat(
                             df_available_validation, df_available_group_validation)
