@@ -52,6 +52,8 @@ class MakeTVTSets:
         self.valid_fraction = valid_fraction
         self.non_unique_divider = non_unique_divider
         self.make_unique_validation = make_unique_validation
+        self.validation_used_counter_name = "UsedXTimesInValidation"
+        self.train_used_counter_name = "UsedXTimesInTraining"
 
     def make_k_folds(self):
         print("Started make k-folds.")
@@ -409,6 +411,8 @@ class MakeTVTSets:
               str(number_of_folds) + "folds")
         return k_folds
 
+
+# TODO remake this method to use df columsn instead. Imagine a sample bag (0) when samples are taken from that they're moved to sample bag (1) when taken from there moved to sample bag(2). We want to start with samples from the smallest numbered bag first, and not move them until we've gotten enough samples. So take them out of the bags randomly, and then put them in the next in line.
     def get_k_folds_tv(self, df, k_fold_test):
         number_of_folds = self.k_folds
         validation_fraction = self.valid_fraction * \
@@ -416,7 +420,91 @@ class MakeTVTSets:
         k_fold_train = [None]*number_of_folds
         k_fold_validation = [None]*number_of_folds
         group_n = {}
+
+        df_tv = df.copy()
+        df_tv[self.validation_used_counter_name] = 0
+        df_tv[self.train_used_counter_name] = 0
+
+        for group in self.included_groups:
+            df_group = df[df[self.include_header].isin([group])]
+            group_n[group] = math.floor(
+                df_group[self.divide_on_header].nunique()*validation_fraction)
+            if group_n[group] < 1:
+                group_n[group] = 1
+                print("A group did not have enough unique groupings to have 1 unique entry per validation fold. Using 1 unique entry anyway. Group:" + str(group))
+
+        for k_fold in range(1, number_of_folds + 1):
+            print("Starting k-fold: " + str(k_fold))
+            df_unused = df.copy()
+            df_fold_test = k_fold_test[k_fold-1]
+            df_unused = pd.concat(
+                [df_unused, df_fold_test, df_fold_test]).drop_duplicates(subset=self.unique_sample_headers, keep=False, ignore_index=True)
+
+            df_fold_validation = pd.DataFrame()
+            df_fold_train = pd.DataFrame()
+            for group in self.included_groups:
+                df_group = df_unused[df_unused[self.include_header].isin([
+                                                                         group])]
+
+                if k_fold == 1:
+                    df_group_coice_validation = self.get_group_selection(
+                        df_group, group_n[group])
+                else:
+                    df_available_group_validation = df_available_validation[df_available_validation[self.include_header].isin([
+                                                                                                                              group])]
+                    unique_entries = df_available_group_validation[self.intact_group_header].unique(
+                    )
+
+                    if len(unique_entries) >= group_n[group]:
+                        df_group_coice_validation = self.get_group_selection(
+                            df_available_group_validation, group_n[group])
+                    else:
+                        ## TODO if time it would probably be easier to have a column with "this has been sampled" rather than doing all this merging and dropping of dataframes. Also do if we get errors here again
+
+                        df_group_coice_validation = df_available_group_validation.copy()
+
+                        df_available_group_validation = self.reset_sample_space_df(
+                            df, df_available_group_validation, group)
+                        df_available_validation = pd.concat(
+                            [df_available_validation, df_available_group_validation])
+
+                        number_of_added = group_n[group] - len(unique_entries)
+                        add_to_validation = self.get_group_selection(
+                            df_available_group_validation, number_of_added)
+                        df_group_coice_validation = pd.concat(
+                            [df_group_coice_validation, add_to_validation], ignore_index=True)
+                        print(
+                            "Reusing previous validation compounds for validation, for group: " + group)
+
+                df_fold_validation = pd.concat(
+                    [df_fold_validation, df_group_coice_validation], ignore_index=True)
+
+            df_available_validation = pd.concat(
+                [df_available_validation, df_fold_validation, df_fold_validation], ignore_index=True).drop_duplicates(keep=False, ignore_index=True)
+            df_fold_train = pd.concat(
+                [df_unused, df_fold_validation, df_fold_validation], ignore_index=True).drop_duplicates(keep=False, ignore_index=True)
+            df_unused = pd.concat([df_unused, df_fold_validation, df_fold_train],
+                                  ignore_index=True).drop_duplicates(keep=False, ignore_index=True)
+            k_fold_validation[k_fold-1] = df_fold_validation
+            k_fold_train[k_fold-1] = df_fold_train
+            if not df_unused.empty:
+                print(
+                    "WARNING: Didn't put all available compound into train or valid k-folds! Left over:")
+                print(df_unused)
+
+        print("Made train and valid sets for k-folds")
+
+        return k_fold_train, k_fold_validation
+
+    def old_get_k_folds_tv(self, df, k_fold_test):
+        number_of_folds = self.k_folds
+        validation_fraction = self.valid_fraction * \
+            (number_of_folds-1)/number_of_folds
+        k_fold_train = [None]*number_of_folds
+        k_fold_validation = [None]*number_of_folds
+        group_n = {}
         df_available_validation = df.copy()
+        df_available_validation[self.used_counter_name] = 0
 
         for group in self.included_groups:
             df_group = df[df[self.include_header].isin([group])]
