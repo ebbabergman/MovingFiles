@@ -420,29 +420,46 @@ class MakeTVTSets:
 # So take them out of the bags randomly, and then put them in the next in line.
 
     def get_k_folds_tv(self, df, k_fold_test):
+
+        self.check_leave_one_out_validity(self, df)
+
         number_of_folds = self.k_folds
         validation_fraction = self.valid_fraction * \
             (number_of_folds-1)/number_of_folds
         k_fold_train = [None]*number_of_folds
         k_fold_validation = [None]*number_of_folds
-        group_n = {}
 
         df_tv = df.copy()
         df_tv[self.validation_used_counter_name] = 0
         df_tv[self.train_used_counter_name] = 0
+        df_tv["TestsetK_fold"] = 0  # note: will be the largest k-fold sample is a part of
 
-        for group in self.included_groups:
-            df_group = df[df[self.include_header].isin([group])]
-            group_n[group] = math.floor(
-                df_group[self.divide_on_header].nunique()*validation_fraction)
-            if group_n[group] < 1:
-                group_n[group] = 1
-                print("A group did not have enough unique groupings to have 1 unique entry per validation fold. Using 1 unique entry anyway. Group:" + str(group))
-
+        group_n = self.get_validation_samples_per_group(df_tv, validation_fraction)
+        
         for k_fold in range(1, number_of_folds + 1):
             print("Starting k-fold: " + str(k_fold))
-            df_unused = df.copy()
             df_fold_test = k_fold_test[k_fold-1]
+
+            # Match df_tv to df_fold_test and update df_tv["TestsetK_fold"]
+
+            # Make a mask and only use data not in test
+
+            # Find lowest sample bag, sample from that
+
+            # If we do not have enough samples, take all of the samples in the lowest bag
+                # Then sample from the next bag
+
+            # put samples in the next bag up
+
+            # put samples into validation for this fold
+
+            # put all others into the training set for this fold
+
+            # check that test + validation + training add up to all samples within group
+                # If not throw error
+            # Done for this iteration
+
+
             df_unused = pd.concat(
                 [df_unused, df_fold_test, df_fold_test]).drop_duplicates(subset=self.unique_sample_headers, keep=False, ignore_index=True)
 
@@ -501,6 +518,17 @@ class MakeTVTSets:
         print("Made train and valid sets for k-folds")
 
         return k_fold_train, k_fold_validation
+
+    def get_validation_samples_per_group(self, df, validation_fraction): # TODO rename
+        group_n = {}
+        for group in self.included_groups:
+            df_group = df[df[self.include_header].isin([group])]
+            group_n[group] = math.floor(
+                df_group[self.divide_on_header].nunique()*validation_fraction)
+            if group_n[group] < 1:
+                group_n[group] = 1
+                print("A group did not have enough unique groupings to have 1 unique entry per validation fold. Using 1 unique entry anyway. Group:" + str(group))
+        return group_n
 
     def old_get_k_folds_tv(self, df, k_fold_test):
         number_of_folds = self.k_folds
