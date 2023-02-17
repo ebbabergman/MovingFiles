@@ -412,7 +412,13 @@ class MakeTVTSets:
         return k_folds
 
 
-# TODO remake this method to use df columsn instead. Imagine a sample bag (0) when samples are taken from that they're moved to sample bag (1) when taken from there moved to sample bag(2). We want to start with samples from the smallest numbered bag first, and not move them until we've gotten enough samples. So take them out of the bags randomly, and then put them in the next in line.
+# TODO remake this method to use df columsn instead. 
+# Imagine a sample bag (0) when samples are taken from that they're moved to sample bag (1) 
+# when taken from there moved to sample bag(2). 
+# We want to start with samples from the smallest numbered bag first, 
+# and not move them until we've gotten enough samples. 
+# So take them out of the bags randomly, and then put them in the next in line.
+
     def get_k_folds_tv(self, df, k_fold_test):
         number_of_folds = self.k_folds
         validation_fraction = self.valid_fraction * \
