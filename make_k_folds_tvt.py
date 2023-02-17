@@ -517,6 +517,7 @@ class MakeTVTSets:
 
         print("Made train and valid sets for k-folds")
 
+        # Save df to bug check/get statistics later
         return k_fold_train, k_fold_validation
 
     def get_validation_samples_per_group(self, df, validation_fraction): # TODO rename
